@@ -134,6 +134,15 @@ European Union. It is not covered by this repository's licence; its source,
 hash and reuse terms are recorded in
 [docs/methodology/sources/README.md](docs/methodology/sources/README.md).
 
+## Onboarding documents (#16)
+
+README.md and CONTRIBUTING.md follow the structure of CCR-K-SFTs at
+`dc293037111816ec1c9768a4aa890919892ebcef` (blobs
+`8ba0920ca04a2e61efc644d71461ba22043a2189` and
+`0698f3aa1e77e4f05628adc1adfd5146a009ccf2`), under its MPL-2.0 notice
+(Copyright 2026 Daniele Penza and contributors). Their content, workflow and
+links were written for this repository.
+
 ## Regression scaffold (#10)
 
 Adapted from CCR-K-SFTs under its MPL-2.0 notice (Copyright 2026 Daniele Penza
