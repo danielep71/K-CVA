@@ -967,6 +967,23 @@ class DependencyTest(unittest.TestCase):
         findings = run_check(check_vba_dependencies.check, hidden)
         self.assertTrue(any("m_inputs is behind the facade" in item for item in findings), findings)
 
+    def test_examples_do_not_use_model_classes(self) -> None:
+        example = example_module("Public Sub Run()\n        Dim Result As New CCalculationResult\n"
+                                 "        Result.Amount = 10\nEnd Sub\n")
+        files = {EXAMPLE_PATH: example, "src/classes/CCalculationResult.cls": CLASS}
+        findings = run_check(check_vba_dependencies.check, files)
+        self.assertTrue(any("CCalculationResult is behind the facade" in item for item in findings),
+                        findings)
+        lower = {**files, EXAMPLE_PATH: example.replace("New CCalculationResult",
+                                                        "New ccalculationresult")}
+        findings = run_check(check_vba_dependencies.check, lower)
+        self.assertTrue(any("ccalculationresult is behind the facade" in item for item in findings),
+                        findings)
+        counted = {EXAMPLE_PATH: example_module("Public Sub Run()\n        Debug.Print Count\n"
+                                                "End Sub\n"),
+                   "src/classes/CCalculationResult.cls": CLASS}
+        self.assertEqual(run_check(check_vba_dependencies.check, counted), [])
+
     def test_counts_only_restricted_homes(self) -> None:
         with repository(VALID) as root:
             _, components = check_vba_dependencies.check(root)

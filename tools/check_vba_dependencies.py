@@ -66,8 +66,10 @@ ALLOWED_OBJECTS = frozenset({"scripting.dictionary"})
 UPPER_HOMES = ("src/modules/", "src/workbook/", "src/forms/", "tests/modules/", EXAMPLES)
 UPWARD_ANY_CASE = re.compile(r"(?<![\w.])((?:CVA|TEST)_\w+)", re.I)
 UPWARD = re.compile(r"(?<![\w.])(M_\w+|Example[A-Z]\w*|sh[A-Z]\w*|frm[A-Z]\w*)")
-# Components that examples may not name: everything but the facade.
-HIDDEN_HOMES = (CORE, "src/workbook/", "src/forms/", "tests/modules/")
+# Components that examples may not name: everything but the facade. Model
+# classes match only by their tracked names: a C prefix pattern would also
+# match ordinary identifiers such as Count.
+HIDDEN_HOMES = (CORE, CLASSES, "src/workbook/", "src/forms/", "tests/modules/")
 HIDDEN_ANY_CASE = re.compile(r"(?<![\w.])((?:CORE|TEST)_\w+)", re.I)
 HIDDEN = re.compile(r"(?<![\w.])(M_\w+|sh[A-Z]\w*|frm[A-Z]\w*)")
 # The statements after Then and Else of a single-line If, as in
