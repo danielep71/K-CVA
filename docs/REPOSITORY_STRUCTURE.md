@@ -21,7 +21,7 @@ not evidence of implemented or validated functionality.
 | --- | --- | --- |
 | `.github/` | Workflow configuration, issue forms and canonical labels | Present, including Repository integrity CI, Dependabot version updates (#6) and PR template (#7). Required-check enforcement configured under #12; controlled enforcement demonstration remains #13. |
 | `docs/` | Governance, architecture, decisions and API inventory | Present. |
-| `docs/methodology/` | Dated source register, approach decisions and fixture contract | Guide present; methodology pending #8. |
+| `docs/methodology/` | Dated source register, approach decisions and fixture contract | Methodology skeleton, source register with a copy of the controlling text, and test-case contract (#8); no formula transcribed. |
 | `docs/contracts/` | Versioned public input/output contracts | Reserved until the first real contract. |
 | `src/` | Production source and source placement guide | Guide only. |
 | `src/core/` | VBA calculations and pure validation | Reserved. |
@@ -29,7 +29,7 @@ not evidence of implemented or validated functionality.
 | `src/classes/` | Host-independent record/model classes if required | Reserved. |
 | `src/workbook/`, `src/forms/` | Excel adapters, document modules and optional forms | Reserved. |
 | `tests/` | Verification guide, harness, synthetic fixtures and expected values | Guide only; scaffold pending #10. |
-| `tests/fixtures/`, `tests/expected/` | Inputs and independently justified expected results | Reserved. |
+| `tests/fixtures/`, `tests/expected/` | Inputs and independently justified expected results | One illustrative format example ([TEST_CASES.md](methodology/TEST_CASES.md)); no regulatory case. |
 | `tests/derivations/` | Independent Python reference calculations | Reserved. |
 | `tests/evidence/` | Deliberately retained, reviewed evidence tied to a source commit | Reserved; evidence contract pending #11. |
 | `tools/` | Repository checks, build and evidence tooling | Issue-policy checker and tests, [check_repository.py](../tools/check_repository.py), [actionlint-lock.json](../tools/actionlint-lock.json) and the static VBA checks (`check_vba_*.py`, `vba_lexer.py`) present; see [CI.md](CI.md). |

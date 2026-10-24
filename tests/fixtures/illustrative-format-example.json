@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "kind": "cva-fixture",
+  "id": "illustrative-format-example",
+  "synthetic": true,
+  "description": "Shows the fixture format with one counterparty and one netting set; holds no regulatory value",
+  "category": "nominal",
+  "approach": "ba_cva_reduced",
+  "calculation_currency_code": "EUR",
+  "valuation_date": "2026-01-02",
+  "counterparties": [
+    {"id": "CP1", "inputs": {"illustrative_sector_code": "SECTOR-A"}}
+  ],
+  "netting_sets": [
+    {
+      "id": "NS1",
+      "counterparty_id": "CP1",
+      "inputs": {"currency_code": "EUR", "exposure_value_amount": 1000000}
+    }
+  ],
+  "hedges": []
+}
