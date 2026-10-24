@@ -32,8 +32,8 @@ not evidence of implemented or validated functionality.
 | `tests/fixtures/`, `tests/expected/` | Inputs and independently justified expected results | Reserved. |
 | `tests/derivations/` | Independent Python reference calculations | Reserved. |
 | `tests/evidence/` | Deliberately retained, reviewed evidence tied to a source commit | Reserved; evidence contract pending #11. |
-| `tools/` | Repository checks, build and evidence tooling | Issue-policy checker and tests, [check_repository.py](../tools/check_repository.py) and [actionlint-lock.json](../tools/actionlint-lock.json) present; see [CI.md](CI.md). |
-| `examples/` | Synthetic examples using supported API only | Reserved. |
+| `tools/` | Repository checks, build and evidence tooling | Issue-policy checker and tests, [check_repository.py](../tools/check_repository.py), [actionlint-lock.json](../tools/actionlint-lock.json) and the static VBA checks (`check_vba_*.py`, `vba_lexer.py`) present; see [CI.md](CI.md). |
+| `examples/modules/` | Synthetic VBA examples using supported API only | Reserved. |
 | `test-results/` | Disposable run output | Ignored by .gitignore. Do not commit disposable run output. |
 
 Create reserved directories with their first useful file, not empty placeholders.
@@ -60,7 +60,8 @@ classes. Classes must not call the facade or host, avoiding dependency cycles.
   from methodology rather than mechanically translating VBA.
 - Repository tooling is not a second calculation implementation.
 
-These boundaries are review rules now; automated checks follow in #9.
+The `vba-dependencies` check enforces these boundaries by name and review
+covers what it cannot resolve ([VBA static checks](CI.md#vba-static-checks)).
 Host policy and conventions are in [INSTALLATION.md](../INSTALLATION.md) and
 [VBA_HOUSE_STYLE.md](VBA_HOUSE_STYLE.md); host validation remains pending #11.
 
@@ -83,7 +84,7 @@ Kinds: Function, Sub, Property Get, Property Let, Property Set, Const, Enum or
 Type. Normalize signature whitespace to single spaces. Blank lines and ordinary
 # comments are ignored; # SIG lines are signature records. Public class members
 follow the same inventory convention when classes become supported API.
-Inventory verification is pending #9.
+The `vba-public-api` check verifies the inventory against src/modules/.
 
 A supported API change needs an issue, updated contract and inventory, tests and
 a changelog entry once a changelog exists. There are no supported entry points

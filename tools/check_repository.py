@@ -90,6 +90,8 @@ def main():
         run('label-sync', ['node', '.github/scripts/labels-sync.mjs', '--self-test'])
         run('label-drift', ['node', '.github/scripts/labels-drift.mjs', '--self-test'])
         run('label-evidence', ['node', '--test', '.github/scripts/test-labels-drift.mjs'])
+        for gate in ('source', 'conditionals', 'jumps', 'public_api', 'dependencies'):
+            run('vba-' + gate.replace('_', '-'), [sys.executable, f'tools/check_vba_{gate}.py'])
         for path in tracked:
             if path.endswith('.mjs'):
                 run('syntax-' + Path(path).stem, ['node', '--check', path])
