@@ -1,0 +1,43 @@
+# MKT-K-CVA editing policy; Git normalization is owned by .gitattributes.
+# Adapted from CCR-K-SFTs; see NOTICE.md.
+root = true
+
+[*]
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+[*.{bas,cls,frm}]
+# ASCII only, without BOM; do not force an editor-specific ANSI encoding.
+end_of_line = crlf
+
+[*.{py,pyw,sh,md,txt,toml,csv,tsv}]
+charset = utf-8
+
+[*.{json,jsonc,yml,yaml,xml,js,mjs,cjs}]
+charset = utf-8
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false
+
+[*.{bat,cmd,ps1,psm1,psd1,vbs,reg,ini}]
+end_of_line = crlf
+
+[{.editorconfig,.gitattributes,.gitignore,LICENSE}]
+charset = utf-8
+
+# Reserved source-copy area: preserve future registered publisher bytes.
+[docs/methodology/sources/**]
+charset = unset
+end_of_line = unset
+insert_final_newline = unset
+trim_trailing_whitespace = false
+
+[docs/methodology/sources/README.md]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = false
