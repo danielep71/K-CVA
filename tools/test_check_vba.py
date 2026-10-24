@@ -907,6 +907,20 @@ End Function
 Private Sub Helper(ByVal Value As Long)
 End Sub
 ''')),
+    "members-named-like-statements": (CORE_PATH, core_module('''Private Type Quote
+    Name As String
+    Close As Double
+    Lock As Boolean
+    Range(1 To 2) As Double
+    [Open] As Double
+End Type
+
+Private Enum Field
+    Reset = 1
+    Load = 2
+    Dir = 3
+End Enum
+''')),
     "tests-and-facade-are-not-restricted": ("tests/modules/TEST_Fixture.bas", module('''
 Public Sub RunAll()
         Debug.Print Application.Name, CORE_Validation.IsPositive(1)
@@ -1061,7 +1075,18 @@ End Sub
     "file-system-object": (CORE_PATH, in_procedure("        Dim Fso As Scripting.FileSystemObject"),
                            "Scripting.FileSystemObject is an external object model"),
     "new-file-system-object": (CLASS_PATH, class_module("Private mFso As New FileSystemObject\n"),
-                               "As FileSystemObject is a file-system type"),
+                               "FileSystemObject is a file-system type"),
+    "standalone-new-file-system-object": (CORE_PATH, in_procedure(
+        "        Dim Fso As Object\n        Set Fso = New FileSystemObject\n"
+        '        Fso.CreateTextFile "output.txt"'), "FileSystemObject is a file-system type"),
+    "excel-type-in-a-type-member": (CORE_PATH, core_module("Private Type Holder\n"
+                                                           "    Target As Worksheet\nEnd Type\n"),
+                                    "As Worksheet is an Excel or UI type"),
+    "statement-after-a-type-block": (CORE_PATH, core_module("Private Type Holder\n"
+                                                            "    Value As Double\nEnd Type\n\n"
+                                                            "Public Sub Work()\n        Close\n"
+                                                            "End Sub\n"),
+                                     "file, registry or process access"),
     "database-object-model": (CORE_PATH, in_procedure("        Dim Connection As ADODB.Connection"),
                               "ADODB.Connection is an external object model"),
     "example-behind-facade-in-lower-case": (EXAMPLE_PATH, example_module("Public Sub Run()\n"

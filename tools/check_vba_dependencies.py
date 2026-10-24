@@ -69,8 +69,10 @@ DECLARE = re.compile(r"^(?:(?:Public|Private|Global)\s+)?Declare\b", re.I)
 EXTERNAL = re.compile(r"(?<![\w.])(Scripting\.(?!Dictionary\b)\w+|(?:ADODB|DAO|MSXML2|WinHttp|"
                       r"WScript|IWshRuntimeLibrary|Shell32|MSHTML|Outlook|Word|PowerPoint|Access|"
                       r"Office)\.\w+)", re.I)
-EXTERNAL_TYPE = re.compile(r"\bAs\s+(?:New\s+)?(FileSystemObject|TextStream|Drive|Folder|File)\b",
-                           re.I)
+# Scripting Runtime file-system types, declared or created with a standalone
+# New, as in Set Fso = New FileSystemObject.
+EXTERNAL_TYPE = re.compile(r"\b(?:As\s+(?:New\s+)?|New\s+)(FileSystemObject|TextStream|Drive|"
+                           r"Folder|File)\b", re.I)
 # A numeric line label, an explicit Call, and the VBA library qualifiers that
 # reach a built-in under another name, as in Call VBA.FileSystem.Kill(Path).
 LINE_LABEL = re.compile(r"^\s*\d+(?=\s|$)\s*")
@@ -106,6 +108,12 @@ MODULE_VARIABLE = re.compile(r"^(?:Dim|Private|Public|Global|Static)\s+(?!(?:Con
                              r"Type|Sub|Function|Property|Event)\b)(?:WithEvents\s+)?[A-Za-z_]",
                              re.I)
 STATIC = re.compile(r"^Static\s+[A-Za-z_]", re.I)
+# The members of a Type or Enum block are names, not statements: Close As
+# Double is a field and Reset = 1 a member, also in brackets as [Close]. Only
+# what follows the name is checked.
+BLOCK_OPEN = re.compile(r"^(?:(?:Public|Private)\s+)?(?:Type|Enum)\s+[A-Za-z_]", re.I)
+BLOCK_CLOSE = re.compile(r"^End\s+(?:Type|Enum)\b", re.I)
+MEMBER_NAME = re.compile(r"^(?:[A-Za-z_]\w*|\[[^\]]*\])")
 
 
 def names(components: Sequence[str]) -> re.Pattern[str] | None:
@@ -165,7 +173,7 @@ def host_independent(path: str, line: int, code: str, raw: str,
         add(f"{match.group(1)} is an external object model; core and classes are "
             "host-independent")
     for match in EXTERNAL_TYPE.finditer(code):
-        add(f"As {match.group(1)} is a file-system type; core and classes do no I/O")
+        add(f"{match.group(1)} is a file-system type; core and classes do no I/O")
     for match in DYNAMIC.finditer(code):
         add(f"{match.group(1)}: a dynamic call that no check can resolve")
     for match in object_calls(raw):
@@ -206,7 +214,16 @@ def analyze(path: str, text: str, upper: re.Pattern[str] | None = None,
     """Findings for one component; ``upper`` and ``hidden`` match the tracked
     components that core and classes, or examples, may not name."""
     findings: list[Finding] = []
+    member = False
     for line, code, raw in statements(text):
+        # A procedure header also ends a block, so that a missing End Type
+        # cannot hide the statements after it.
+        if BLOCK_CLOSE.match(code) or is_procedure(code):
+            member = False
+        elif member:
+            code, raw = MEMBER_NAME.sub("", code), MEMBER_NAME.sub("", raw)
+        elif BLOCK_OPEN.match(code):
+            member = True
         if path.startswith(INDEPENDENT):
             findings.extend(host_independent(path, line, code, raw, upper))
         elif path.startswith(EXAMPLES):
