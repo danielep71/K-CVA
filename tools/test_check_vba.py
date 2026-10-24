@@ -844,6 +844,21 @@ End Property
         Debug.Print CVA_Functions.CVA_IsPositive(1)
 End Sub
 ''')),
+    "object-calls-in-strings-are-text": (CORE_PATH, core_module('''Public Sub Work()
+        Debug.Print "GetObject(", "CreateObject(""Excel.Application"")"
+End Sub
+''')),
+    "lower-case-member-prefix-is-an-identifier": (CLASS_PATH, class_module('''Private m_Total As Double
+
+
+Public Sub Add(ByVal Amount As Double)
+        m_Total = m_Total + Amount
+End Sub
+''')),
+    "single-line-if-without-io": (CORE_PATH, core_module('''Public Sub Work(ByVal Flag As Boolean)
+        If Flag Then Debug.Print "Kill" Else Debug.Print "Open"
+End Sub
+''')),
     "tests-and-facade-are-not-restricted": ("tests/modules/TEST_Fixture.bas", module('''
 Public Sub RunAll()
         Debug.Print Application.Name, CORE_Validation.IsPositive(1)
@@ -906,6 +921,20 @@ DEPENDENCY_INVALID = {
     "inactive-branch-is-read": (CORE_PATH, in_procedure("#If VBA7 Then\n        Debug.Print 1\n#Else\n"
                                                         "        MsgBox \"legacy\"\n#End If"),
                                 "MsgBox reaches the Excel host"),
+    "core-calls-facade-in-lower-case": (CORE_PATH, in_procedure("        Debug.Print cva_functions.Calculate(1)"),
+                                        "cva_functions names a facade, host, test or example component"),
+    "single-line-if-kill": (CORE_PATH, in_procedure('        If Flag Then Kill "f.txt"'),
+                            "file, registry or process access"),
+    "single-line-else-kill": (CORE_PATH, in_procedure('        If Flag Then Debug.Print 1 Else Kill "f.txt"'),
+                              "file, registry or process access"),
+    "nested-single-line-if": (CORE_PATH, in_procedure('        If A Then If B Then Open "f" For Input As #1'),
+                              "file, registry or process access"),
+    "block-else-on-same-line": (CORE_PATH, in_procedure('        If A Then\n        Else Kill "f.txt"\n        End If'),
+                                "file, registry or process access"),
+    "example-behind-facade-in-lower-case": (EXAMPLE_PATH, example_module("Public Sub Run()\n"
+                                                                         "        Debug.Print core_validation.IsPositive(1)\n"
+                                                                         "End Sub\n"),
+                                            "core_validation is behind the facade"),
     "example-behind-facade": (EXAMPLE_PATH, example_module("Public Sub Run()\n"
                                                            "        Debug.Print CORE_Validation.IsPositive(1)\n"
                                                            "End Sub\n"),
@@ -925,6 +954,18 @@ class DependencyTest(unittest.TestCase):
             with self.subTest(name=name):
                 findings = run_check(check_vba_dependencies.check, {path: source})
                 self.assertTrue(any(text in item for item in findings), findings)
+
+    def test_tracked_component_names_match_in_any_case(self) -> None:
+        adapter = 'Attribute VB_Name = "M_Run"\nOption Explicit\nPublic Sub Start()\nEnd Sub\n'
+        files = {CLASS_PATH: class_module("Public Sub Go()\n        m_run.Start\nEnd Sub\n"),
+                 "src/workbook/M_Run.bas": adapter}
+        findings = run_check(check_vba_dependencies.check, files)
+        self.assertTrue(any("m_run names a facade" in item for item in findings), findings)
+        workbook_module = files["src/workbook/M_Run.bas"].replace("M_Run", "M_Inputs")
+        hidden = {EXAMPLE_PATH: example_module("Public Sub Run()\n        m_inputs.Load\nEnd Sub\n"),
+                  "src/workbook/M_Inputs.bas": workbook_module}
+        findings = run_check(check_vba_dependencies.check, hidden)
+        self.assertTrue(any("m_inputs is behind the facade" in item for item in findings), findings)
 
     def test_counts_only_restricted_homes(self) -> None:
         with repository(VALID) as root:

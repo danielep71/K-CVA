@@ -96,7 +96,12 @@ every branch at once, so a host call in an inactive branch is still rejected.
 - formulas in the facade or adapters; `vba-dependencies` matches names, not
   calls, so a host object reached through a variable passed in, a qualified
   member such as `Item.Range` or a shadowed name is not resolved, and a
-  constant that happens to start with a component prefix is reported;
+  constant that happens to start with a component prefix is reported.
+  Tracked component names and the `CVA_`, `CORE_` and `TEST_` prefixes match
+  in any case, as VBA resolves them; `M_`, `sh`, `frm` and `Example` names of
+  components not yet tracked match only as the house style writes them,
+  since `m_Total` is an ordinary identifier. Single-line `If ... Then ...
+  Else ...` branches are read as statements;
 - calls: whether a called procedure exists, is visible and gets the right
   arguments. Compiling in Excel checks direct calls.
 - **Dynamic calls** outside `src/core/` and `src/classes/`: no check resolves
