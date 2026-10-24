@@ -38,16 +38,19 @@ Do not weaken organization macro or endpoint policy to run a workbook.
 
 ## Automation boundary
 
-| Current workflow | Permissions and behavior |
+| Automation | Permissions and behavior |
 | --- | --- |
 | Label synchronization | PR validation reads contents. Reconciliation on relevant main pushes or manual dispatch has contents:read and issues:write. Review the selected ref before dispatching a write-capable run. |
 | Label drift | PR fixtures read contents; live checks read contents/issues. No label mutation. |
 | Issue triage | Reads contents, issues and pull requests; reports metadata violations without editing issues. |
+| Repository integrity | Reads contents; runs unfiltered PR/push checks for main and release/**, plus manual dispatch. Uploads diagnostic evidence retained for 30 days. No source or issue mutation; see [CI coverage](docs/CI.md). |
+| Dependabot version updates | Weekly GitHub Actions dependency-update PRs targeting release/0.1.0, assigned to the maintainer. No automatic approval or merge; maintainer final-head review is required. |
 
 The workflow files pin actions to full SHAs and disable persisted checkout
 credentials. No traffic token or traffic workflow is established by this issue.
-Traffic collection belongs to #14. Universal repository CI belongs to #6;
-required-check enforcement to #12. A green metadata check is not a security scan.
+Traffic collection belongs to #14. Universal repository CI was delivered by #6
+through PR #30 and integrated into main by PR #32; required-check enforcement
+remains #12 work. A green metadata check is not a security scan.
 
 ## Feature status and limitations
 
@@ -65,11 +68,11 @@ was changed during this verification.
 | Automatic dependency submission | Disabled. |
 | Malware alerts | Disabled. |
 | Dependabot security updates / grouped security updates | Both disabled. |
-| Dependabot version updates | Settings offers creation of dependabot.yml; configuration is pending #6. |
+| Dependabot version updates | Configured in [.github/dependabot.yml](.github/dependabot.yml) by #6 and integrated into main by PR #32. Weekly GitHub Actions updates target release/0.1.0; PR #34 demonstrates operation. This is distinct from the disabled security-update features above. |
 | Code scanning | Overview explicitly shows disabled and states that Advanced Security is only available for organizations. Unavailable in this repository's current configuration. |
 | Secret scanning / repository push protection | Neither control is offered in Advanced Security settings. They are unavailable in the current personal-private configuration under the documented eligibility below; no scan or push-blocking coverage is claimed. |
 | GitHub private vulnerability reporting | No control or advisory reporting entry is offered. GitHub documents this feature for public repositories; it is unavailable while this repository remains private. Use the confirmed email route above. |
-| Security policy discovery | Overview shows disabled because SECURITY.md is on release/0.1.0 and has not yet been integrated into main. Recheck discovery after main integration. |
+| Security policy discovery | [SECURITY.md is on main](https://github.com/danielep71/MKT-K-CVA/blob/main/SECURITY.md), integrated by PR #28. The issue chooser security link targets main following #7/PR #32. The private email reporting route remains unchanged. |
 
 Eligibility references checked on the same date:
 [secret scanning](https://docs.github.com/en/code-security/how-tos/secure-your-secrets/detect-secret-leaks/enable-secret-scanning),
@@ -88,8 +91,8 @@ visibility. Manual review and the data/credential rules above remain necessary.
 
 Existing [issue #12](https://github.com/danielep71/MKT-K-CVA/issues/12) evidence
 also records required full-SHA action pinning and default workflow-token read
-permissions. Dependency-update configuration remains #6 work. These settings
-and metadata checks do not constitute code or secret scanning.
+permissions. Dependency-update configuration was completed by #6. These settings
+and repository integrity checks do not constitute code or secret scanning.
 
 Repository automation and human review do not certify the security of Excel,
 operating systems, dependencies or future calculation code.

@@ -19,7 +19,7 @@ not evidence of implemented or validated functionality.
 
 | Location | Responsibility | Current status |
 | --- | --- | --- |
-| `.github/` | Workflow configuration, issue forms and canonical labels | Present; universal CI and PR template pending #6/#7. |
+| `.github/` | Workflow configuration, issue forms and canonical labels | Present, including Repository integrity CI, Dependabot version updates (#6) and PR template (#7). Required-check enforcement remains #12. |
 | `docs/` | Governance, architecture, decisions and API inventory | Present. |
 | `docs/methodology/` | Dated source register, approach decisions and fixture contract | Guide present; methodology pending #8. |
 | `docs/contracts/` | Versioned public input/output contracts | Reserved until the first real contract. |
@@ -32,7 +32,7 @@ not evidence of implemented or validated functionality.
 | `tests/fixtures/`, `tests/expected/` | Inputs and independently justified expected results | Reserved. |
 | `tests/derivations/` | Independent Python reference calculations | Reserved. |
 | `tests/evidence/` | Deliberately retained, reviewed evidence tied to a source commit | Reserved; evidence contract pending #11. |
-| `tools/` | Repository checks, build and evidence tooling | Issue-policy checker and tests present. |
+| `tools/` | Repository checks, build and evidence tooling | Issue-policy checker and tests, [check_repository.py](../tools/check_repository.py) and [actionlint-lock.json](../tools/actionlint-lock.json) present; see [CI.md](CI.md). |
 | `examples/` | Synthetic examples using supported API only | Reserved. |
 | `test-results/` | Disposable run output | Ignored by .gitignore. Do not commit disposable run output. |
 
@@ -40,7 +40,7 @@ Create reserved directories with their first useful file, not empty placeholders
 Existing checker unit tests stay beside the checker in tools; numerical and
 host verification belong in tests. Keep generated workbooks out of source
 control unless a reviewed source template has an explicit path exception under
-#5. Exported source is authoritative; workbook changes must be exported and
+the [Git hygiene policy](../INSTALLATION.md#git-hygiene-verification) established by #5. Exported source is authoritative; workbook changes must be exported and
 reviewed. Form resources, when used, stay beside their form definitions.
 
 ## Dependencies
