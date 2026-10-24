@@ -30,3 +30,6 @@ text, applicability dates and initial approach remain decisions for issue #8.
 Task branches start from `release/0.1.0`; task PRs target that branch.
 Milestones belong to issues only. See [LICENSE](LICENSE), [licensing and provenance](NOTICE.md) and
 [private security reporting](SECURITY.md).
+
+Portable infrastructure validation: `python tools/check_repository.py`.
+See [CI and dependency updates](docs/CI.md) for prerequisites, coverage and evidence.

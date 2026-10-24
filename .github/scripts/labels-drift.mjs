@@ -1,10 +1,9 @@
 #!/usr/bin/env node
 
 import assert from "node:assert/strict";
+import { planChanges } from "./labels-sync.mjs";
 import { execFile } from "node:child_process";
-import { appendFile, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { appendFile, mkdir, readFile, writeFile } from "node:fs/promises";
 import process from "node:process";
 import { promisify } from "node:util";
 
@@ -224,48 +223,11 @@ function localPlan(desiredLabels, liveLabels, { prune = true } = {}) {
   ));
 }
 
-function canonicalRows(stdout) {
-  const countMatch = stdout.match(/- Planned changes: \*\*(\d+)\*\*/);
-  if (!countMatch) throw new Error("Canonical plan summary has no planned-change count");
-  const rows = [];
-  for (const line of stdout.split("\n")) {
-    const match = line.match(/^\| (update|create|delete) \| `([^`]*)` \| ([^|]*) \|$/);
-    if (match) {
-      rows.push({ action: match[1], name: match[2], detail: match[3].trim() });
-    }
-  }
-  return { count: Number(countMatch[1]), rows };
-}
-
-function localRows(changes) {
-  return changes.map(change => ({
-    action: change.action,
-    name: change.name,
-    detail: change.action === "update"
-      ? change.fields.join(", ")
-      : change.action === "delete"
-        ? "outside selected manifest"
-        : "missing live label"
-  }));
-}
-
 async function verifyAgainstCanonicalPlan(manifestPath, policyPath, liveLabels, changes) {
-  const directory = await mkdtemp(join(tmpdir(), "label-drift-"));
-  const livePath = join(directory, "live.json");
-  try {
-    await writeFile(livePath, `${JSON.stringify(liveLabels, null, 2)}\n`, "utf8");
-    const stdout = await runReconciler([
-      "--manifest", manifestPath,
-      "--policy", policyPath,
-      "--mode", "plan",
-      "--live", livePath
-    ]);
-    const canonical = canonicalRows(stdout);
-    assert.equal(canonical.count, changes.length, "canonical/local difference counts disagree");
-    assert.deepEqual(canonical.rows, localRows(changes), "canonical/local change plans disagree");
-  } finally {
-    await rm(directory, { recursive: true, force: true });
-  }
+  // Compare structured data; Markdown escaping is presentation, not a wire format.
+  const { manifest, desiredLabels } = await prepareContract(manifestPath, policyPath);
+  const canonical = planChanges(desiredLabels, liveLabels, { prune: manifest.prune });
+  assert.deepEqual(canonical, changes, "canonical/local change plans disagree");
 }
 
 function changeEvidence(change, observedByName) {
