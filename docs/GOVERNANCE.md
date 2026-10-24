@@ -61,8 +61,7 @@ finding and resolve applicable conversations. Older reviews do not cover a new
 head. Do not claim Codex coverage when it was skipped.
 
 Bot-authored PRs require maintainer final-head review; do not change authorship
-to obtain a review. Codex review availability in this repository is not yet
-verified. If required review is unavailable, keep the PR open and record the
+to obtain a review. Codex review was observed on the final heads of PRs #21 and #24. If required review is unavailable, keep the PR open and record the
 blocker rather than treating absent review as success.
 
 A sync PR with a verified empty file diff needs only applicable CI, with that
@@ -93,9 +92,9 @@ evidence recorded in [#12](https://github.com/danielep71/MKT-K-CVA/issues/12):
 | Enforcement demonstration | Pending controlled failing/passing PR exercise #13. Configured controls alone do not prove enforcement. |
 | General settings | Projects off; update-branch suggestion and automatic head-branch deletion on. Repository supports merge, squash and rebase, restricted by the branch rules above. |
 | Actions | Full-SHA action pinning required; default token reads contents/packages; workflow PR creation/approval off. |
-| Security | Dependency graph and Dependabot alerts enabled. Licensing, provenance and security policy pending #4; dependency-update configuration pending #6. |
+| Security | Dependency graph and Dependabot alerts enabled. MPL-2.0 and security/provenance policies recorded in #4; dependency-update configuration pending #6. |
 | Label automation and forms | Installed by #1. Label validation/drift fixtures are path-filtered; live reconciliation is on main. Issue triage is read-only. PR template pending #7. |
-| Codex review | Availability not yet verified here; SFTs review results are not evidence for this repository. |
+| Codex review | Observed completed on PRs #21 and #24; coverage must still be verified per final head. |
 
 Until the universal check exists, record applicable checks and explicit gaps in
 each PR. Absence of a check is not a passing check. Update this dated snapshot
@@ -132,8 +131,9 @@ Versioning and release preparation belong to #17; tags and releases require an
 explicit maintainer decision.
 
 Do not commit credentials or confidential client data. Security reporting,
-licensing and the provenance register are decisions for #4; no SFTs license,
-security feature or technical stack is implicitly adopted.
+licensing and provenance are documented in [SECURITY.md](../SECURITY.md) and
+[NOTICE.md](../NOTICE.md). The maintainer selected MPL-2.0 in #4; security
+features are recorded with their verification limits.
 
 This policy was written for MKT-K-CVA using the process in
 [CCR-K-SFTs governance](https://github.com/danielep71/CCR-K-SFTs/blob/c13e1167e779ab1816db9d8c81e140abddbf6c66/docs/GOVERNANCE.md)

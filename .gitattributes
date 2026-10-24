@@ -1,0 +1,74 @@
+# MKT-K-CVA Git policy. Adapted from CCR-K-SFTs; see NOTICE.md.
+# Normalize text to LF in the index; export VBA as CRLF on checkout.
+# ASCII-only VBA needs no working-tree-encoding conversion.
+[attr]vba-source text eol=crlf diff=vba linguist-language=VBA
+[attr]opaque binary merge=binary
+* text=auto eol=lf
+*.bas vba-source
+*.cls vba-source
+*.frm vba-source
+*.frx opaque
+
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+*.psm1 text eol=crlf
+*.psd1 text eol=crlf
+*.vbs text eol=crlf
+*.reg text eol=crlf
+*.ini text eol=crlf
+
+*.md text eol=lf
+*.txt text eol=lf
+*.py text eol=lf
+*.sh text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.json text eol=lf
+*.mjs text eol=lf
+*.xml text eol=lf
+*.csv text eol=lf
+*.tsv text eol=lf
+*.toml text eol=lf
+.editorconfig text eol=lf
+.gitattributes text eol=lf
+.gitignore text eol=lf
+LICENSE text eol=lf
+
+*.xls opaque
+*.xlsx opaque
+*.xlsm opaque
+*.xlsb opaque
+*.xlt opaque
+*.xltx opaque
+*.xltm opaque
+*.xla opaque
+*.xlam opaque
+*.xll opaque
+*.doc opaque
+*.docx opaque
+*.docm opaque
+*.ppt opaque
+*.pptx opaque
+*.pptm opaque
+*.pdf opaque
+*.zip opaque
+*.7z opaque
+*.gz opaque
+*.exe opaque
+*.dll opaque
+*.png opaque
+*.jpg opaque
+*.jpeg opaque
+*.gif opaque
+*.ico opaque
+*.woff opaque
+*.woff2 opaque
+*.svg text eol=lf
+
+# Future publisher copies preserve bytes; guide remains ordinary text.
+docs/methodology/sources/** -text
+docs/methodology/sources/README.md text eol=lf
+
+# No export-ignore: source archives retain repository controls.
+# Archives still contain Git's LF blobs; use a clone for VBE import.
