@@ -143,6 +143,28 @@ README.md and CONTRIBUTING.md follow the structure of CCR-K-SFTs at
 (Copyright 2026 Daniele Penza and contributors). Their content, workflow and
 links were written for this repository.
 
+## Versioning and closeout (#17)
+
+Adapted from K-SFTs (formerly CCR-K-SFTs) under its MPL-2.0 notice (Copyright
+2026 Daniele Penza and contributors), read on branch `release/0.1.0` at
+commit `a0a817a6d3c25b4c0d3fe62a0a070456a98854c5` on 2026-10-24:
+
+| Local file | Source blob | Local changes |
+| --- | --- | --- |
+| `CHANGELOG.md` | `80a6a838285804d622b1d5f8d405b6b3450fe995` | Maintenance policy and date and version rules kept; the gate named for `check_repository.py`; the `[Unreleased]` entries written for this repository's issues and evidence. |
+| `RELEASING.md` | `8154a397342615d64b7f258b220668adb908d8ad` | This repository's links, check command and rulesets; the Excel-run invariant points to the harness log and the evidence contract of #11, since no run checker exists here; no candidate meets it before #11. |
+| `tools/check_changelog.py` | `d632fc72af119d39e65b04047296172cf20d19b5` | Provenance line; a level-2 heading that looks like a version but is not `## [Unreleased]` or `## [X.Y.Z] - YYYY-MM-DD`, such as one without brackets, is rejected instead of ignored. |
+| `tools/test_check_changelog.py` | `ae2de147b6a5c311a8ddd6d53fce280c6029d2dc` | A test for malformed version headings. |
+
+K-SFTs adapted the structure of its changelog, release procedure and
+changelog check from K-SACCR at `00bb72d1bf5ec9252b8ca5ba3adc567d948be15d`
+and wrote the tests itself; preserve that attribution. The release-preparation
+choices (`VERSION` only from the first prepared release, a gate linking it to
+the changelog, and for 0.1.0 an annotated tag and release notes with no asset)
+follow K-SFTs' maintainer decisions and were confirmed for this repository by
+the maintainer on 2026-10-24 in #17 (PR #82).
+`docs/CLOSEOUT.md` was written for this repository.
+
 ## Regression scaffold (#10)
 
 Adapted from CCR-K-SFTs under its MPL-2.0 notice (Copyright 2026 Daniele Penza

@@ -20,7 +20,10 @@ Linux, Windows and macOS on x64/ARM64. This is not Excel host certification.
 The command checks issue configuration, all Python tooling tests, canonical
 label self-tests, drift self-tests and CLI evidence regressions, the format of
 the numerical [test-case files](methodology/TEST_CASES.md#checking) (gate
-`test-cases`), the static [VBA checks](#vba-static-checks), Python/Node/JSON syntax, relative Markdown links, action SHA pins, checkout credential settings,
+`test-cases`), the [changelog and `VERSION`](../CHANGELOG.md#date-and-version-rules)
+(gate `changelog`: headings, dates, order, link references, and no `VERSION`
+before a dated release, then equal to the newest; nothing is tagged or
+published), the static [VBA checks](#vba-static-checks), Python/Node/JSON syntax, relative Markdown links, action SHA pins, checkout credential settings,
 workflow syntax/expressions with actionlint, and whitespace in all committed
 content plus local staged/unstaged changes. The committed check compares HEAD
 with Git's empty tree, so it works in clean and shallow CI checkouts without
@@ -132,9 +135,9 @@ here: the `CVA_` facade prefix and `examples/modules/` home; every
 those listed in REPOSITORY_STRUCTURE.md; a `GoTo`, `GoSub` or `Resume`
 after a dot read as a member call, not a jump; fixtures without SFT names. The
 dependency check and its fixtures are written for this repository. Not
-adopted: SFTs' test-case format checker, which depends on its methodology
-(#8 defines this repository's fixture contract), and its separate quality
-tools (Ruff, mypy).
+adopted: its separate quality tools (Ruff, mypy). The test-case format
+checker (#10) and the changelog check (#17) were adopted later; see
+[NOTICE.md](../NOTICE.md).
 
 ## Dependency updates
 
