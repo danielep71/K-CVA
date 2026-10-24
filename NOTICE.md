@@ -104,12 +104,15 @@ host-test claim was imported.
 ## Repository CI (#6)
 
 The integrity runner, workflow, checksum lock and drift CLI regression tests
-were written locally. The imported label reconciler now has an import-safe CLI
-guard; drift comparison uses its structured plan instead of parsing Markdown.
-The original source attribution above remains applicable.
+were written locally, as were the integrity runner's whitespace tests in
+tools/test_check_repository.py (#37). The imported label reconciler now has an
+import-safe CLI guard; drift comparison uses its structured plan instead of
+parsing Markdown. The original source attribution above remains applicable.
 
 Actionlint 1.7.12 is downloaded from the official rhysd/actionlint release;
 platform archive SHA-256 digests are recorded in tools/actionlint-lock.json
 from GitHub release metadata checked on 2026-10-24. It retains its upstream
-MIT license; no binary or source is vendored. Existing action pins are retained;
-actions/setup-node is pinned to the v6 commit resolved on the same date.
+MIT license; no binary or source is vendored. Existing action pins are retained.
+actions/setup-node was first pinned to a v6 commit resolved on the same date;
+PR #34 updated every use to the v7.1.0 commit
+`949feb2413d6458794dcd2491c4babbbce0c15c1`.
