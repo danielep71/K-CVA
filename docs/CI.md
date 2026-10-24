@@ -9,7 +9,9 @@ python tools/check_repository.py
 This is the local and CI entry point. It exits nonzero on any failed check.
 Python uses only the standard library; Node uses only built-in modules. No pip
 or npm packages are required. The declared versions are the CI baseline; local
-versions are recorded in evidence. The first run downloads actionlint 1.7.12
+versions are recorded in evidence. Issue triage uses the same pinned Python
+version; all label fixture, detection and reconciliation jobs explicitly set up
+the same pinned Node version. The first run downloads actionlint 1.7.12
 from its official release and verifies the platform archive against
 [the checksum lock](../tools/actionlint-lock.json). Later runs reverify the cached
 archive and extract only the named executable. Supported tooling platforms are
@@ -18,7 +20,11 @@ Linux, Windows and macOS on x64/ARM64. This is not Excel host certification.
 The command checks issue configuration, all Python tooling tests, canonical
 label self-tests, drift self-tests and CLI evidence regressions, Python/Node/JSON
 syntax, relative Markdown links, action SHA pins, checkout credential settings,
-workflow syntax/expressions with actionlint, and working-tree whitespace.
+workflow syntax/expressions with actionlint, and whitespace in all committed
+content plus local staged/unstaged changes. The committed check compares HEAD
+with Git's empty tree, so it works in clean and shallow CI checkouts without
+fetching parent history. Untracked files must be staged to enter local checks.
+Git's whitespace rules and binary-file handling apply.
 Actionlint's optional ShellCheck and Pyflakes integrations are explicitly off
 so local and hosted validation have the same declared dependencies. No VBA
 compiler, CVA engine, numerical certification or live issue audit is implied.

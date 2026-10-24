@@ -47,6 +47,17 @@ def actionlint():
     return str(executable)
 
 
+def whitespace_commands():
+    """Check all committed content, then local changes, without needing history."""
+    empty_tree = subprocess.check_output(
+        ['git', 'hash-object', '-t', 'tree', '--stdin'], input=b''
+    ).decode().strip()
+    return [
+        ('whitespace-committed', ['git', 'diff', '--check', empty_tree, 'HEAD']),
+        ('whitespace-local', ['git', 'diff', '--check', 'HEAD']),
+    ]
+
+
 def main():
     os.chdir(ROOT)
     OUT.mkdir(parents=True, exist_ok=True)
@@ -103,7 +114,8 @@ def main():
         validator = actionlint()
         run('actionlint-version', [validator, '-version'])
         run('workflow-validation', [validator, '-shellcheck=', '-pyflakes=', *workflows])
-        run('whitespace', ['git', 'diff', '--check', 'HEAD'])
+        for name, command in whitespace_commands():
+            run(name, command)
     except Exception as error:
         report['checks'].append({'name': 'repository-validation', 'exit_code': 1, 'error': str(error)})
         print(str(error), file=sys.stderr)

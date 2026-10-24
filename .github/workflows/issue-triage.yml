@@ -43,7 +43,7 @@ jobs:
       contents: read
       issues: read
       # Without it the issues API omits pull requests, and a dependency
-      # section naming one is reported as a missing issue (#32).
+      # section naming one is reported as a missing issue.
       pull-requests: read
     env:
       PYTHONUTF8: "1"
@@ -58,7 +58,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
-          python-version: "3.13"
+          python-version: "3.12.14"
 
       - name: Audit open issues
         env:
