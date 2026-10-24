@@ -10,7 +10,7 @@ Contributors and automation act within the maintainer's authorization and retain
 truthful authorship. Bot authorship does not permit bypassing review or rules.
 
 The milestone **v0.1.0 - Repo setup** covers repository infrastructure.
-Architecture and CVA scope are decided in [#3](https://github.com/danielep71/MKT-K-CVA/issues/3);
+Architecture and the initial CVA product scope were established in [#3](https://github.com/danielep71/MKT-K-CVA/issues/3);
 production calculations, numerical certification and production workbook packaging
 are outside this milestone. Keep the repository private.
 
@@ -66,15 +66,15 @@ blocker rather than treating absent review as success.
 
 A sync PR with a verified empty file diff needs only applicable CI, with that
 evidence recorded in the PR. A sync PR changing files needs normal final-head
-review. Once #6 and #12 enable it, `Repository integrity` must pass on the sync
-head as on other protected-branch PRs.
+review. `Repository integrity`, installed by #6, must pass on the sync head
+as on other protected-branch PRs. Ruleset enforcement remains pending #12.
 
 ## Protection policy and verified controls
 
 Intended policy for main and release/**: require PRs, resolved conversations,
 zero mandatory approvals, no deletion, no force pushes and no bypass.
 Require the exact `Repository integrity` check and up-to-date branches after
-#6 supplies an unfiltered workflow and #12 configures enforcement. Path-filtered
+#12 configures enforcement. The unfiltered workflow was delivered by #6. Path-filtered
 label workflows must not serve as the universal required check.
 
 Snapshot verified on **2026-10-24** through GitHub API reads and the settings
@@ -88,17 +88,20 @@ evidence recorded in [#12](https://github.com/danielep71/MKT-K-CVA/issues/12):
 | Release deletion ruleset 25781993 | Active for release/**; deletion blocked, no bypass. |
 | Tag ruleset 25781957 | Active for v*; updates, deletion and force pushes blocked, no bypass. |
 | Traffic ruleset 25782014 | Active for traffic-history; deletion and force pushes blocked; regular automation updates allowed, no PR requirement or bypass. Branch and workflow pending #14. |
-| Required check and strict up-to-date rule | **Pending #6 and #12**. Neither main nor release currently requires status checks. Preserve the release-branch creation exception when configuring the check. |
+| Required check and strict up-to-date rule | **Enforcement pending #12**. Repository integrity exists and has passed hosted runs; neither main nor release currently requires status checks. Preserve the release-branch creation exception when configuring the check. |
 | Enforcement demonstration | Pending controlled failing/passing PR exercise #13. Configured controls alone do not prove enforcement. |
 | General settings | Projects off; update-branch suggestion and automatic head-branch deletion on. Repository supports merge, squash and rebase, restricted by the branch rules above. |
 | Actions | Full-SHA action pinning required; default token reads contents/packages; workflow PR creation/approval off. |
-| Security | Dependency graph and Dependabot alerts enabled. MPL-2.0 and security/provenance policies recorded in #4; dependency-update configuration pending #6. |
-| Label automation and forms | Installed by #1. Label validation/drift fixtures are path-filtered; live reconciliation is on main. Issue triage is read-only. PR template pending #7. |
+| Security | Dependency graph and Dependabot alerts enabled. MPL-2.0 and security/provenance policies recorded in #4; weekly GitHub Actions version updates configured by #6 in [.github/dependabot.yml](../.github/dependabot.yml), targeting release/0.1.0; updates require review. |
+| Label automation and forms | Installed by #1. Label validation/drift fixtures are path-filtered; live reconciliation is on main. Issue triage is read-only. [PR template](../.github/pull_request_template.md) installed by #7 and integrated into main by PR #32. |
 | Codex review | Observed completed on PRs #21 and #24; coverage must still be verified per final head. |
 
-Until the universal check exists, record applicable checks and explicit gaps in
-each PR. Absence of a check is not a passing check. Update this dated snapshot
+The universal check is documented in [CI.md](CI.md) and was integrated into
+main by [PR #32](https://github.com/danielep71/MKT-K-CVA/pull/32).
+Record applicable checks and explicit gaps in each PR. Absence of a check is not a passing check. Update this dated snapshot
 when a control changes; do not describe desired controls as configured.
+Before closing a setup issue, reconcile affected status tables, decision records
+and dependent issue progress with its delivered evidence and remaining work.
 
 ## Issues, dependencies and closure
 
