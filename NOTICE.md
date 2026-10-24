@@ -95,6 +95,7 @@ and contributors). Immutable source blobs read on 2026-10-24:
 | `.gitignore` | `b2e5e7a8bb04b0c3ccfdb0b2ae5fdf0c1a027365` | Reduced to local scope; preserved source/evidence, no workbook exception, retained archive controls. |
 | `docs/VBA_HOUSE_STYLE.md` | `70fedf63cc19c4c55466d02bf918bb4f9e63745c` | Rewritten for CVA; local issue links, untested host status, explicit outcome/cleanup and import/export contracts. |
 | `INSTALLATION.md` | `07467f7d20bea9e7fe025875fb87ca0c92335974` | Rewritten for CVA; local issue links, untested host status, explicit outcome/cleanup and import/export contracts. |
+
 Source repository: https://github.com/danielep71/CCR-K-SFTs . Its upstream
 conventions trace to K-SACCR revision `00bb72d1bf5ec9252b8ca5ba3adc567d948be15d`
 as recorded in the original provenance notice. No SFT formula, workbook or

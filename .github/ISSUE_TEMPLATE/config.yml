@@ -1,8 +1,11 @@
 blank_issues_enabled: false
 contact_links:
-  - name: "Governance and issue rules"
+  - name: "Issue labels and triage"
     url: "https://github.com/danielep71/MKT-K-CVA/blob/main/docs/ISSUE_LABELS.md"
     about: "Priorities, milestones, dependency status and how issues are closed."
+  - name: "Governance and review"
+    url: "https://github.com/danielep71/MKT-K-CVA/blob/main/docs/GOVERNANCE.md"
+    about: "Branch rules, reviews, integration and repository ownership."
   - name: "Report a security vulnerability privately"
     url: "https://github.com/danielep71/MKT-K-CVA/blob/main/SECURITY.md"
     about: "Do not open an issue. Use the private email route in SECURITY.md."
