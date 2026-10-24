@@ -3,3 +3,6 @@ contact_links:
   - name: "Governance and issue rules"
     url: "https://github.com/danielep71/MKT-K-CVA/blob/main/docs/ISSUE_LABELS.md"
     about: "Priorities, milestones, dependency status and how issues are closed."
+  - name: "Report a security vulnerability privately"
+    url: "https://github.com/danielep71/MKT-K-CVA/blob/release/0.1.0/SECURITY.md"
+    about: "Do not open an issue. Use the private email route in SECURITY.md."
