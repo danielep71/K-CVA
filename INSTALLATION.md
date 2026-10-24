@@ -3,7 +3,7 @@
 **Setup only:** no VBA components, template or workbook exist yet.
 The procedures below define the convention for future components; they have
 not been executed in Excel. The first real host run belongs to #11.
-Complete onboarding and CI commands follow in #16/#6.
+Complete onboarding follows in #16; portable CI is documented in [docs/CI.md](docs/CI.md).
 
 ## Host policy
 
@@ -86,13 +86,12 @@ Do not hand-edit binary .frx files. Git normalizes source line endings on add.
 Run the checks that exist:
 
 ```sh
-python tools/check_issues.py --check-config
-python -m unittest discover -s tools -p 'test_check_issues.py'
-git diff --check
+python tools/check_repository.py
 ```
 
-These checks validate issue policy and whitespace, not VBA compilation or CVA
-correctness. Universal checks and static VBA enforcement are pending #6/#9.
+These checks validate repository infrastructure, not VBA compilation or CVA
+correctness. See [CI coverage and prerequisites](docs/CI.md). Static VBA enforcement
+is pending #9 and required-check enforcement remains #12.
 
 ## Git hygiene verification
 
