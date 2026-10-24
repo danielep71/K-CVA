@@ -90,6 +90,7 @@ def main():
         run('label-sync', ['node', '.github/scripts/labels-sync.mjs', '--self-test'])
         run('label-drift', ['node', '.github/scripts/labels-drift.mjs', '--self-test'])
         run('label-evidence', ['node', '--test', '.github/scripts/test-labels-drift.mjs'])
+        run('test-cases', [sys.executable, 'tools/check_test_cases.py'])
         for gate in ('source', 'conditionals', 'jumps', 'public_api', 'dependencies'):
             run('vba-' + gate.replace('_', '-'), [sys.executable, f'tools/check_vba_{gate}.py'])
         for path in tracked:
