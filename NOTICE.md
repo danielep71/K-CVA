@@ -116,3 +116,25 @@ MIT license; no binary or source is vendored. Existing action pins are retained.
 actions/setup-node was first pinned to a v6 commit resolved on the same date;
 PR #34 updated every use to the v7.1.0 commit
 `949feb2413d6458794dcd2491c4babbbce0c15c1`.
+
+## VBA static checks (#9)
+
+Adapted from CCR-K-SFTs under its MPL-2.0 notice (Copyright 2026 Daniele Penza
+and contributors), read at commit `dc293037111816ec1c9768a4aa890919892ebcef`
+on 2026-10-24:
+
+| Local file | Source blob | Local changes |
+| --- | --- | --- |
+| `tools/vba_lexer.py` | `f7c765bed0e937ff9eb9b457d957d1f7ecde0f2a` | Documentation pointers. |
+| `tools/check_vba_source.py` | `ca9be39e521d6a62ff87a450bb4c202773d78fae` | `CVA_` facade prefix; every `Option Base` rejected; documentation pointers. |
+| `tools/check_vba_conditionals.py` | `2e150008b51f162b0707907e403c310b70efaa53` | Documentation pointers. |
+| `tools/check_vba_jumps.py` | `07974e1f78b9269014c876b2c9b04c8cbe4fbd2f` | Documentation pointers. |
+| `tools/check_vba_public_api.py` | `8637f6190c3dcbf5459ba48761081783c36f9e94` | Public variables and public `Declare` rejected in standard modules; documentation pointers. |
+| `tools/test_check_vba.py` | `8a6f9f3e9131f4295a836d72f4a696739e3c6dc7` | Fixtures renamed without SFT names; fixtures for the changed rules and for the dependency check. |
+
+CCR-K-SFTs adapted its checks from K-SACCR at
+`00bb72d1bf5ec9252b8ca5ba3adc567d948be15d`, which took the jump,
+conditional-compilation and public-API checks from EXCEL-VBA-PROJECT-TEMPLATE
+at `b903fe44ef6a032c4689870b83745afa1c22490d`; preserve that attribution.
+`tools/check_vba_dependencies.py` and its fixtures were written locally. No
+SFT formula, module name, fixture value or regulatory decision is imported.

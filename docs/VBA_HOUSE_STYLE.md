@@ -1,8 +1,10 @@
 # VBA house style
 
 These conventions apply to the first and subsequent VBA components.
-No VBA implementation exists yet. Mechanical enforcement is planned in #9;
-runtime verification and failure-path evidence belong to #10/#11.
+No VBA implementation exists yet. The mechanical rules are checked
+statically by the [VBA static checks](CI.md#vba-static-checks), which also
+list what they cannot see; runtime verification and failure-path evidence
+belong to #10/#11.
 [Architecture](REPOSITORY_STRUCTURE.md) owns placement and dependency direction;
 [installation](../INSTALLATION.md) owns import/export and host status.
 
@@ -120,7 +122,7 @@ Form .frx files are binary and stay beside their .frm.
 
 Git stores normalized LF text; .gitattributes checks VBA out with CRLF.
 Preserve VBE-generated VERSION/BEGIN/END and Attribute metadata. EditorConfig
-does not enforce ASCII; review it now, with automated enforcement planned in #9.
+does not enforce ASCII; the `vba-source` check does.
 
 Use four spaces per indentation level, no tabs or trailing whitespace.
 Keep procedure declarations, End statements and labels at their natural outer
