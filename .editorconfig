@@ -1,4 +1,4 @@
-# MKT-K-CVA editing policy; Git normalization is owned by .gitattributes.
+# K-CVA editing policy; Git normalization is owned by .gitattributes.
 # Adapted from CCR-K-SFTs; see NOTICE.md.
 root = true
 

@@ -1,5 +1,5 @@
 name: "🐛 Bug report"
-description: "Report reproducible incorrect behavior in MKT-K-CVA source, tooling or documentation."
+description: "Report reproducible incorrect behavior in K-CVA source, tooling or documentation."
 title: "[Bug]: "
 labels: ["bug", "P2"]
 assignees: ["danielep71"]

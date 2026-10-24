@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to MKT-K-CVA are recorded here, from the user's point of
+All notable changes to K-CVA are recorded here, from the user's point of
 view. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). It is not a commit
@@ -111,4 +111,4 @@ CVA calculation, public API or workbook.
   than an illustrative format example. Methodology decisions M4 and M6 are
   open, and M5 and M7 in part ([docs/DECISIONS.md](docs/DECISIONS.md)).
 
-[Unreleased]: https://github.com/danielep71/MKT-K-CVA/commits/main
+[Unreleased]: https://github.com/danielep71/K-CVA/commits/main
