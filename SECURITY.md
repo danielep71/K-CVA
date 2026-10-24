@@ -51,18 +51,45 @@ required-check enforcement to #12. A green metadata check is not a security scan
 
 ## Feature status and limitations
 
-Snapshot: **2026-10-24**. Private visibility was read back through the repository
-API. Settings evidence recorded in
-[issue #12](https://github.com/danielep71/MKT-K-CVA/issues/12)
-verified dependency graph and Dependabot alerts enabled, full-SHA pinning
-required and default workflow-token read permissions.
+Snapshot: **2026-10-24**, verified in this repository's signed-in
+[Advanced Security settings](https://github.com/danielep71/MKT-K-CVA/settings/security_analysis)
+and [security overview](https://github.com/danielep71/MKT-K-CVA/security).
+The repository API confirmed private visibility, personal ownership and main as
+the default branch. No visibility, ownership, subscription or security setting
+was changed during this verification.
 
-Dependabot update configuration is pending #6. Code scanning, secret scanning,
-push protection and GitHub private vulnerability reporting have **not been
-verified as enabled for this repository**. The connector did not expose their
-security_and_analysis status; absence of that field is not proof of availability
-or absence. Do not claim these features are active or copy SFTs availability
-claims. Use the confirmed email route regardless.
+| Feature | Observed status and limitation |
+| --- | --- |
+| Dependency graph | Enabled. |
+| Dependabot alerts | Enabled. |
+| Automatic dependency submission | Disabled. |
+| Malware alerts | Disabled. |
+| Dependabot security updates / grouped security updates | Both disabled. |
+| Dependabot version updates | Settings offers creation of dependabot.yml; configuration is pending #6. |
+| Code scanning | Overview explicitly shows disabled and states that Advanced Security is only available for organizations. Unavailable in this repository's current configuration. |
+| Secret scanning / repository push protection | Neither control is offered in Advanced Security settings. They are unavailable in the current personal-private configuration under the documented eligibility below; no scan or push-blocking coverage is claimed. |
+| GitHub private vulnerability reporting | No control or advisory reporting entry is offered. GitHub documents this feature for public repositories; it is unavailable while this repository remains private. Use the confirmed email route above. |
+| Security policy discovery | Overview shows disabled because SECURITY.md is on release/0.1.0 and has not yet been integrated into main. Recheck discovery after main integration. |
+
+Eligibility references checked on the same date:
+[secret scanning](https://docs.github.com/en/code-security/how-tos/secure-your-secrets/detect-secret-leaks/enable-secret-scanning),
+[push protection](https://docs.github.com/en/code-security/concepts/secret-security/push-protection),
+and [private vulnerability reporting](https://docs.github.com/code-security/how-tos/report-and-fix-vulnerabilities/configure-vulnerability-reporting/configure-for-a-repository).
+Secret scanning eligibility includes organization-owned private repositories
+with Secret Protection and specified enterprise-managed user repositories;
+this repository exposes neither configuration. Repository push protection
+requires Secret Protection. User-level push protection for public repositories
+does not establish coverage for this private repository.
+
+The missing controls and documented eligibility together establish the current
+availability limitation; an omitted API security_and_analysis field alone does
+not. Reassess after any ownership, plan or visibility change. Retain private
+visibility. Manual review and the data/credential rules above remain necessary.
+
+Existing [issue #12](https://github.com/danielep71/MKT-K-CVA/issues/12) evidence
+also records required full-SHA action pinning and default workflow-token read
+permissions. Dependency-update configuration remains #6 work. These settings
+and metadata checks do not constitute code or secret scanning.
 
 Repository automation and human review do not certify the security of Excel,
 operating systems, dependencies or future calculation code.
