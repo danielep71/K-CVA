@@ -165,6 +165,20 @@ follow K-SFTs' maintainer decisions and were confirmed for this repository by
 the maintainer on 2026-10-24 in #17 (PR #82).
 `docs/CLOSEOUT.md` was written for this repository.
 
+## Excel-run evidence (#11)
+
+Adapted from K-SFTs (formerly CCR-K-SFTs) under its MPL-2.0 notice (Copyright
+2026 Daniele Penza and contributors), read on branch `release/0.1.0` at
+commit `acc00327847d00bf20f17562cc29c05821047a74` on 2026-10-24:
+
+| Local file | Source blob | Local changes |
+| --- | --- | --- |
+| `tools/check_excel_run.py` | `a3f9054950e9e83e02c71bbbc06a0873577ad24b` | CVA instead of SFT in the docstring and report; provenance line. |
+| `tools/test_check_excel_run.py` | `3ed0ca1108fca47b0af8b8e28d2cbdb45a13ff77` | This suite's assertion count (27); provenance line. |
+| `SaveExampleEvidence` and `SaveRun` in `tests/modules/TEST_Examples.bas` | `7194156875c3a7b9dc58667fa84ab3e611bbc603` | None; the module header describes them. |
+| The `build` field and four comments of `tests/modules/TEST_Harness.bas` | `c0fe2af6d7de3eba6b13917bec60f4ceeb664fcd` | None. |
+| The *Recording an Excel run* section of `INSTALLATION.md` | `4c872d701fca26a2caba6bf8e2b0726b1804c201` | This repository's links and issue; the folder stays outside Git because its exported modules would be second copies of the components. |
+
 ## Regression scaffold (#10)
 
 Adapted from CCR-K-SFTs under its MPL-2.0 notice (Copyright 2026 Daniele Penza

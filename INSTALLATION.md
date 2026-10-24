@@ -21,9 +21,11 @@ entries before compilation. Any new reference needs a reviewed dependency
 decision. Python is tooling/reference testing only and is never called by the
 workbook. Follow organizational macro policy; do not weaken security settings.
 
+<a id="tested-environments"></a>
+
 | Tested environment | Commit | Evidence |
 | --- | --- | --- |
-| None yet | Not applicable | Host smoke validation pending #11 |
+| None yet | Not applicable | Pending the first [recorded Excel run](#recording-an-excel-run) (#11) |
 
 ## Obtain an exact source revision
 
@@ -73,7 +75,8 @@ Where evidence goes:
 | --- | --- |
 | Repository checks: one log per check and a JSON report with the checkout commit, tracked-file hashes and tool versions | `test-results/integrity/` (ignored, not committed); CI uploads it as an artifact kept 30 days |
 | Harness log | The Immediate window, or `TEST_Harness.SaveLog` to `test-results/` or a folder outside the checkout ([running the harness](#running-the-harness)) |
-| Retained, reviewed evidence tied to a commit | `tests/evidence/`, under the evidence contract of #11 |
+| Excel run: the three logs, the exported modules and `host.txt` | An evidence folder such as `test-results/excel-run/` (ignored, not committed); the `check_excel_run.py` report is copied into the issue or pull request ([recording an Excel run](#recording-an-excel-run)) |
+| Other retained, reviewed evidence tied to a commit | `tests/evidence/` |
 
 ## Importing VBA into Excel
 
@@ -135,7 +138,8 @@ configured under #12 and were demonstrated under #13
 
 ## Running the harness
 
-Not yet run: the first host run, with its evidence, is #11. In a
+Not yet run: the first host run, with its evidence, is #11; to record a run
+as evidence, follow [recording an Excel run](#recording-an-excel-run). In a
 **development** workbook built as above, open the Immediate window
 (**Ctrl+G**) and type:
 
@@ -170,6 +174,81 @@ more entry points show the failure paths and are expected to fail:
   tolerances, error values, raised errors, completeness and the cleanup
   pattern. It contains no CVA calculation, and a passing run validates none.
   The log format is in [tests/README.md](tests/README.md#log-format).
+
+<a id="recording-an-excel-run"></a>
+
+## Recording an Excel run
+
+The evidence that a commit's VBA was imported, compiled and run on a host,
+for [#11](https://github.com/danielep71/K-CVA/issues/11) and for every later
+issue or pull request that cites an Excel run. It needs no self-hosted
+runner, no change to the macro-security level and no *Trust access to the
+VBA project object model*.
+
+1. **Fix the candidate.** In a clone with no local changes
+   (`git status --short` prints nothing), type `git switch --detach <commit>`,
+   then `git rev-parse HEAD` for the full SHA.
+2. **Make the evidence folder**, for example `test-results\excel-run\` in the
+   checkout (ignored by Git), with an empty `exported\` folder inside.
+3. **Build a development workbook** from that checkout as in
+   [importing VBA into Excel](#importing-vba-into-excel), with the modules of
+   `tests/modules/`.
+4. **Compile** with **Debug → Compile VBAProject**.
+5. **Run.** In the Immediate window type, with the full path of the folder
+   and no trailing backslash:
+
+   ```text
+   TEST_Examples.SaveExampleEvidence "C:\path\to\test-results\excel-run"
+   ```
+
+   It runs the suite normally, with the injected failure and with the
+   skipped case, and saves each complete log as `examples.log`,
+   `injected.log` and `skipped.log`. Each run prints a `SAVED=` line: the
+   normal run with `error=0`, the two failure runs with the error *Suite
+   examples did not pass*. The errors are printed, not raised, so that all
+   three logs are written.
+6. **Export the modules back.** In the VBE, right-click each module →
+   **Export File**, into `exported\`, under its own name
+   (`TEST_Examples.bas`, `TEST_Harness.bas`). Do not edit the exported files.
+7. **Write `host.txt`** in the folder:
+
+   ```text
+   windows=Windows 11 Pro, version 24H2, OS build 26100.4061
+   references=Visual Basic For Applications; Microsoft Excel 16.0 Object Library; OLE Automation; Microsoft Office 16.0 Object Library
+   compile=PASS
+   ```
+
+   `windows` is what `winver` shows. `references` lists the boxes ticked
+   in **Tools → References**, separated by `; `. Write `compile=PASS` only if
+   step 4 completed with no error; otherwise write what it reported.
+8. **Check** the folder against the commit, with Python 3.12 or later and Git:
+
+   ```sh
+   python tools/check_excel_run.py test-results/excel-run --commit <commit>
+   ```
+
+   It must end with `excel-run: PASS`. It prints the commit, the host and
+   the Git blob id of every imported component.
+9. **Record.** Copy the report into the issue or pull request and add a row
+   to [tested environments](#tested-environments). The folder stays outside
+   Git: its exported modules would be second copies of the VBA components.
+
+`check_excel_run.py` reads only the folder and the commit:
+
+| It fails when | Because |
+| --- | --- |
+| An exported module differs from the commit's file, or one is missing or extra | The workbook was not built from that commit |
+| A log is missing or empty, does not end with `RESULT`, holds more than one run, or a line is not a `KEY=value` record | The log is incomplete |
+| A record is missing, extra or out of the order in which the commit's suite writes it, or an unexpected error (`ERROR`) is logged | The run did not execute the suite as written |
+| The normal run is not `RESULT=PASS`, or its cases and assertions differ from the commit's suite in name or order | The run did not pass as written |
+| `CLEANUP` is not `PASS` or `RECOVERY` is not `NONE` in any of the three logs | Cleanup failed |
+| The two failure runs do not end as [documented](#running-the-harness), or fail anything but their own failure: the injected run its one designated assertion, the skipped-case run only `harness.completeness` | The failure paths did not behave |
+| `ENVIRONMENT` lacks a field, differs between the logs, or Office is not 64-bit | The host is unknown or not the supported target |
+| `host.txt` lacks a field, the references are not exactly the four [default](#host-policy) ones, or `compile` is not `PASS` | The host record is incomplete |
+
+It cannot see Excel: the compile result, the references and the Windows
+build are the runner's own record. A PASS says the evidence is consistent
+with the commit; it validates no CVA calculation.
 
 ## Git hygiene verification
 

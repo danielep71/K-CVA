@@ -64,15 +64,15 @@ A version may be published only when:
 3. `python tools/check_repository.py` passes on a clean clone of the
    candidate, and the hosted `Repository integrity` check is green on it;
 4. the candidate's VBA is imported, compiled and run in Excel on the
-   [intended host](INSTALLATION.md#host-policy), the harness run passes, and
-   the run is recorded against the candidate under the evidence contract of
-   #11 ([running the harness](INSTALLATION.md#running-the-harness));
+   [intended host](INSTALLATION.md#host-policy), and
+   `tools/check_excel_run.py` passes on that evidence against the candidate
+   ([recording an Excel run](INSTALLATION.md#recording-an-excel-run));
 5. the annotated tag targets the candidate; and
 6. the checks after publication pass.
 
 If the source changes after steps 3 and 4, the evidence is stale and is
-produced again for the new candidate. Until #11 delivers its evidence
-procedure and a genuine host run, no candidate meets invariant 4.
+produced again for the new candidate. No candidate meets invariant 4 before
+the first host run is recorded (#11).
 
 ## Preparing and publishing a version
 
@@ -110,11 +110,16 @@ that `test-results/integrity/report.json` names the candidate with
 
 ### 4. Record the Excel run
 
-Build a development workbook from the candidate and run the harness as in
-[running the harness](INSTALLATION.md#running-the-harness). Only a log ending
-in `RESULT=PASS` with `completeness=COMPLETE`, recorded against the candidate
-as #11 defines, qualifies the candidate. If it fails, fix through a task pull
-request and start again at step 2.
+Build a development workbook from the candidate and record the run as in
+[recording an Excel run](INSTALLATION.md#recording-an-excel-run). Only
+`excel-run: PASS` from
+
+```sh
+python tools/check_excel_run.py <evidence-folder> --commit FULL_SHA
+```
+
+qualifies the candidate. If it fails, fix through a task pull request and
+start again at step 2.
 
 ### 5. Create the annotated tag
 
@@ -135,7 +140,7 @@ vX.Y.Z - <milestone title>
 
 Candidate <full 40-character SHA>.
 Static checks: check_repository.py PASS; Repository integrity run <run id> PASS.
-Excel: <host, build, bitness>; harness RESULT=PASS, completeness=COMPLETE.
+Excel: <host, build, bitness>; check_excel_run PASS.
 Issues: #<n>, #<n>.
 Deviations: none.
 ```
@@ -155,9 +160,9 @@ and the candidate SHA.
 
 Keep with the release, in the release notes or the closing issue: the
 candidate SHA, the integration pull request, the `check_repository.py` and
-`Repository integrity` results, the harness log with the host it names, the
-tag name and its target, and any deviation. Logs and artifacts expire, so
-copy the decisive lines ([docs/CI.md](docs/CI.md)).
+`Repository integrity` results, the `check_excel_run.py` report with the host
+it names, the tag name and its target, and any deviation. Logs and artifacts
+expire, so copy the decisive lines ([docs/CI.md](docs/CI.md)).
 
 ## Recovery
 
@@ -177,7 +182,7 @@ copy the decisive lines ([docs/CI.md](docs/CI.md)).
 | 3 | Release branch integrated into `main`, and synced back | ☐ |
 | 4 | Candidate frozen: the integration merge commit's full SHA | ☐ |
 | 5 | `check_repository.py` and `Repository integrity` pass on the candidate | ☐ |
-| 6 | The harness passes in Excel on the candidate, recorded as #11 defines | ☐ |
+| 6 | `check_excel_run.py` passes on the candidate's Excel run | ☐ |
 | 7 | The maintainer decided to publish | ☐ |
 | 8 | Annotated tag on the candidate | ☐ |
 | 9 | GitHub Release published from the tag and verified | ☐ |
