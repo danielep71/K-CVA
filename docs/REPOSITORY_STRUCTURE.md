@@ -31,7 +31,7 @@ not evidence of implemented or validated functionality.
 | `tests/` | Verification guide, harness, synthetic fixtures and expected values | Guide, VBA harness and neutral example suite in `tests/modules/` (#10); not yet run in Excel (#11). |
 | `tests/fixtures/`, `tests/expected/` | Inputs and independently justified expected results | One illustrative format example ([TEST_CASES.md](methodology/TEST_CASES.md)); no regulatory case. |
 | `tests/derivations/` | Independent Python reference calculations | Reserved. |
-| `tests/evidence/` | Deliberately retained, reviewed evidence tied to a source commit | Reserved; evidence contract pending #11. |
+| `tests/evidence/` | Deliberately retained, reviewed evidence tied to a source commit | Reserved. An Excel run is recorded as in [INSTALLATION.md](../INSTALLATION.md#recording-an-excel-run): its folder stays outside Git, its report goes into the issue (#11). |
 | `tools/` | Repository checks, build and evidence tooling | Issue-policy checker and tests, [check_repository.py](../tools/check_repository.py), [actionlint-lock.json](../tools/actionlint-lock.json) and the static VBA checks (`check_vba_*.py`, `vba_lexer.py`) present; see [CI.md](CI.md). |
 | `examples/modules/` | Synthetic VBA examples using supported API only | Reserved. |
 | `test-results/` | Disposable run output | Ignored by .gitignore. Do not commit disposable run output. |

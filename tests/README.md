@@ -12,7 +12,7 @@ validation are #11. The repository tooling has its own tests in
 | `fixtures/` | Synthetic inputs: counterparties, netting sets, hedges |
 | `expected/` | Expected results, each with its provenance |
 | `derivations/` | Python reference derivations that compute expected values from the documented method, separately from the code under test; created with the first one |
-| `evidence/` | Deliberately retained, reviewed evidence tied to a source commit (#11) |
+| `evidence/` | Deliberately retained, reviewed evidence tied to a source commit. An Excel run's evidence folder stays outside Git; its report is recorded in the issue ([recording an Excel run](../INSTALLATION.md#recording-an-excel-run), #11) |
 
 The fixture and expected-result format, reference classes, tolerances and
 completeness rules are defined in
@@ -76,7 +76,7 @@ of the table:
 | Record | Fields |
 | --- | --- |
 | `RUN=<suite>` | `mode` (`NORMAL` or a deliberate failure mode), `expected_cases`, `expected_assertions`, `started` |
-| `ENVIRONMENT=` | `host`, `version`, `os`, `office` (`64-bit` or `32-bit`), `runtime` (`VBA7` or `VBA6`) |
+| `ENVIRONMENT=` | `host`, `version`, `build` (`Application.Build`), `os`, `office` (`64-bit` or `32-bit`), `runtime` (`VBA7` or `VBA6`) |
 | `CASE=<case-id>` | One per case, in run order |
 | `ASSERT=<case-id>/<name>` | `status` (`PASS` or `FAIL`); on failure, the expected and actual values |
 | `FAILURE=<id>` | One per failure: an assertion, `<case-id>.unexpected-error`, `runner.unexpected-error`, `harness.case-id`, `harness.no-case` or `harness.completeness`, with its detail |
@@ -95,7 +95,9 @@ fixed in the suite's source, so two logs of the same commit can be compared
 line by line, apart from `started` and `ENVIRONMENT`.
 
 The harness runs only in Excel and has not been run yet: compiling and
-running it on the intended host is #11. Without Excel,
+running it on the intended host is #11, recorded as in
+[recording an Excel run](../INSTALLATION.md#recording-an-excel-run) and
+checked against its commit by `tools/check_excel_run.py`. Without Excel,
 `tools/test_vba_harness.py` checks what the source can show: the example
 suite's counts equal its cases and assertions, every case runs once with a
 unique identifier, and every documented record is written.
