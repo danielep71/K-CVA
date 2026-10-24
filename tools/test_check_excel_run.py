@@ -56,7 +56,7 @@ def run_log(mode: str) -> list[str]:
         for name in (item for item in examples.assertions if item.startswith(f"{case}/")):
             assertions += 1
             if mode == "INJECTED_FAILURE" and name in examples.injected:
-                detail = "expected=1; actual=0.75"
+                detail = f"expected={examples.injected_expected}; actual=0.75"
                 lines.append(f"ASSERT={name}; status=FAIL; {detail}")
                 lines.append(f"FAILURE={name}; {detail}")
                 failures.append(f"{name}; {detail}")
@@ -207,13 +207,33 @@ class EvidenceTest(unittest.TestCase):
     def test_the_injected_failure_must_be_the_designated_assertion(self) -> None:
         designated = suite().injected[0]
         other = next(item for item in suite().assertions if item != designated)
+        detail = f"expected={suite().injected_expected}; actual=0.75"
         def moved(folder: Path) -> None:
-            edit("injected.log", f"ASSERT={designated}; status=FAIL; expected=1; actual=0.75",
+            edit("injected.log", f"ASSERT={designated}; status=FAIL; {detail}",
                  f"ASSERT={designated}; status=PASS")(folder)
             edit("injected.log", f"ASSERT={other}; status=PASS",
-                 f"ASSERT={other}; status=FAIL; expected=1; actual=0.75")(folder)
+                 f"ASSERT={other}; status=FAIL; {detail}")(folder)
             edit("injected.log", f"FAILURE={designated}", f"FAILURE={other}")(folder)
         self.assertFinding(moved, f"FAILURE={other}, expected FAILURE={designated}")
+
+    def test_the_injected_failure_values_match_the_suite(self) -> None:
+        designated = suite().injected[0]
+        detail = f"expected={suite().injected_expected}; actual=0.75"
+        def everywhere(old: str, new: str) -> Callable[[Path], None]:
+            def apply(folder: Path) -> None:
+                path = folder / "injected.log"
+                path.write_bytes(path.read_bytes().replace(old.encode(), new.encode()))
+            return apply
+        self.assertFinding(everywhere(detail, "expected=1; actual=0.75"),
+                           "expected=1, but the suite injects")
+        self.assertFinding(everywhere(detail, "expected=0.75; actual=0.75"),
+                           "expected equals actual")
+        self.assertFinding(everywhere(f"{designated}; {detail}", f"{designated}; reason=x"),
+                           "lacks numeric expected= and actual= values")
+        self.assertFinding(edit("injected.log", f"FAILURE={designated}; {detail}",
+                                f"FAILURE={designated}; expected="
+                                f"{suite().injected_expected}; actual=0.7"),
+                           "values differ between ASSERT, FAILURE and PRIMARY_FAILURE")
 
     def test_environment(self) -> None:
         self.assertFinding(edit("injected.log", "build=17928", "build=18000"),
@@ -241,6 +261,7 @@ class SuiteTest(unittest.TestCase):
         self.assertEqual(len(examples.assertions), examples.expected_assertions)
         self.assertEqual(examples.last_case[0], examples.cases[-1])
         self.assertEqual(len(examples.injected), 1)
+        self.assertEqual(examples.injected_expected, "0.76")
 
     def test_the_entry_point_saves_the_logs_the_checker_reads(self) -> None:
         source = (ROOT / EXAMPLES).read_text(encoding="ascii")

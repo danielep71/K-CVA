@@ -11,7 +11,9 @@ against the candidate commit, without Excel:
   record, what the commit's suite writes in its mode (no record missing,
   extra or out of order, no ERROR), with cleanup PASS and no recovery: the
   normal run passes with every case and assertion; the injected-failure run
-  fails only its designated assertion; the skipped-case run lacks only the
+  fails only its designated assertion, with the expected value the suite
+  injects, an actual value that differs and the same values in its ASSERT,
+  FAILURE and PRIMARY_FAILURE records; the skipped-case run lacks only the
   last case and fails only harness.completeness; all three come from one
   64-bit host;
 - host.txt: the Windows build, the references (exactly the four supported
@@ -50,6 +52,7 @@ PROCEDURE = re.compile(r"^(?:Public|Private) Sub (\w+)\(.*?^End Sub$", re.M | re
 BEGIN_CASE = re.compile(r'TEST_Harness\.BeginCase "([^"]+)"')
 ASSERTION = re.compile(r'TEST_Harness\.Assert\w+ "([^"]+)"')
 CALL = re.compile(r"^\s+(Case\w+)$", re.M)
+INJECTED_VALUE = re.compile(r'If mMode = "INJECTED_FAILURE" Then\s+\w+ = ([-+.\dE]+)\s')
 
 
 @dataclass
@@ -65,8 +68,8 @@ class Record:
 @dataclass
 class Suite:
     """What the commit's example suite runs: case and assertion identifiers in order,
-    the identifiers of the last case (skipped in SKIPPED_CASE) and the assertions of
-    the case whose expected value INJECTED_FAILURE changes."""
+    the identifiers of the last case (skipped in SKIPPED_CASE), the assertions of
+    the case whose expected value INJECTED_FAILURE changes and the value it sets."""
 
     cases: list[str]
     assertions: list[str]
@@ -74,6 +77,7 @@ class Suite:
     injected: list[str]
     expected_cases: int
     expected_assertions: int
+    injected_expected: str = ""
 
 
 @dataclass
@@ -139,6 +143,7 @@ def read_suite(source: bytes) -> Suite:
     assertions: list[str] = []
     last_case: list[str] = []
     injected: list[str] = []
+    injected_expected = ""
     for name in CALL.findall(bodies.get("RunSuite", "")):
         body = bodies.get(name, "")
         case = BEGIN_CASE.findall(body)
@@ -148,8 +153,10 @@ def read_suite(source: bytes) -> Suite:
         last_case = case + names
         if 'mMode = "INJECTED_FAILURE"' in body:
             injected += names
+            value = INJECTED_VALUE.search(body)
+            injected_expected = value.group(1) if value else ""
     return Suite(cases, assertions, last_case, injected, constants.get("EXPECTED_CASES", -1),
-                 constants.get("EXPECTED_ASSERTIONS", -1))
+                 constants.get("EXPECTED_ASSERTIONS", -1), injected_expected)
 
 
 def check_sources(root: Path, commit: str, folder: Path, evidence: Evidence) -> dict[str, bytes]:
@@ -282,6 +289,36 @@ def check_fields(name: str, records: list[Record], plan: Plan, suite: Suite,
                             f"{record.fields}, expected {plan.result}")
 
 
+def check_injected(name: str, records: list[Record], plan: Plan, suite: Suite,
+                   problems: list[str]) -> None:
+    """The designated failure's ASSERT, FAILURE and PRIMARY_FAILURE records carry
+    numeric expected and actual values that differ, the expected one being the value
+    the suite injects, and all three carry the same values."""
+    if plan.mode != "INJECTED_FAILURE" or len(suite.injected) != 1:
+        return
+    found = [record for record in records
+             if record.key in ("ASSERT", "FAILURE", "PRIMARY_FAILURE")
+             and record.value == suite.injected[0]]
+    for record in found:
+        values = (record.fields.get("expected", ""), record.fields.get("actual", ""))
+        try:
+            expected, actual = float(values[0]), float(values[1])
+        except ValueError:
+            problems.append(f"{name}:{record.line}: {record.key} lacks numeric expected= "
+                            "and actual= values")
+            continue
+        if suite.injected_expected and expected != float(suite.injected_expected):
+            problems.append(f"{name}:{record.line}: {record.key} expected={values[0]}, but the "
+                            f"suite injects {suite.injected_expected}")
+        if expected == actual:
+            problems.append(f"{name}:{record.line}: {record.key} expected equals actual, so "
+                            "the assertion cannot have failed")
+    if len({(record.fields.get("expected"), record.fields.get("actual"))
+            for record in found}) > 1:
+        problems.append(f"{name}: the injected failure's values differ between ASSERT, "
+                        "FAILURE and PRIMARY_FAILURE")
+
+
 def check_logs(folder: Path, suite: Suite, evidence: Evidence) -> None:
     environments = []
     for plan in plans(suite):
@@ -291,6 +328,7 @@ def check_logs(folder: Path, suite: Suite, evidence: Evidence) -> None:
             continue
         if check_sequence(filename, records, sequence(plan, suite), evidence.findings):
             check_fields(filename, records, plan, suite, evidence.findings)
+            check_injected(filename, records, plan, suite, evidence.findings)
         if len(records) > 1 and records[1].key == "ENVIRONMENT":
             environments.append(records[1].fields)
     for environment in environments:
@@ -335,6 +373,9 @@ def check(root: Path, commit: str, folder: Path) -> Evidence:
     if len(suite.injected) != 1:
         evidence.findings.append(f"{EXAMPLES} at {commit[:12]}: INJECTED_FAILURE must change "
                                  f"exactly one assertion, found {suite.injected}")
+    elif not suite.injected_expected:
+        evidence.findings.append(f"{EXAMPLES} at {commit[:12]}: INJECTED_FAILURE sets no "
+                                 "numeric expected value")
     check_logs(folder, suite, evidence)
     check_host(folder, evidence)
     return evidence

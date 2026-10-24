@@ -173,8 +173,8 @@ commit `acc00327847d00bf20f17562cc29c05821047a74` on 2026-10-24:
 
 | Local file | Source blob | Local changes |
 | --- | --- | --- |
-| `tools/check_excel_run.py` | `a3f9054950e9e83e02c71bbbc06a0873577ad24b` | CVA instead of SFT in the docstring and report; provenance line. |
-| `tools/test_check_excel_run.py` | `3ed0ca1108fca47b0af8b8e28d2cbdb45a13ff77` | This suite's assertion count (27); provenance line. |
+| `tools/check_excel_run.py` | `a3f9054950e9e83e02c71bbbc06a0873577ad24b` | The injected failure's expected and actual values are checked: numeric, different, the expected one equal to the value the suite injects, and the same in its `ASSERT`, `FAILURE` and `PRIMARY_FAILURE` records; CVA instead of SFT in the docstring and report; provenance line. |
+| `tools/test_check_excel_run.py` | `3ed0ca1108fca47b0af8b8e28d2cbdb45a13ff77` | This suite's assertion count (27) and injected value (0.76); a test for the injected failure's values; provenance line. |
 | `SaveExampleEvidence` and `SaveRun` in `tests/modules/TEST_Examples.bas` | `7194156875c3a7b9dc58667fa84ab3e611bbc603` | None; the module header describes them. |
 | The `build` field and four comments of `tests/modules/TEST_Harness.bas` | `c0fe2af6d7de3eba6b13917bec60f4ceeb664fcd` | None. |
 | The *Recording an Excel run* section of `INSTALLATION.md` | `4c872d701fca26a2caba6bf8e2b0726b1804c201` | This repository's links and issue; the folder stays outside Git because its exported modules would be second copies of the components. |
