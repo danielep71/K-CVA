@@ -1,5 +1,7 @@
 # K-CVA
 
+![K-CVA — CVA risk regulatory capital; research and development](docs/assets/K-CVA-social-preview.jpg)
+
 Regulatory capital for credit valuation adjustment (CVA) risk. K-CVA is
 intended to become an Excel/VBA application that calculates the own funds
 requirements for CVA risk under the EU Capital Requirements Regulation, from
