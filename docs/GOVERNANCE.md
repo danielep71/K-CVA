@@ -89,7 +89,7 @@ evidence recorded in [#12](https://github.com/danielep71/MKT-K-CVA/issues/12):
 | Tag ruleset 25781957 | Active for v*; updates, deletion and force pushes blocked, no bypass. |
 | Traffic ruleset 25782014 | Active for traffic-history; deletion and force pushes blocked; regular automation updates allowed, no PR requirement or bypass. Branch and workflow pending #14. |
 | Required check and strict up-to-date rule | **Configured under #12**. Main and release/** require Repository integrity from GitHub Actions (integration 15368), with strict up-to-date checks. Checks apply on main creation; release creation alone is exempt. No bypass actors or excluded refs. See [settings evidence](REPOSITORY_SETTINGS.md). |
-| Enforcement demonstration | Pending controlled failing/passing PR exercise #13. Configured controls alone do not prove enforcement. |
+| Enforcement demonstration | Exercised on 2026-10-24 under #13 for release/**; see [Demonstrated enforcement](#demonstrated-enforcement). Rules not triggered there remain verified by read-back only. |
 | General settings | Projects off; update-branch suggestion and automatic head-branch deletion on. Repository supports merge, squash and rebase, restricted by the branch rules above. |
 | Actions | Full-SHA action pinning required; default token reads contents/packages; workflow PR creation/approval off. |
 | Security | Dependency graph and Dependabot alerts enabled. MPL-2.0 and security/provenance policies recorded in #4; weekly GitHub Actions version updates configured by #6 in [.github/dependabot.yml](../.github/dependabot.yml), targeting release/0.1.0; updates require review. |
@@ -102,6 +102,36 @@ Record applicable checks and explicit gaps in each PR. Absence of a check is not
 when a control changes; do not describe desired controls as configured.
 Before closing a setup issue, reconcile affected status tables, decision records
 and dependent issue progress with its delivered evidence and remaining work.
+
+<a id="demonstrated-enforcement"></a>
+
+### Demonstrated enforcement
+
+Recorded on **2026-10-24** for [#13](https://github.com/danielep71/MKT-K-CVA/issues/13).
+Each row is a merge GitHub refused on a real pull request into release/0.1.0.
+The refusal text is quoted from the API response.
+
+| Rule | Evidence |
+| --- | --- |
+| A failing required check blocks the merge | Controlled [PR #68](https://github.com/danielep71/MKT-K-CVA/pull/68). Head `e05d06e` added `tests/modules/TEST_DefectProbe.bas`, whose `GoTo Missing` names no label. Run [40116817400](https://github.com/danielep71/MKT-K-CVA/actions/runs/40116817400) checked test merge `379b3dc`; only `vba-jumps` failed, with `tests/modules/TEST_DefectProbe.bas:8: GoTo target 'Missing' is not a label of procedure Probe`. A squash merge pinned to `e05d06e` was refused: *405 Repository rule violations found. Required status check "Repository integrity" is failing.* Correction `2f56108` removed the probe; run [40116946233](https://github.com/danielep71/MKT-K-CVA/actions/runs/40116946233) passed on test merge `46b9ecb`. The probe never reached an integration branch: #68 was squash-merged after the correction, so only the corrected tree landed. |
+| A passing check on an old base is not enough | After [#69](https://github.com/danielep71/MKT-K-CVA/pull/69) moved release/0.1.0 to `d6014c8`, a squash merge of #68 pinned to `2f56108`, whose passing run predated that base, was refused: *405 Repository rule violations found. Required status check "Repository integrity" is expected.* |
+| Rebase merges are refused | A rebase merge of #69 pinned to `19d6308`, with its check passing, was refused: *405 Rebase merges are not allowed on this repository.* The message does not say whether the repository setting or the release ruleset refused it; the #12 read-back records rebase as allowed by the repository and excluded by the ruleset. #69 was then squash-merged. |
+
+**What a pull request run checks.** A `pull_request` run checks out GitHub's
+test merge of the head into the current base, not the head alone. Its evidence
+artifact is named after that test-merge SHA, and its report records both the
+checked commit and the PR head SHA (`PR_HEAD_SHA`). Every gate reads every
+tracked file and the workflow has no path filter, so the whole change range is
+checked; the up-to-date rule makes the checked tree the tree that merges.
+Intermediate commits are not checked one by one; a squash merge lands only the
+checked tree.
+
+**Not demonstrated, verified by read-back only:** the resolved-conversation
+rule (no unresolved thread was open during the exercise); merge-commit-only on
+main; deletion, force-push and tag protections; and the release creation
+exemption. A refusal can only be shown by attempting the merge; an untriggered
+rule is recorded as verified, not enforced. Workflow logs and the 30-day
+artifacts expire, so the decisive lines are copied here and into #13.
 
 ## Issues, dependencies and closure
 

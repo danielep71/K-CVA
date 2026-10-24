@@ -1,7 +1,8 @@
 # Repository settings verification
 
-Verified on 2026-10-24 for #12. This records configured controls, not the controlled
-failing/passing enforcement demonstration assigned to #13.
+Verified on 2026-10-24 for #12. This records configured controls. The controlled
+failing/passing enforcement exercise of #13 is recorded in
+[GOVERNANCE.md](GOVERNANCE.md#demonstrated-enforcement).
 
 ## Comparison with CCR-K-SFTs
 
