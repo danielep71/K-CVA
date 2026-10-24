@@ -136,9 +136,27 @@ def load_json(path: Path, root: Path, report: Report) -> Any:
     def no_constants(name: str) -> None:
         raise ValueError(f"non-standard number {name}")
 
+    # A literal such as 1e400 parses to infinity without reaching
+    # parse_constant; reject it here, in every category, before an invalid
+    # case's inputs are exempted from the input rules.
+    def finite_float(text: str) -> float:
+        value = float(text)
+        if not math.isfinite(value):
+            raise ValueError(f"number {text} is not finite")
+        return value
+
+    def finite_int(text: str) -> int:
+        value = int(text)
+        try:
+            float(value)
+        except OverflowError:
+            raise ValueError(f"number {text[:20]}... is not finite") from None
+        return value
+
     try:
         return json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=no_duplicates,
-                          parse_constant=no_constants)
+                          parse_constant=no_constants, parse_float=finite_float,
+                          parse_int=finite_int)
     except (OSError, UnicodeDecodeError, ValueError) as error:
         report.add(rel(path, root), f"not valid UTF-8 JSON ({error})")
         return LOAD_FAILED

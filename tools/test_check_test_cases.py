@@ -176,11 +176,21 @@ class CheckTestCasesTests(unittest.TestCase):
                       json.dumps(expected()).replace('"value": 100', '"value": -Infinity'))
         self.assertFinding("not valid UTF-8 JSON (non-standard number -Infinity)")
 
-    def test_overflowing_numbers_are_rejected(self) -> None:
-        text = json.dumps(fixture()).replace('"exposure_value_amount": 100',
-                                             '"exposure_value_amount": 1e400')
-        self.ws.write("tests/fixtures/illustrative-case.json", text)
-        self.assertFinding("input 'exposure_value_amount' is not a finite number")
+    def test_overflowing_numbers_are_rejected_in_every_category(self) -> None:
+        for category in ("nominal", "invalid"):
+            for number in ("1e400", "-1e400", "1" + "0" * 400):
+                with self.subTest(category=category, number=number[:6]):
+                    data = fixture()
+                    data["category"] = category
+                    text = json.dumps(data).replace('"exposure_value_amount": 100',
+                                                    f'"exposure_value_amount": {number}')
+                    self.ws.write("tests/fixtures/illustrative-case.json", text)
+                    self.assertFinding("is not finite")
+        self.ws.write("tests/fixtures/illustrative-case.json", fixture())
+        self.ws.write("tests/expected/illustrative-case.crr.json",
+                      json.dumps(expected()).replace('"value": 100', '"value": 1e400'))
+        self.assertFinding("illustrative-case.crr.json: not valid UTF-8 JSON (number 1e400 is "
+                           "not finite)")
 
     def test_harness_metadata_rules(self) -> None:
         data = fixture()
