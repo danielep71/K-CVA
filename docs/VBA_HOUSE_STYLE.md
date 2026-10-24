@@ -136,4 +136,5 @@ generator and are regenerated rather than hand-edited.
 
 Changed VBA must be imported, compiled and exercised on the declared target
 host before its runtime behavior is accepted. Static checks are not compilation.
-Record full commit, host version/bitness, reference list and results.
+Record full commit, host version/bitness, reference list and results, as in
+[recording an Excel run](../INSTALLATION.md#recording-an-excel-run).
