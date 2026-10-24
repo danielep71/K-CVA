@@ -161,7 +161,8 @@ changelog check from K-SACCR at `00bb72d1bf5ec9252b8ca5ba3adc567d948be15d`
 and wrote the tests itself; preserve that attribution. The release-preparation
 choices (`VERSION` only from the first prepared release, a gate linking it to
 the changelog, and for 0.1.0 an annotated tag and release notes with no asset)
-follow K-SFTs' maintainer decisions and are proposed here in #17.
+follow K-SFTs' maintainer decisions and were confirmed for this repository by
+the maintainer on 2026-10-24 in #17 (PR #82).
 `docs/CLOSEOUT.md` was written for this repository.
 
 ## Regression scaffold (#10)
