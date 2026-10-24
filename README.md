@@ -61,7 +61,11 @@ figure produced from this repository should be relied on.
 | [docs/CI.md](docs/CI.md), [tools/README.md](tools/README.md) | Repository checks, CI coverage and dependency updates |
 | [SECURITY.md](SECURITY.md) | Reporting vulnerabilities privately; synthetic data only |
 | [NOTICE.md](NOTICE.md), [LICENSE](LICENSE) | Copyright, provenance and the MPL-2.0 licence |
+| [CHANGELOG.md](CHANGELOG.md), [RELEASING.md](RELEASING.md) | What changed, versions and the release procedure |
+| [docs/CLOSEOUT.md](docs/CLOSEOUT.md) | The v0.1.0 closeout checklist and evidence index |
 
 Task branches start from `release/0.1.0`, and task pull requests target it.
-Versions, the changelog and the release procedure are not defined yet (#17);
-nothing has been published.
+Nothing has been released: no version, tag or workbook. Changes are recorded
+under `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md), and a version is
+prepared and published only by maintainer decision, as in
+[RELEASING.md](RELEASING.md).

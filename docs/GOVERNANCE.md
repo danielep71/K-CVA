@@ -160,8 +160,10 @@ the change on main. Explain duplicate/not-planned closures explicitly.
 ## Publication, security and provenance
 
 Milestone closure or integration into main does not publish a release.
-Versioning and release preparation belong to #17; tags and releases require an
-explicit maintainer decision.
+Versions, the changelog and the release procedure are defined in
+[RELEASING.md](../RELEASING.md) and [CHANGELOG.md](../CHANGELOG.md);
+preparing a version and publishing it are separate explicit maintainer
+decisions. The milestone closeout follows [CLOSEOUT.md](CLOSEOUT.md).
 
 Do not commit credentials or confidential client data. Security reporting,
 licensing and provenance are documented in [SECURITY.md](../SECURITY.md) and

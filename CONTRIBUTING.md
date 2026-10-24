@@ -48,8 +48,10 @@ Each issue gets the assignee, exactly one priority and a milestone at triage
    or `chore/<issue>-<slug>`.
 3. **Change** as little as the issue needs: no unrelated formatting, generated
    output or opportunistic refactoring. Update the documentation the change
-   affects in the same pull request, and record anything adapted from another
-   repository in [NOTICE.md](NOTICE.md).
+   affects in the same pull request, add a material change under
+   `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md#maintenance-policy), and
+   record anything adapted from another repository in
+   [NOTICE.md](NOTICE.md).
 4. **Check** with `python tools/check_repository.py` before every push; every
    check must pass. Stage new files first, so that they are checked
    ([CI](docs/CI.md)).
@@ -123,7 +125,8 @@ were not checked in a commit message.
 | Branches, review, protection, issues | [docs/GOVERNANCE.md](docs/GOVERNANCE.md), [docs/ISSUE_LABELS.md](docs/ISSUE_LABELS.md) |
 | Pull request checklist | [.github/pull_request_template.md](.github/pull_request_template.md) |
 | Vulnerabilities and data | [SECURITY.md](SECURITY.md) |
-| Versions and releases | Not defined yet (#17); nothing is published. |
+| Versions, changelog and releases | [CHANGELOG.md](CHANGELOG.md), [RELEASING.md](RELEASING.md); nothing is published |
+| The v0.1.0 closeout | [docs/CLOSEOUT.md](docs/CLOSEOUT.md) |
 
 ## Licensing
 
