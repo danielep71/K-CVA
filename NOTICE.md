@@ -99,3 +99,16 @@ Source repository: https://github.com/danielep71/CCR-K-SFTs . Its upstream
 conventions trace to K-SACCR revision `00bb72d1bf5ec9252b8ca5ba3adc567d948be15d`
 as recorded in the original provenance notice. No SFT formula, workbook or
 host-test claim was imported.
+
+## Repository CI (#6)
+
+The integrity runner, workflow, checksum lock and drift CLI regression tests
+were written locally. The imported label reconciler now has an import-safe CLI
+guard; drift comparison uses its structured plan instead of parsing Markdown.
+The original source attribution above remains applicable.
+
+Actionlint 1.7.12 is downloaded from the official rhysd/actionlint release;
+platform archive SHA-256 digests are recorded in tools/actionlint-lock.json
+from GitHub release metadata checked on 2026-10-24. It retains its upstream
+MIT license; no binary or source is vendored. Existing action pins are retained;
+actions/setup-node is pinned to the v6 commit resolved on the same date.

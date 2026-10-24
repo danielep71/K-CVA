@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { pathToFileURL } from "node:url";
 
 import assert from "node:assert/strict";
 import { appendFile, readFile } from "node:fs/promises";
@@ -647,7 +648,7 @@ async function main() {
   if (!verified) throw new Error(`Post-run verification found ${remaining.length} remaining difference(s)`);
 }
 
-main().catch(async error => {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) main().catch(async error => {
   const message = error instanceof Error ? error.message : String(error);
   try {
     await publishSummary(renderSummary({
