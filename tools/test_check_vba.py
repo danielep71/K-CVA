@@ -840,6 +840,8 @@ Public Function Count(ByVal Items As Object) As Long
         ' Application, MsgBox and [A1] in a comment are not code.
         Dim Seen As Object
         Set Seen = CreateObject("Scripting.Dictionary")
+        Set Seen = CreateObject( "Scripting.Dictionary" )
+        CreateObject "Scripting.Dictionary"
         Debug.Print "Range and MsgBox inside a string"
         Count = Items.Count + Items.Rows + LIMIT
 End Function
@@ -928,6 +930,18 @@ DEPENDENCY_INVALID = {
     "create-object-from-variable": (CORE_PATH,
                                     in_procedure("        Debug.Print CreateObject(ProgId)"),
                                     "CreateObject creates an object no check can see"),
+    "create-object-statement": (CORE_PATH, in_procedure('        CreateObject "Word.Application"'),
+                                "CreateObject creates an object no check can see"),
+    "get-object-statement": (CORE_PATH, in_procedure('        GetObject , "Excel.Application"'),
+                             "GetObject creates an object no check can see"),
+    "call-create-object": (CLASS_PATH, class_module('Public Sub Go()\n        Call CreateObject("Word.Application")\n'
+                                                    'End Sub\n'),
+                           "CreateObject creates an object no check can see"),
+    "qualified-create-object-statement": (CORE_PATH, in_procedure(
+        '        VBA.Interaction.CreateObject "Word.Application"'),
+        "CreateObject creates an object no check can see"),
+    "create-object-statement-from-variable": (CORE_PATH, in_procedure("        CreateObject ProgId"),
+                                              "CreateObject creates an object no check can see"),
     "get-object": (CORE_PATH, in_procedure('        Debug.Print GetObject(, "Excel.Sheet")'),
                    "GetObject creates an object no check can see"),
     "core-calls-facade": (CORE_PATH, in_procedure("        Debug.Print CVA_Functions.CVA_IsPositive(1)"),

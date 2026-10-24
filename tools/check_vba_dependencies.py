@@ -75,7 +75,10 @@ CALL = re.compile(r"^Call\s+", re.I)
 VBA_QUALIFIER = re.compile(r"(?<![\w.])(?:VBA\.)?(?:FileSystem|Interaction|Strings|Information|"
                            r"Conversion|DateTime|Math|Financial)\.|(?<![\w.])VBA\.", re.I)
 DYNAMIC = re.compile(r"(?<![\w.])(CallByName|Evaluate|ExecuteExcel4Macro|AddressOf)\b", re.I)
-OBJECT = re.compile(r'(?<![\w.])(CreateObject|GetObject)\s*\(\s*(?:"([^"]*)")?', re.I)
+# CreateObject and GetObject in any call form: with or without parentheses,
+# as VBA allows for a call whose result is not used, with the first literal
+# argument when there is one.
+OBJECT = re.compile(r'(?<![\w.])(CreateObject|GetObject)\b\s*\(?\s*(?:"([^"]*)")?', re.I)
 ALLOWED_OBJECTS = frozenset({"scripting.dictionary"})
 # Components that src/core/ and src/classes/ may not name: the facade and the
 # host adapters above them, and the tests and examples beside them. VBA
