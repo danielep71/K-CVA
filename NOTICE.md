@@ -153,8 +153,8 @@ commit `a0a817a6d3c25b4c0d3fe62a0a070456a98854c5` on 2026-10-24:
 | --- | --- | --- |
 | `CHANGELOG.md` | `80a6a838285804d622b1d5f8d405b6b3450fe995` | Maintenance policy and date and version rules kept; the gate named for `check_repository.py`; the `[Unreleased]` entries written for this repository's issues and evidence. |
 | `RELEASING.md` | `8154a397342615d64b7f258b220668adb908d8ad` | This repository's links, check command and rulesets; the Excel-run invariant points to the harness log and the evidence contract of #11, since no run checker exists here; no candidate meets it before #11. |
-| `tools/check_changelog.py` | `d632fc72af119d39e65b04047296172cf20d19b5` | Provenance line. |
-| `tools/test_check_changelog.py` | `ae2de147b6a5c311a8ddd6d53fce280c6029d2dc` | None. |
+| `tools/check_changelog.py` | `d632fc72af119d39e65b04047296172cf20d19b5` | Provenance line; a level-2 heading that looks like a version but is not `## [Unreleased]` or `## [X.Y.Z] - YYYY-MM-DD`, such as one without brackets, is rejected instead of ignored. |
+| `tools/test_check_changelog.py` | `ae2de147b6a5c311a8ddd6d53fce280c6029d2dc` | A test for malformed version headings. |
 
 K-SFTs adapted the structure of its changelog, release procedure and
 changelog check from K-SACCR at `00bb72d1bf5ec9252b8ca5ba3adc567d948be15d`

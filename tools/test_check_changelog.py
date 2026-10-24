@@ -71,6 +71,13 @@ class ChangelogTest(unittest.TestCase):
                 self.assertFinding(RELEASED.replace("## [0.2.0] - 2026-11-02", heading), text,
                                    "0.2.0\n")
 
+    def test_unbracketed_version_headings(self) -> None:
+        for heading in ("## 0.2.0 - 2026-11-02", "## v0.2.0 - 2026-11-02", "## Unreleased",
+                        "##  [0.2.0] - 2026-11-02"):
+            with self.subTest(heading=heading):
+                self.assertFinding(RELEASED.replace("## [0.2.0] - 2026-11-02", heading),
+                                   "version heading must be", "0.1.0\n")
+
     def test_order_and_duplicates(self) -> None:
         swapped = RELEASED.replace("0.2.0", "X").replace("0.1.0", "0.2.0").replace("X", "0.1.0")
         self.assertFinding(swapped, "newest first", "0.1.0\n")

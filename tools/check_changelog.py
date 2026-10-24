@@ -24,6 +24,9 @@ CHANGELOG = "CHANGELOG.md"
 VERSION = "VERSION"
 SEMVER = r"(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)"
 VERSION_HEADING = re.compile(r"^## \[([^\]]+)\](.*)$", re.M)
+# A level-2 heading that looks like a version, bracketed or not; policy headings
+# start with a word and are not matched.
+VERSION_LIKE = re.compile(r"^##[ \t]+(?:\[|v?\d|unreleased\b).*$", re.M | re.I)
 RELEASE_SUFFIX = re.compile(r" - (\d{4}-\d{2}-\d{2})")
 
 
@@ -52,7 +55,9 @@ def released_versions(text: str) -> list[str]:
 
 def check_changelog(text: str) -> list[str]:
     headings = VERSION_HEADING.findall(text)
-    findings = []
+    findings = [f"{CHANGELOG}: version heading must be '## [Unreleased]' or "
+                f"'## [X.Y.Z] - YYYY-MM-DD': {line}"
+                for line in VERSION_LIKE.findall(text) if not VERSION_HEADING.fullmatch(line)]
     if not headings or headings[0] != ("Unreleased", ""):
         findings.append(f"{CHANGELOG}: the first version heading must be '## [Unreleased]'")
     seen: set[str] = set()
