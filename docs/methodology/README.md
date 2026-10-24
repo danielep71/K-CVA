@@ -92,7 +92,7 @@ text requires and who provides it.
 | --- | --- | --- |
 | Counterparty | Sector and credit quality, mapped to a risk weight by Table 1; a counterparty without an external rating takes the unrated column unless an internal-rating mapping is approved by the competent authority | Caller: the Table 1 sector and credit-quality category. The tool does not rate counterparties or map internal ratings |
 | Netting set | Counterparty credit risk exposure value, including collateral, under Title II, Chapter 6, Sections 3 to 6 | Caller: supplied EAD (M5) |
-| Netting set | Effective maturity under Article 162, capped at the longest contractual remaining maturity in the netting set instead of five years | Open: supplied or derived (M5) |
+| Netting set | Effective maturity under Article 162, capped at the longest contractual remaining maturity in the netting set instead of five years | Caller: supplied in years (M5). The tool takes it as given and does not apply Article 162 or the cap |
 | Netting set | Supervisory discount factor: 1 for an institution using Title II, Chapter 6, Section 6; otherwise a formula of the maturity | Calculated, from a caller-supplied indicator of the exposure method |
 | Single-name hedge (full BA-CVA) | Residual maturity, notional, supervisory discount factor, risk weight of the reference name (Table 1) and correlation `r_hc` by its relation to the counterparty (Table 2, Article 386(3), point (a)) | Caller supplies maturity, notional, reference sector and credit quality, and relation; the rest is calculated |
 | Index hedge (full BA-CVA) | Residual (notional-weighted) maturity, full notional, supervisory discount factor, and a risk weight from the index constituents' sectors and credit qualities | Caller supplies maturity, notional and constituent categories; the rest is calculated |
@@ -163,7 +163,7 @@ authentic text is the one published in the Official Journal.
 | Topic | Current position |
 | --- | --- |
 | Units | Amounts in a stated currency, unscaled; rates, weights and factors as decimals; maturities in years ([VBA_HOUSE_STYLE.md](../VBA_HOUSE_STYLE.md#contracts-units-and-errors)). Test cases follow the same rules ([TEST_CASES.md](TEST_CASES.md#fixture-format)) |
-| Exposure | EAD per netting set is supplied, not computed (M5). The tool takes it as the exposure value Article 384 defines and does not check how it was calculated |
+| Exposure | EAD and effective maturity per netting set are supplied, not computed (M5). The tool takes them as the exposure value and maturity Article 384 defines and does not check how they were calculated |
 | Scope and eligibility | The caller supplies only in-scope netting sets (Article 382) and eligible hedges (Article 386); the tool does not apply exemptions or eligibility tests (M4, M6) |
 | Supervisory parameters | Taken only from a registered controlling text, recorded with its locator, and never typed in code without a `REFERENCE` |
 | Numeric conventions | `Double` arithmetic, no intermediate rounding; tolerances are explicit on every expected value ([TEST_CASES.md](TEST_CASES.md#tolerance)) |
@@ -179,9 +179,8 @@ change that records it here with its controlling source:
 
 - **M4:** scope and exemptions under Article 382, including the amendments of
   Regulation (EU) 2024/2987, and counterparty classification for Table 1.
-- **M5:** whether the effective maturity of a netting set is supplied or
-  derived under Article 162; netting-set and collateral assumptions beyond
-  the supplied EAD.
+- **M5:** netting-set and collateral assumptions beyond the supplied EAD
+  and effective maturity.
 - **M6:** hedge data and eligibility; SA-CVA market data and sensitivities.
 - **M7:** output measures, currencies, sign conventions and the error policy
   of the facade.

@@ -73,7 +73,7 @@ A case is one input file and one expected-result file per calculation regime:
 | Identifiers | Each counterparty, netting set and hedge has an `id`, unique in the fixture. Each netting set names an existing `counterparty_id`. A single-name hedge names the `counterparty_id` it hedges; an index hedge has `counterparty_id: null` |
 | Hedges | Each hedge has `kind`, `single_name` or `index`, and an `inputs` object. Only eligible hedges appear: eligibility under Article 386 is the caller's responsibility, not tested by a case |
 | Inputs | Every quantity sits in an `inputs` object, whose keys are lower snake case and end in a unit suffix (below). Which keys exist is decided by the input contract; until it is written, only `illustrative-` cases may exist, and their keys may start with `illustrative_` |
-| Exposure | A netting set's exposure value is supplied (M5), never derived in a case: it is an input, not an expected output |
+| Exposure | A netting set's exposure value and effective maturity are supplied (M5), never derived in a case: they are inputs, not expected outputs |
 | Currencies | `calculation_currency_code` is the currency of results. An object whose `inputs` hold an `_amount` key also holds `currency_code`, the currency of all its amounts, so a currency mismatch is always visible |
 | Signs | Amounts are unsigned unless the input contract defines a signed field |
 
@@ -182,7 +182,8 @@ An actual result `a` matches the expected value `e` when
 
 Both bounds are stated on every numeric output, as finite numbers of at least
 0; there is no hidden default. Both 0 means an exact comparison, for whole
-numbers only.
+numbers only. The bounds below were accepted by the maintainer on 2026-10-24
+in [#8](https://github.com/danielep71/MKT-K-CVA/issues/8) (M7).
 
 | Reference | `absolute` | `relative` |
 | --- | --- | --- |
