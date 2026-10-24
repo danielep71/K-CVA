@@ -101,7 +101,8 @@ every branch at once, so a host call in an inactive branch is still rejected.
   in any case, as VBA resolves them; `M_`, `sh`, `frm` and `Example` names of
   components not yet tracked match only as the house style writes them,
   since `m_Total` is an ordinary identifier. Statements are read without
-  numeric line labels and `VBA.` library qualifiers, and single-line
+  numeric line labels, an explicit `Call` and `VBA.` library qualifiers, and
+  single-line
   `If ... Then ... Else ...` branches as statements of their own. Reading
   the clock (`Now`, `Date`, `Timer`) is not reported; whether core results
   may depend on it belongs to the methodology (#8);

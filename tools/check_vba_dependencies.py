@@ -53,8 +53,8 @@ STRING = re.compile(r'"(?:[^"]|"")*"?')
 FILE_STATEMENT = re.compile(r"^(?:Open\b.*\bFor\b|Kill|FileCopy|MkDir|RmDir|ChDir|ChDrive|SetAttr|"
                             r"Reset|SaveSetting|DeleteSetting|SendKeys|AppActivate|Load|Unload|"
                             r"Name\b.*\bAs)\b|"
-                            r"^(?:Close|Print|Input|Line\s+Input|Write|Get|Put|Seek|Lock|Unlock|"
-                            r"Width)\s*#|^(?:Date|Time)\$?\s*=", re.I)
+                            r"^(?:Print|Input|Line\s+Input|Write|Width)\s*#|^Close\b|"
+                            r"^(?:Get|Put|Seek|Lock|Unlock)\s*[#\w(]|^(?:Date|Time)\$?\s*=", re.I)
 # VBA's file, registry, environment and process functions. Those that are
 # also ordinary words match only as calls.
 FILE_FUNCTION = re.compile(r"(?<![\w.])(?:(Dir|Shell|GetSetting|GetAllSettings|Environ|CurDir|"
@@ -68,9 +68,10 @@ EXTERNAL = re.compile(r"(?<![\w.])(Scripting\.(?!Dictionary\b)\w+|(?:ADODB|DAO|M
                       r"Office)\.\w+)", re.I)
 EXTERNAL_TYPE = re.compile(r"\bAs\s+(?:New\s+)?(FileSystemObject|TextStream|Drive|Folder|File)\b",
                            re.I)
-# A numeric line label, and the VBA library qualifiers that reach a built-in
-# under another name, as in VBA.FileSystem.Kill.
+# A numeric line label, an explicit Call, and the VBA library qualifiers that
+# reach a built-in under another name, as in Call VBA.FileSystem.Kill(Path).
 LINE_LABEL = re.compile(r"^\s*\d+(?=\s|$)\s*")
+CALL = re.compile(r"^Call\s+", re.I)
 VBA_QUALIFIER = re.compile(r"(?<![\w.])(?:VBA\.)?(?:FileSystem|Interaction|Strings|Information|"
                            r"Conversion|DateTime|Math|Financial)\.|(?<![\w.])VBA\.", re.I)
 DYNAMIC = re.compile(r"(?<![\w.])(CallByName|Evaluate|ExecuteExcel4Macro|AddressOf)\b", re.I)
@@ -120,7 +121,7 @@ def executable_parts(code: str) -> list[str]:
     parts: list[str] = []
     pending = [code.strip()]
     while pending:
-        for piece in (LINE_LABEL.sub("", item).strip() for item in ELSE.split(pending.pop())):
+        for piece in (normalize(item) for item in ELSE.split(pending.pop())):
             parts.append(piece)
             branch = SINGLE_LINE_IF.match(piece)
             if branch:
@@ -188,9 +189,10 @@ def statements(text: str) -> list[tuple[int, str, str]]:
 
 
 def normalize(statement: str) -> str:
-    """The statement without a numeric line label or VBA library qualifiers,
-    so that 100 Kill Path and VBA.FileSystem.Kill Path read as Kill Path."""
-    return VBA_QUALIFIER.sub("", LINE_LABEL.sub("", statement))
+    """The statement without a numeric line label, an explicit Call or VBA
+    library qualifiers, so that 100 Kill Path, Call Kill(Path) and
+    VBA.FileSystem.Kill Path all read as a Kill statement."""
+    return VBA_QUALIFIER.sub("", CALL.sub("", LINE_LABEL.sub("", statement).strip()))
 
 
 def analyze(path: str, text: str, upper: re.Pattern[str] | None = None,

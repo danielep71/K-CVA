@@ -839,6 +839,11 @@ End Function
 Public Property Get Total() As Double
         Total = mTotal
 End Property
+
+
+Public Property Let Total(ByVal Value As Double)
+        mTotal = Value
+End Property
 ''')),
     "example-uses-facade": (EXAMPLE_PATH, example_module('''Public Sub Run()
         Debug.Print CVA_Functions.CVA_IsPositive(1)
@@ -864,7 +869,11 @@ End Sub
         Set Seen = New Scripting.Dictionary
 100     Debug.Print Date, Inputs + Location
         Pick = VBA.Strings.Left("ab", 1)
+        Call Helper(1)
 End Function
+
+Private Sub Helper(ByVal Value As Long)
+End Sub
 ''')),
     "tests-and-facade-are-not-restricted": ("tests/modules/TEST_Fixture.bas", module('''
 Public Sub RunAll()
@@ -968,6 +977,22 @@ DEPENDENCY_INVALID = {
                         "file, registry or process access"),
     "qualified-msgbox": (CORE_PATH, in_procedure('        VBA.Interaction.MsgBox "x"'),
                          "MsgBox reaches the Excel host"),
+    "call-save-setting": (CORE_PATH, in_procedure('        Call SaveSetting("App", "Section", "Key", "1")'),
+                          "file, registry or process access"),
+    "call-qualified-save-setting": (CORE_PATH, in_procedure(
+        '        Call VBA.Interaction.SaveSetting("App", "Section", "Key", "1")'),
+        "file, registry or process access"),
+    "call-kill": (CLASS_PATH, class_module('Public Sub Go()\n        Call Kill("data.txt")\nEnd Sub\n'),
+                  "file, registry or process access"),
+    "call-after-then": (CORE_PATH, in_procedure('        If Flag Then Call MkDir("out")'),
+                        "file, registry or process access"),
+    "numbered-call": (CORE_PATH, in_procedure('100     Call FileCopy("a", "b")'),
+                      "file, registry or process access"),
+    "close-all-files": (CORE_PATH, in_procedure("        Close"), "file, registry or process access"),
+    "close-without-hash": (CORE_PATH, in_procedure("        Close 1"), "file, registry or process access"),
+    "get-without-hash": (CORE_PATH, in_procedure("        Get 1, , Value"),
+                         "file, registry or process access"),
+    "seek-without-hash": (CORE_PATH, in_procedure("        Seek 1, 1"), "file, registry or process access"),
     "native-declare": (CORE_PATH, core_module('Private Declare PtrSafe Function GetTickCount Lib '
                                               '"kernel32" () As Long\n'),
                        "a native Declare; core and classes call no external library"),
