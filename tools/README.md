@@ -8,7 +8,9 @@ are configured under #12. Controlled enforcement verification remains #13.
 
 check_issues.py audits issue metadata and configuration; test_check_issues.py
 exercises that policy. Live issue auditing remains a separate read-only workflow.
-Static architecture checks follow in #9. Build and evidence scripts may be added
-here with their own contracts. Regulatory reference derivations belong in
-tests/derivations, never in repository policy checks. Python tooling is not
-shipped as part of the workbook runtime; no numerical engine is validated here.
+check_vba_*.py and vba_lexer.py are the static VBA checks, with fixtures in
+test_check_vba.py; see docs/CI.md for their rules and limits. Build and
+evidence scripts may be added here with their own contracts. Regulatory
+reference derivations belong in tests/derivations, never in repository policy
+checks. Python tooling is not shipped as part of the workbook runtime; no
+numerical engine is validated here.
