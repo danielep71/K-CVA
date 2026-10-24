@@ -290,7 +290,7 @@ class SourceTest(unittest.TestCase):
         self.assertTrue(any("check it out with CRLF" in item for item in findings), findings)
 
     def test_workbooks_are_not_committed(self) -> None:
-        self.assertFinding({"src/workbook/MKT-K-CVA.xlsm": b"PK\x03\x04"}, "workbook committed")
+        self.assertFinding({"src/workbook/K-CVA.xlsm": b"PK\x03\x04"}, "workbook committed")
 
     def test_main_exit_codes(self) -> None:
         for files, expected in ((VALID, 0), ({"src/Stray.bas": CORE}, 1)):

@@ -1,6 +1,6 @@
 # Numerical test cases
 
-This document defines how MKT-K-CVA's numerical test cases are written:
+This document defines how K-CVA's numerical test cases are written:
 files, inputs and their units, expected results and their provenance,
 tolerances, case categories, invalid inputs and when a rule counts as
 validated. Sources, approaches and rule IDs come from the
@@ -182,7 +182,7 @@ An actual result `a` matches the expected value `e` when
 Both bounds are stated on every numeric output, as finite numbers of at least
 0; there is no hidden default. Both 0 means an exact comparison, for whole
 numbers only. The bounds below were accepted by the maintainer on 2026-10-24
-in [#8](https://github.com/danielep71/MKT-K-CVA/issues/8) (M7).
+in [#8](https://github.com/danielep71/K-CVA/issues/8) (M7).
 
 | Reference | `absolute` | `relative` |
 | --- | --- | --- |
@@ -248,7 +248,7 @@ Each fixture declares one `category`:
   public input domain at least one `invalid` case, as a fixture or a VBA test.
 - A harness run that does not execute every expected case and assertion is
   **incomplete, not a pass**
-  ([#10](https://github.com/danielep71/MKT-K-CVA/issues/10)).
+  ([#10](https://github.com/danielep71/K-CVA/issues/10)).
 - A release states which rules are validated, under which version of the
   controlling text, and lists every rule that is implemented but not
   validated.

@@ -10,6 +10,7 @@ Live REST readback compared repository general settings and all five rulesets.
 Signed-in Actions and Advanced Security settings were inspected for both repos.
 [Retained ruleset readback](evidence/repository-rulesets-2026-10-24.json) records
 conditions, rules and bypass lists; it contains no credentials.
+It was recorded before the repository was renamed and names it MKT-K-CVA.
 
 | Area | Verified result |
 | --- | --- |
@@ -31,11 +32,11 @@ no additional scanner coverage is claimed by this settings change.
 
 ## Saved target rulesets
 
-- [Protect main](https://github.com/danielep71/MKT-K-CVA/rules/25781886)
-- [Protect release branches](https://github.com/danielep71/MKT-K-CVA/rules/25781928)
-- [Release deletion guard](https://github.com/danielep71/MKT-K-CVA/rules/25781993)
-- [Release tags](https://github.com/danielep71/MKT-K-CVA/rules/25781957)
-- [Traffic history](https://github.com/danielep71/MKT-K-CVA/rules/25782014)
+- [Protect main](https://github.com/danielep71/K-CVA/rules/25781886)
+- [Protect release branches](https://github.com/danielep71/K-CVA/rules/25781928)
+- [Release deletion guard](https://github.com/danielep71/K-CVA/rules/25781993)
+- [Release tags](https://github.com/danielep71/K-CVA/rules/25781957)
+- [Traffic history](https://github.com/danielep71/K-CVA/rules/25782014)
 
 The UI confirmed both source-branch rulesets saved; independent REST readback
 confirmed the exact check name, GitHub Actions source, strict policy and creation

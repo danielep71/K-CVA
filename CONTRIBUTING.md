@@ -1,6 +1,6 @@
-# Contributing to MKT-K-CVA
+# Contributing to K-CVA
 
-MKT-K-CVA has one maintainer, who decides scope, priorities and what is
+K-CVA has one maintainer, who decides scope, priorities and what is
 integrated ([docs/GOVERNANCE.md](docs/GOVERNANCE.md#ownership-and-scope)).
 The repository is private. Every change starts from an issue and arrives
 through a pull request.

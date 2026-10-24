@@ -3,7 +3,7 @@ Attribute VB_Name = "TEST_Harness"
 ' MODULE: TEST_Harness
 '------------------------------------------------------------------------------
 ' PURPOSE
-'   Deterministic regression harness for MKT-K-CVA's VBA test suites: one
+'   Deterministic regression harness for K-CVA's VBA test suites: one
 '   run per suite, stable case identifiers, exact and tolerance assertions,
 '   expected error values and raised errors, expected case and assertion
 '   counts, and a complete key=value log. It holds no CVA calculation.

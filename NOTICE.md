@@ -4,7 +4,7 @@ Copyright 2026 Daniele Penza and contributors.
 
 ## License decision
 
-The maintainer selected **MPL-2.0** for MKT-K-CVA on 2026-10-24 in issue #4's
+The maintainer selected **MPL-2.0** for K-CVA on 2026-10-24 in issue #4's
 implementation discussion. Code, documentation, workflows and configuration
 are covered by [LICENSE](LICENSE), unless a separate notice states otherwise.
 Repository visibility remains private; this change does not publish the project.
@@ -53,7 +53,7 @@ Preserve that upstream attribution as well as the immediate SFTs source.
 - docs/GOVERNANCE.md was written using SFTs governance at
   `c13e1167e779ab1816db9d8c81e140abddbf6c66`,
   blob `bab2ca28c0e48cda98a58698003bbad65de1c9e4`.
-  Rules and controls were adapted to MKT-K-CVA. SFTs attributes the process
+  Rules and controls were adapted to K-CVA. SFTs attributes the process
   structure to K-Risk-Engines `8942d070c80097762534ad6fb09e9c38b101da83`.
 - docs/REPOSITORY_STRUCTURE.md and docs/PUBLIC_API.txt use the architecture
   and inventory conventions of SFTs source blob

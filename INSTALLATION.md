@@ -30,8 +30,8 @@ workbook. Follow organizational macro policy; do not weaken security settings.
 With authorized access to the private repository:
 
 ```sh
-git clone https://github.com/danielep71/MKT-K-CVA.git
-cd MKT-K-CVA
+git clone https://github.com/danielep71/K-CVA.git
+cd K-CVA
 git switch release/0.1.0
 git rev-parse HEAD
 git status --short
