@@ -127,7 +127,7 @@ on 2026-10-24:
 | --- | --- | --- |
 | `tools/vba_lexer.py` | `f7c765bed0e937ff9eb9b457d957d1f7ecde0f2a` | Documentation pointers. |
 | `tools/check_vba_source.py` | `ca9be39e521d6a62ff87a450bb4c202773d78fae` | `CVA_` facade prefix; every `Option Base` rejected; documentation pointers. |
-| `tools/check_vba_conditionals.py` | `2e150008b51f162b0707907e403c310b70efaa53` | Documentation pointers. |
+| `tools/check_vba_conditionals.py` | `2e150008b51f162b0707907e403c310b70efaa53` | Each colon-separated statement checked for a `Declare` without `PtrSafe` (#56); documentation pointers. |
 | `tools/check_vba_jumps.py` | `07974e1f78b9269014c876b2c9b04c8cbe4fbd2f` | Documentation pointers. |
 | `tools/check_vba_public_api.py` | `8637f6190c3dcbf5459ba48761081783c36f9e94` | Public variables and public `Declare` rejected in standard modules; documentation pointers. |
 | `tools/test_check_vba.py` | `8a6f9f3e9131f4295a836d72f4a696739e3c6dc7` | Fixtures renamed without SFT names; fixtures for the changed rules and for the dependency check. |

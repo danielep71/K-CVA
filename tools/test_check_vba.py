@@ -331,6 +331,12 @@ CONDITIONAL_VALID = {
         () As Long
 #End If
 ''',
+    "colon-separated-ptrsafe": '''Private Const N As Long = 1: Private Declare PtrSafe Function B Lib "kernel32" () As LongPtr
+''',
+    "colon-separated-legacy-under-vba6": '''#If Not VBA7 Then
+    Private Const N As Long = 1: Private Declare Function B Lib "kernel32" () As Long
+#End If
+''',
     "literals": '''#If True And Not 0 Then
     Private Declare PtrSafe Function Modern Lib "kernel32" () As LongPtr
 #End If
@@ -349,6 +355,11 @@ CONDITIONAL_INVALID = {
     Private Declare PtrSafe Function NeverReached Lib "kernel32" () As LongPtr
 #End If
 ''', "vba7-win64"),
+    "colon-separated-declare": ('Private Const N As Long = 1: Private Declare Function B Lib "kernel32" '
+                                '() As Long\n', "without PtrSafe in vba7-win32, vba7-win64"),
+    "declare-after-two-colons": ('Private Const N As Long = 1: Private Const M As Long = 2: '
+                                 'Private Declare Sub C Lib "kernel32" ()\n',
+                                 "without PtrSafe in vba7-win32, vba7-win64"),
     "unknown-symbol": ("#If Mac Then\n#End If\n", "unsupported conditional-compilation symbol"),
     "vba6-is-true-under-vba7": ('''#If VBA6 Then
     Private Declare Function Legacy Lib "kernel32" () As Long

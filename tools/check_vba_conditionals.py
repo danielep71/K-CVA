@@ -19,7 +19,14 @@ from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
-from vba_lexer import Finding, logical_units, read_component, report, tracked_components
+from vba_lexer import (
+    Finding,
+    logical_units,
+    read_component,
+    report,
+    split_statements,
+    tracked_components,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 DECLARE = re.compile(
@@ -272,11 +279,13 @@ def analyze(path: str, text: str) -> list[Finding]:
         if kind == "directive":
             handle_directive(path, start, code, stacks, findings)
             continue
-        declaration = DECLARE.match(code)
         reachable = [name for name in VBA7_ENVIRONMENTS if active(stacks[name])]
-        if declaration and reachable and not declaration.group("ptrsafe"):
-            findings.append(Finding(path, start, "Declare reachable under VBA7 without PtrSafe "
-                                                 f"in {', '.join(reachable)}"))
+        # Every statement of the line: a Declare may follow a colon.
+        for statement in split_statements(code):
+            declaration = DECLARE.match(statement)
+            if declaration and reachable and not declaration.group("ptrsafe"):
+                findings.append(Finding(path, start, "Declare reachable under VBA7 without "
+                                                     f"PtrSafe in {', '.join(reachable)}"))
     return findings + unclosed(path, stacks)
 
 
