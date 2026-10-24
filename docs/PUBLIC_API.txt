@@ -1,0 +1,3 @@
+# Supported public API inventory for MKT-K-CVA
+# No supported declarations exist during repository setup.
+# Format and change policy: REPOSITORY_STRUCTURE.md
