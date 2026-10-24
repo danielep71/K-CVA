@@ -37,8 +37,8 @@ Repository setup checks do not certify CVA calculations or Excel execution.
 Route: <!-- Task -> release/0.1.0 (squash); release -> main (merge, owner approval); main -> release (merge, record empty/non-empty file diff). -->
 Review/evidence links: <!-- Final-head review, checks and artifact links. -->
 
-Follow [repository governance](https://github.com/danielep71/MKT-K-CVA/blob/main/docs/GOVERNANCE.md)
-and [issue rules](https://github.com/danielep71/MKT-K-CVA/blob/main/docs/ISSUE_LABELS.md).
+Follow [repository governance](https://github.com/danielep71/K-CVA/blob/main/docs/GOVERNANCE.md)
+and [issue rules](https://github.com/danielep71/K-CVA/blob/main/docs/ISSUE_LABELS.md).
 Report security vulnerabilities through the
-[private reporting route](https://github.com/danielep71/MKT-K-CVA/blob/main/SECURITY.md),
+[private reporting route](https://github.com/danielep71/K-CVA/blob/main/SECURITY.md),
 not in this PR.

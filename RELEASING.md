@@ -80,9 +80,9 @@ procedure and a genuine host run, no candidate meets invariant 4.
 
 In a task pull request into the release branch, move the `[Unreleased]`
 entries into `## [X.Y.Z] - YYYY-MM-DD` and add its link reference,
-`[X.Y.Z]: https://github.com/danielep71/MKT-K-CVA/releases/tag/vX.Y.Z`.
+`[X.Y.Z]: https://github.com/danielep71/K-CVA/releases/tag/vX.Y.Z`.
 Keep an empty `## [Unreleased]` section, with its link reference changed to
-`https://github.com/danielep71/MKT-K-CVA/compare/vX.Y.Z...HEAD`. Create or
+`https://github.com/danielep71/K-CVA/compare/vX.Y.Z...HEAD`. Create or
 update `VERSION` to `X.Y.Z` in the same pull request. Update the *Current
 status* table above.
 

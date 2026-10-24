@@ -1,6 +1,6 @@
 # Repository governance
 
-This document defines how changes to MKT-K-CVA are proposed, reviewed and
+This document defines how changes to K-CVA are proposed, reviewed and
 integrated. Policy and verified GitHub controls are recorded separately.
 
 ## Ownership and scope
@@ -10,7 +10,7 @@ Contributors and automation act within the maintainer's authorization and retain
 truthful authorship. Bot authorship does not permit bypassing review or rules.
 
 The milestone **v0.1.0 - Repo setup** covers repository infrastructure.
-Architecture and the initial CVA product scope were established in [#3](https://github.com/danielep71/MKT-K-CVA/issues/3);
+Architecture and the initial CVA product scope were established in [#3](https://github.com/danielep71/K-CVA/issues/3);
 production calculations, numerical certification and production workbook packaging
 are outside this milestone. Keep the repository private.
 
@@ -78,7 +78,7 @@ branches are required by the main and release rulesets. The unfiltered workflow 
 label workflows must not serve as the universal required check.
 
 Snapshot verified on **2026-10-24** through GitHub API reads and the settings
-evidence recorded in [#12](https://github.com/danielep71/MKT-K-CVA/issues/12):
+evidence recorded in [#12](https://github.com/danielep71/K-CVA/issues/12):
 
 | Control | Configured or pending |
 | --- | --- |
@@ -97,7 +97,7 @@ evidence recorded in [#12](https://github.com/danielep71/MKT-K-CVA/issues/12):
 | Codex review | Observed completed on PRs #21 and #24; coverage must still be verified per final head. |
 
 The universal check is documented in [CI.md](CI.md) and was integrated into
-main by [PR #32](https://github.com/danielep71/MKT-K-CVA/pull/32).
+main by [PR #32](https://github.com/danielep71/K-CVA/pull/32).
 Record applicable checks and explicit gaps in each PR. Absence of a check is not a passing check. Update this dated snapshot
 when a control changes; do not describe desired controls as configured.
 Before closing a setup issue, reconcile affected status tables, decision records
@@ -107,14 +107,14 @@ and dependent issue progress with its delivered evidence and remaining work.
 
 ### Demonstrated enforcement
 
-Recorded on **2026-10-24** for [#13](https://github.com/danielep71/MKT-K-CVA/issues/13).
+Recorded on **2026-10-24** for [#13](https://github.com/danielep71/K-CVA/issues/13).
 Each row is a merge GitHub refused on a real pull request into release/0.1.0.
 The refusal text is quoted from the API response.
 
 | Rule | Evidence |
 | --- | --- |
-| A failing required check blocks the merge | Controlled [PR #68](https://github.com/danielep71/MKT-K-CVA/pull/68). Head `e05d06e` added `tests/modules/TEST_DefectProbe.bas`, whose `GoTo Missing` names no label. Run [40116817400](https://github.com/danielep71/MKT-K-CVA/actions/runs/40116817400) checked test merge `379b3dc`; only `vba-jumps` failed, with `tests/modules/TEST_DefectProbe.bas:8: GoTo target 'Missing' is not a label of procedure Probe`. A squash merge pinned to `e05d06e` was refused: *405 Repository rule violations found. Required status check "Repository integrity" is failing.* Correction `2f56108` removed the probe; run [40116946233](https://github.com/danielep71/MKT-K-CVA/actions/runs/40116946233) passed on test merge `46b9ecb`. The probe never reached an integration branch: #68 was squash-merged after the correction, so only the corrected tree landed. |
-| A passing check on an old base is not enough | After [#69](https://github.com/danielep71/MKT-K-CVA/pull/69) moved release/0.1.0 to `d6014c8`, a squash merge of #68 pinned to `2f56108`, whose passing run predated that base, was refused: *405 Repository rule violations found. Required status check "Repository integrity" is expected.* |
+| A failing required check blocks the merge | Controlled [PR #68](https://github.com/danielep71/K-CVA/pull/68). Head `e05d06e` added `tests/modules/TEST_DefectProbe.bas`, whose `GoTo Missing` names no label. Run [40116817400](https://github.com/danielep71/K-CVA/actions/runs/40116817400) checked test merge `379b3dc`; only `vba-jumps` failed, with `tests/modules/TEST_DefectProbe.bas:8: GoTo target 'Missing' is not a label of procedure Probe`. A squash merge pinned to `e05d06e` was refused: *405 Repository rule violations found. Required status check "Repository integrity" is failing.* Correction `2f56108` removed the probe; run [40116946233](https://github.com/danielep71/K-CVA/actions/runs/40116946233) passed on test merge `46b9ecb`. The probe never reached an integration branch: #68 was squash-merged after the correction, so only the corrected tree landed. |
+| A passing check on an old base is not enough | After [#69](https://github.com/danielep71/K-CVA/pull/69) moved release/0.1.0 to `d6014c8`, a squash merge of #68 pinned to `2f56108`, whose passing run predated that base, was refused: *405 Repository rule violations found. Required status check "Repository integrity" is expected.* |
 | Rebase merges are refused | A rebase merge of #69 pinned to `19d6308`, with its check passing, was refused: *405 Rebase merges are not allowed on this repository.* The message does not say whether the repository setting or the release ruleset refused it; the #12 read-back records rebase as allowed by the repository and excluded by the ruleset. #69 was then squash-merged. |
 
 **What a pull request run checks.** A `pull_request` run checks out GitHub's
@@ -170,7 +170,7 @@ licensing and provenance are documented in [SECURITY.md](../SECURITY.md) and
 [NOTICE.md](../NOTICE.md). The maintainer selected MPL-2.0 in #4; security
 features are recorded with their verification limits.
 
-This policy was written for MKT-K-CVA using the process in
+This policy was written for K-CVA using the process in
 [CCR-K-SFTs governance](https://github.com/danielep71/CCR-K-SFTs/blob/c13e1167e779ab1816db9d8c81e140abddbf6c66/docs/GOVERNANCE.md)
 as a design reference (source blob `bab2ca28c0e48cda98a58698003bbad65de1c9e4`).
 Its configured controls and domain-specific decisions were not copied as facts.

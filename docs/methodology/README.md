@@ -1,6 +1,6 @@
 # Methodology
 
-This directory records **what MKT-K-CVA will implement and on what authority**:
+This directory records **what K-CVA will implement and on what authority**:
 the controlling text and its dates, the source register, the approaches and
 their CRR articles, the inputs they need, the assumptions and open decisions,
 and the trace from each rule to its formula, code and tests. The numerical
@@ -22,7 +22,7 @@ its SFT methods, sources or values applies here.
 ## Regulatory basis
 
 Decided by the maintainer on 2026-10-24 in
-[#8](https://github.com/danielep71/MKT-K-CVA/issues/8)
+[#8](https://github.com/danielep71/K-CVA/issues/8)
 ([DECISIONS.md](../DECISIONS.md) M1).
 
 | Role | Source | Use |

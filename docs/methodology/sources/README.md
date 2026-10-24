@@ -1,6 +1,6 @@
 # Regulatory sources
 
-Copies of the texts MKT-K-CVA's methodology relies on, so that a citation and
+Copies of the texts K-CVA's methodology relies on, so that a citation and
 its formula can be checked against the exact version that was read. The
 [source register](../README.md#source-register) says what each text is used
 for and how far it was read. Selected texts only: a registered source is

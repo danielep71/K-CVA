@@ -1,7 +1,7 @@
 # v0.1.0 closeout
 
 The checklist and evidence index for closing the milestone
-[v0.1.0 - Repo setup](https://github.com/danielep71/MKT-K-CVA/milestone/1).
+[v0.1.0 - Repo setup](https://github.com/danielep71/K-CVA/milestone/1).
 Prepared by #17 before the file audits; filled in by #18, #19 and #20.
 Nothing in this document is complete until its row links the evidence.
 

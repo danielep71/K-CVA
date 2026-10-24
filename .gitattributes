@@ -1,4 +1,4 @@
-# MKT-K-CVA Git policy. Adapted from CCR-K-SFTs; see NOTICE.md.
+# K-CVA Git policy. Adapted from CCR-K-SFTs; see NOTICE.md.
 # Normalize text to LF in the index; export VBA as CRLF on checkout.
 # ASCII-only VBA needs no working-tree-encoding conversion.
 [attr]vba-source text eol=crlf diff=vba linguist-language=VBA

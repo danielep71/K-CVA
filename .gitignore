@@ -1,4 +1,4 @@
-# MKT-K-CVA source-first policy. Adapted from CCR-K-SFTs; see NOTICE.md.
+# K-CVA source-first policy. Adapted from CCR-K-SFTs; see NOTICE.md.
 # Ignores prevent accidental additions, not exposure of already tracked secrets.
 ~$*
 .~lock.*#

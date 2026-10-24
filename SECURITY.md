@@ -2,7 +2,7 @@
 
 ## Reporting privately
 
-Email **danielep71@gmail.com** with subject **Private security report — MKT-K-CVA**.
+Email **danielep71@gmail.com** with subject **Private security report — K-CVA**.
 The maintainer confirmed this route on 2026-10-24 for issue #4. No test email
 was sent. Do not put vulnerability details, credentials or confidential data
 in issues, PRs, commits, logs or screenshots, even while the repository is private.
@@ -56,8 +56,8 @@ demonstration remains #13. A green metadata check is not a security scan.
 ## Feature status and limitations
 
 Snapshot: **2026-10-24**, verified in this repository's signed-in
-[Advanced Security settings](https://github.com/danielep71/MKT-K-CVA/settings/security_analysis)
-and [security overview](https://github.com/danielep71/MKT-K-CVA/security).
+[Advanced Security settings](https://github.com/danielep71/K-CVA/settings/security_analysis)
+and [security overview](https://github.com/danielep71/K-CVA/security).
 The repository API confirmed private visibility, personal ownership and main as
 the default branch. No visibility, ownership, subscription or security setting
 was changed during this verification.
@@ -73,7 +73,7 @@ was changed during this verification.
 | Code scanning | Overview explicitly shows disabled and states that Advanced Security is only available for organizations. Unavailable in this repository's current configuration. |
 | Secret scanning / repository push protection | Neither control is offered in Advanced Security settings. They are unavailable in the current personal-private configuration under the documented eligibility below; no scan or push-blocking coverage is claimed. |
 | GitHub private vulnerability reporting | No control or advisory reporting entry is offered. GitHub documents this feature for public repositories; it is unavailable while this repository remains private. Use the confirmed email route above. |
-| Security policy discovery | [SECURITY.md is on main](https://github.com/danielep71/MKT-K-CVA/blob/main/SECURITY.md), integrated by PR #28. The issue chooser security link targets main following #7/PR #32. The private email reporting route remains unchanged. |
+| Security policy discovery | [SECURITY.md is on main](https://github.com/danielep71/K-CVA/blob/main/SECURITY.md), integrated by PR #28. The issue chooser security link targets main following #7/PR #32. The private email reporting route remains unchanged. |
 
 Eligibility references checked on the same date:
 [secret scanning](https://docs.github.com/en/code-security/how-tos/secure-your-secrets/detect-secret-leaks/enable-secret-scanning),
@@ -90,7 +90,7 @@ availability limitation; an omitted API security_and_analysis field alone does
 not. Reassess after any ownership, plan or visibility change. Retain private
 visibility. Manual review and the data/credential rules above remain necessary.
 
-Existing [issue #12](https://github.com/danielep71/MKT-K-CVA/issues/12) evidence
+Existing [issue #12](https://github.com/danielep71/K-CVA/issues/12) evidence
 also records required full-SHA action pinning and default workflow-token read
 permissions. Dependency-update configuration was completed by #6. These settings
 and repository integrity checks do not constitute code or secret scanning.

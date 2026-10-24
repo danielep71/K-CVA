@@ -14,7 +14,7 @@ import check_issues
 from check_issues import Issue
 
 ROOT = Path(__file__).resolve().parents[1]
-REPOSITORY = "danielep71/MKT-K-CVA"
+REPOSITORY = "danielep71/K-CVA"
 BLOCKED_LABEL = check_issues.BLOCKED
 READY = "## Dependencies and blocking status\n\n**Ready to start**: none.\n"
 

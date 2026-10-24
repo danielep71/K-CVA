@@ -1,9 +1,12 @@
-# MKT-K-CVA
+# K-CVA
 
-Regulatory capital for credit valuation adjustment (CVA) risk. MKT-K-CVA is
+Regulatory capital for credit valuation adjustment (CVA) risk. K-CVA is
 intended to become an Excel/VBA application that calculates the own funds
 requirements for CVA risk under the EU Capital Requirements Regulation, from
 supplied exposures and hedges.
+
+The repository was named MKT-K-CVA until 2026-10-24; GitHub redirects the
+old links.
 
 > [!IMPORTANT]
 > **Status: repository setup only.** There is no calculation engine, public
