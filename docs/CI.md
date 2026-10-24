@@ -64,7 +64,7 @@ run by the Python tooling tests.
 | `vba-conditionals` | Every `#If` block evaluates in each modeled host; a project `#Const`, an unknown symbol or an unbalanced block fails; a `Declare` reachable under VBA7 is `PtrSafe` (`check_vba_conditionals.py`). |
 | `vba-jumps` | Every `GoTo`, `GoSub` and `Resume` target is a label of the same procedure, labels are unique per procedure and every procedure is closed, in each modeled host (`check_vba_jumps.py`). |
 | `vba-public-api` | Every procedure and module-level declaration states its visibility; a standard module declares no public variable and no public `Declare`; the public declarations of `src/modules/` and [PUBLIC_API.txt](PUBLIC_API.txt) match one to one with their signatures; no public name collides (`check_vba_public_api.py`). |
-| `vba-dependencies` | `src/core/` and `src/classes/` name no Excel or UI global or type, use no `[...]` evaluation, file, registry or process access, no `CallByName`, `Evaluate`, `ExecuteExcel4Macro` or `AddressOf`, no `CreateObject` other than `"Scripting.Dictionary"` and no `GetObject`, and name no facade, adapter, form, test or example component; `src/core/` standard modules hold no module-level or `Static` variable and no `Static` procedure; `examples/modules/` name only the facade, not core, model classes, adapters, forms or tests (`check_vba_dependencies.py`). |
+| `vba-dependencies` | `src/core/` and `src/classes/` name no Excel or UI global or type, use no `[...]` evaluation, no VBA file, file-metadata, registry, environment, process, form-loading or system-clock statement or function, no native `Declare`, no external object model (`Scripting` other than `Dictionary`, `ADODB`, `MSXML2` and similar) or file-system type, no `CallByName`, `Evaluate`, `ExecuteExcel4Macro` or `AddressOf`, no `CreateObject` other than `"Scripting.Dictionary"` and no `GetObject`, and name no facade, adapter, form, test or example component; `src/core/` standard modules hold no module-level or `Static` variable and no `Static` procedure; `examples/modules/` name only the facade, not core, model classes, adapters, forms or tests (`check_vba_dependencies.py`). |
 
 **Three different checks.** A static PASS is neither a compilation nor a
 validation:
@@ -100,8 +100,11 @@ every branch at once, so a host call in an inactive branch is still rejected.
   Tracked component names and the `CVA_`, `CORE_` and `TEST_` prefixes match
   in any case, as VBA resolves them; `M_`, `sh`, `frm` and `Example` names of
   components not yet tracked match only as the house style writes them,
-  since `m_Total` is an ordinary identifier. Single-line `If ... Then ...
-  Else ...` branches are read as statements;
+  since `m_Total` is an ordinary identifier. Statements are read without
+  numeric line labels and `VBA.` library qualifiers, and single-line
+  `If ... Then ... Else ...` branches as statements of their own. Reading
+  the clock (`Now`, `Date`, `Timer`) is not reported; whether core results
+  may depend on it belongs to the methodology (#8);
 - calls: whether a called procedure exists, is visible and gets the right
   arguments. Compiling in Excel checks direct calls.
 - **Dynamic calls** outside `src/core/` and `src/classes/`: no check resolves

@@ -859,6 +859,13 @@ End Sub
         If Flag Then Debug.Print "Kill" Else Debug.Print "Open"
 End Sub
 ''')),
+    "ordinary-names-and-early-bound-dictionary": (CORE_PATH, core_module('''Public Function Pick(ByVal Inputs As Long, ByVal Location As Long) As String
+        Dim Seen As Scripting.Dictionary
+        Set Seen = New Scripting.Dictionary
+100     Debug.Print Date, Inputs + Location
+        Pick = VBA.Strings.Left("ab", 1)
+End Function
+''')),
     "tests-and-facade-are-not-restricted": ("tests/modules/TEST_Fixture.bas", module('''
 Public Sub RunAll()
         Debug.Print Application.Name, CORE_Validation.IsPositive(1)
@@ -931,6 +938,45 @@ DEPENDENCY_INVALID = {
                               "file, registry or process access"),
     "block-else-on-same-line": (CORE_PATH, in_procedure('        If A Then\n        Else Kill "f.txt"\n        End If'),
                                 "file, registry or process access"),
+    "file-length": (CORE_PATH, in_procedure('        Debug.Print FileLen("data.txt")'),
+                    "file, registry or process access"),
+    "file-date": (CORE_PATH, in_procedure('        Debug.Print FileDateTime("data.txt")'),
+                  "file, registry or process access"),
+    "get-attributes": (CORE_PATH, in_procedure('        Debug.Print GetAttr("data.txt")'),
+                       "file, registry or process access"),
+    "set-attributes": (CORE_PATH, in_procedure('        SetAttr "data.txt", vbHidden'),
+                       "file, registry or process access"),
+    "end-of-file": (CORE_PATH, in_procedure("        Debug.Print EOF(1)"),
+                    "file, registry or process access"),
+    "command-line": (CORE_PATH, in_procedure("        Debug.Print Command$"),
+                     "file, registry or process access"),
+    "set-system-date": (CORE_PATH, in_procedure("        Date = #1/2/2026#"),
+                        "file, registry or process access"),
+    "unload-form": (CLASS_PATH, class_module("Public Sub Go()\n        Unload Me\nEnd Sub\n"),
+                    "file, registry or process access"),
+    "numbered-kill": (CORE_PATH, in_procedure('100     Kill "data.txt"'),
+                      "file, registry or process access"),
+    "numbered-static": (CORE_PATH, in_procedure("100     Static Calls As Long"),
+                        "Static variable; core holds no run state"),
+    "numbered-single-line-if": (CORE_PATH, in_procedure('100     If Flag Then Kill "data.txt"'),
+                                "file, registry or process access"),
+    "qualified-kill": (CORE_PATH, in_procedure('        VBA.FileSystem.Kill "data.txt"'),
+                       "file, registry or process access"),
+    "vba-qualified-kill": (CORE_PATH, in_procedure('        VBA.Kill "data.txt"'),
+                           "file, registry or process access"),
+    "qualified-shell": (CORE_PATH, in_procedure('        Debug.Print VBA.Interaction.Shell("cmd")'),
+                        "file, registry or process access"),
+    "qualified-msgbox": (CORE_PATH, in_procedure('        VBA.Interaction.MsgBox "x"'),
+                         "MsgBox reaches the Excel host"),
+    "native-declare": (CORE_PATH, core_module('Private Declare PtrSafe Function GetTickCount Lib '
+                                              '"kernel32" () As Long\n'),
+                       "a native Declare; core and classes call no external library"),
+    "file-system-object": (CORE_PATH, in_procedure("        Dim Fso As Scripting.FileSystemObject"),
+                           "Scripting.FileSystemObject is an external object model"),
+    "new-file-system-object": (CLASS_PATH, class_module("Private mFso As New FileSystemObject\n"),
+                               "As FileSystemObject is a file-system type"),
+    "database-object-model": (CORE_PATH, in_procedure("        Dim Connection As ADODB.Connection"),
+                              "ADODB.Connection is an external object model"),
     "example-behind-facade-in-lower-case": (EXAMPLE_PATH, example_module("Public Sub Run()\n"
                                                                          "        Debug.Print core_validation.IsPositive(1)\n"
                                                                          "End Sub\n"),

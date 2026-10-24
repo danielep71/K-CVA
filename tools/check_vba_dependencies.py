@@ -48,12 +48,31 @@ HOST_TYPE = re.compile(r"\bAs\s+(?:New\s+)?(Worksheet|Workbook|Chart|Window|Shap
 # member such as [_First] is not.
 BRACKET = re.compile(r"\[(?!_\w*\])")
 STRING = re.compile(r'"(?:[^"]|"")*"?')
-FILE_STATEMENT = re.compile(r"^(?:Open\b.*\bFor\b|Kill|FileCopy|MkDir|RmDir|ChDir|ChDrive|"
-                            r"SaveSetting|DeleteSetting|SendKeys|AppActivate|Name\b.*\bAs)\b|"
-                            r"^(?:Close|Print|Input|Line\s+Input|Write|Get|Put|Seek|Lock|Unlock)"
-                            r"\s*#", re.I)
-FILE_FUNCTION = re.compile(r"(?<![\w.])(Dir|Shell|GetSetting|GetAllSettings|Environ|CurDir|"
-                           r"FreeFile)\b\$?", re.I)
+# VBA's file, registry, process, form and system-clock statements, read at
+# the start of a statement once labels and VBA. qualifiers are removed.
+FILE_STATEMENT = re.compile(r"^(?:Open\b.*\bFor\b|Kill|FileCopy|MkDir|RmDir|ChDir|ChDrive|SetAttr|"
+                            r"Reset|SaveSetting|DeleteSetting|SendKeys|AppActivate|Load|Unload|"
+                            r"Name\b.*\bAs)\b|"
+                            r"^(?:Close|Print|Input|Line\s+Input|Write|Get|Put|Seek|Lock|Unlock|"
+                            r"Width)\s*#|^(?:Date|Time)\$?\s*=", re.I)
+# VBA's file, registry, environment and process functions. Those that are
+# also ordinary words match only as calls.
+FILE_FUNCTION = re.compile(r"(?<![\w.])(?:(Dir|Shell|GetSetting|GetAllSettings|Environ|CurDir|"
+                           r"FreeFile|FileLen|FileDateTime|GetAttr|Command)\b\$?|"
+                           r"(FileAttr|EOF|LOF|Loc|Seek|Input|InputB)\$?\s*\()", re.I)
+# Native libraries and external object models: a Declare, a Scripting type
+# other than Dictionary, or a library-qualified name.
+DECLARE = re.compile(r"^(?:(?:Public|Private|Global)\s+)?Declare\b", re.I)
+EXTERNAL = re.compile(r"(?<![\w.])(Scripting\.(?!Dictionary\b)\w+|(?:ADODB|DAO|MSXML2|WinHttp|"
+                      r"WScript|IWshRuntimeLibrary|Shell32|MSHTML|Outlook|Word|PowerPoint|Access|"
+                      r"Office)\.\w+)", re.I)
+EXTERNAL_TYPE = re.compile(r"\bAs\s+(?:New\s+)?(FileSystemObject|TextStream|Drive|Folder|File)\b",
+                           re.I)
+# A numeric line label, and the VBA library qualifiers that reach a built-in
+# under another name, as in VBA.FileSystem.Kill.
+LINE_LABEL = re.compile(r"^\s*\d+(?=\s|$)\s*")
+VBA_QUALIFIER = re.compile(r"(?<![\w.])(?:VBA\.)?(?:FileSystem|Interaction|Strings|Information|"
+                           r"Conversion|DateTime|Math|Financial)\.|(?<![\w.])VBA\.", re.I)
 DYNAMIC = re.compile(r"(?<![\w.])(CallByName|Evaluate|ExecuteExcel4Macro|AddressOf)\b", re.I)
 OBJECT = re.compile(r'(?<![\w.])(CreateObject|GetObject)\s*\(\s*(?:"([^"]*)")?', re.I)
 ALLOWED_OBJECTS = frozenset({"scripting.dictionary"})
@@ -101,7 +120,7 @@ def executable_parts(code: str) -> list[str]:
     parts: list[str] = []
     pending = [code.strip()]
     while pending:
-        for piece in (item.strip() for item in ELSE.split(pending.pop())):
+        for piece in (LINE_LABEL.sub("", item).strip() for item in ELSE.split(pending.pop())):
             parts.append(piece)
             branch = SINGLE_LINE_IF.match(piece)
             if branch:
@@ -133,6 +152,13 @@ def host_independent(path: str, line: int, code: str, raw: str,
     if any(FILE_STATEMENT.match(part) for part in executable_parts(code)) or \
             FILE_FUNCTION.search(code):
         add("file, registry or process access; core and classes do no I/O")
+    if DECLARE.match(code):
+        add("a native Declare; core and classes call no external library")
+    for match in EXTERNAL.finditer(code):
+        add(f"{match.group(1)} is an external object model; core and classes are "
+            "host-independent")
+    for match in EXTERNAL_TYPE.finditer(code):
+        add(f"As {match.group(1)} is a file-system type; core and classes do no I/O")
     for match in DYNAMIC.finditer(code):
         add(f"{match.group(1)}: a dynamic call that no check can resolve")
     for match in object_calls(raw):
@@ -156,9 +182,15 @@ def statements(text: str) -> list[tuple[int, str, str]]:
     for (line, _, kind, code), (_, _, _, raw) in zip(blanked, kept, strict=True):
         if kind == "directive" or code.lstrip().startswith(("Attribute ", "Option ")):
             continue
-        result.extend((line, part, raw_part) for part, raw_part
+        result.extend((line, normalize(part), normalize(raw_part)) for part, raw_part
                       in zip(split_statements(code), split_statements(raw), strict=False))
     return result
+
+
+def normalize(statement: str) -> str:
+    """The statement without a numeric line label or VBA library qualifiers,
+    so that 100 Kill Path and VBA.FileSystem.Kill Path read as Kill Path."""
+    return VBA_QUALIFIER.sub("", LINE_LABEL.sub("", statement))
 
 
 def analyze(path: str, text: str, upper: re.Pattern[str] | None = None,
