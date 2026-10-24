@@ -82,7 +82,10 @@ each component once per compilation environment, with the branches of every
 is still checked. As in VBA, `Win32` is true in all three and `VBA6` is true
 under VBA7 too. The symbols are `VBA6`, `VBA7`, `Win32` and `Win64`; `Mac`,
 any other symbol and a project `#Const` fail closed. `vba-dependencies` reads
-every branch at once, so a host call in an inactive branch is still rejected.
+every branch at once for references, so a host call in an inactive branch is
+still rejected, and applies its core-state rules in each environment, so that
+alternative procedure headers in exclusive branches cannot hide a
+module-level declaration.
 
 **Not checked, left to review and to compiling in Excel:**
 
