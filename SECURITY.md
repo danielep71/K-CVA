@@ -50,7 +50,8 @@ The workflow files pin actions to full SHAs and disable persisted checkout
 credentials. No traffic token or traffic workflow is established by this issue.
 Traffic collection belongs to #14. Universal repository CI was delivered by #6
 through PR #30 and integrated into main by PR #32; required-check enforcement
-remains #12 work. A green metadata check is not a security scan.
+was configured under #12 for main and release/**. The controlled enforcement
+demonstration remains #13. A green metadata check is not a security scan.
 
 ## Feature status and limitations
 

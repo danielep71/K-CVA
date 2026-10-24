@@ -42,9 +42,10 @@ Download selected evidence before expiry if it must be retained under #11.
 
 The stable job/check name is **Repository integrity**. It runs without path
 filters on PRs targeting main/release/**, pushes to those branches, and manual
-dispatch. It has contents:read only and does not receive a write token. Required
-check enforcement and up-to-date-branch rules remain #12; a workflow alone does
-not configure branch protection.
+dispatch. It has contents:read only and does not receive a write token. Main and release/** rulesets require this check from GitHub Actions with strict
+up-to-date enforcement, configured under #12. Release creation alone is exempt;
+subsequent updates require checks. See [settings evidence](REPOSITORY_SETTINGS.md).
+The controlled failing/passing enforcement demonstration remains #13.
 
 ## Dependency updates
 

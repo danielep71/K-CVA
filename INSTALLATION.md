@@ -91,7 +91,8 @@ python tools/check_repository.py
 
 These checks validate repository infrastructure, not VBA compilation or CVA
 correctness. See [CI coverage and prerequisites](docs/CI.md). Static VBA enforcement
-is pending #9 and required-check enforcement remains #12.
+is pending #9. Required-check and strict up-to-date enforcement are configured
+under #12; the controlled failing/passing demonstration remains #13.
 
 ## Git hygiene verification
 
