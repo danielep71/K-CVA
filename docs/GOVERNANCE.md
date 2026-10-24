@@ -67,14 +67,14 @@ blocker rather than treating absent review as success.
 A sync PR with a verified empty file diff needs only applicable CI, with that
 evidence recorded in the PR. A sync PR changing files needs normal final-head
 review. `Repository integrity`, installed by #6, must pass on the sync head
-as on other protected-branch PRs. Ruleset enforcement remains pending #12.
+as on other protected-branch PRs. Ruleset enforcement was configured and read back under #12 on 2026-10-24.
 
 ## Protection policy and verified controls
 
 Intended policy for main and release/**: require PRs, resolved conversations,
 zero mandatory approvals, no deletion, no force pushes and no bypass.
-Require the exact `Repository integrity` check and up-to-date branches after
-#12 configures enforcement. The unfiltered workflow was delivered by #6. Path-filtered
+The exact `Repository integrity` check from GitHub Actions and up-to-date
+branches are required by the main and release rulesets. The unfiltered workflow was delivered by #6. Path-filtered
 label workflows must not serve as the universal required check.
 
 Snapshot verified on **2026-10-24** through GitHub API reads and the settings
@@ -88,7 +88,7 @@ evidence recorded in [#12](https://github.com/danielep71/MKT-K-CVA/issues/12):
 | Release deletion ruleset 25781993 | Active for release/**; deletion blocked, no bypass. |
 | Tag ruleset 25781957 | Active for v*; updates, deletion and force pushes blocked, no bypass. |
 | Traffic ruleset 25782014 | Active for traffic-history; deletion and force pushes blocked; regular automation updates allowed, no PR requirement or bypass. Branch and workflow pending #14. |
-| Required check and strict up-to-date rule | **Enforcement pending #12**. Repository integrity exists and has passed hosted runs; neither main nor release currently requires status checks. Preserve the release-branch creation exception when configuring the check. |
+| Required check and strict up-to-date rule | **Configured under #12**. Main and release/** require Repository integrity from GitHub Actions (integration 15368), with strict up-to-date checks. Checks apply on main creation; release creation alone is exempt. No bypass actors or excluded refs. See [settings evidence](REPOSITORY_SETTINGS.md). |
 | Enforcement demonstration | Pending controlled failing/passing PR exercise #13. Configured controls alone do not prove enforcement. |
 | General settings | Projects off; update-branch suggestion and automatic head-branch deletion on. Repository supports merge, squash and rebase, restricted by the branch rules above. |
 | Actions | Full-SHA action pinning required; default token reads contents/packages; workflow PR creation/approval off. |

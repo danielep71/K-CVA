@@ -3,7 +3,8 @@
 Run `python tools/check_repository.py` for portable repository validation.
 See [CI and dependency updates](../docs/CI.md) for pinned prerequisites, coverage,
 local/hosted evidence and dependency review rules. The workflow's stable check
-name is Repository integrity; required-check enforcement remains #12.
+name is Repository integrity; required-check and strict up-to-date enforcement
+are configured under #12. Controlled enforcement verification remains #13.
 
 check_issues.py audits issue metadata and configuration; test_check_issues.py
 exercises that policy. Live issue auditing remains a separate read-only workflow.
