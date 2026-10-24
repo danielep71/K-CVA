@@ -68,7 +68,7 @@ A case is one input file and one expected-result file per calculation regime:
 
 | Rule | Detail |
 | --- | --- |
-| Envelope | `schema_version` (1), `kind` (`cva-fixture`), `id`, `synthetic` (`true`), `description`, `category`, `approach`, `calculation_currency_code`, `valuation_date`, `counterparties`, `netting_sets` and `hedges` are required, and no other key is allowed |
+| Envelope | `schema_version` (1), `kind` (`cva-fixture`), `id`, `synthetic` (`true`), `description`, `category`, `approach`, `calculation_currency_code`, `valuation_date`, `counterparties`, `netting_sets` and `hedges` are required, and no other key is allowed; an `invalid` case relaxes this for the calculation inputs ([invalid inputs](#invalid-inputs)) |
 | Approach | `ba_cva_reduced` (Article 384(1), point (b), and paragraph 3) requires an empty `hedges` list; `ba_cva_full` (Article 384(1), point (a), and paragraph 2) requires at least one hedge. SA-CVA has no value yet: it is added when its scope is recorded in the methodology |
 | Identifiers | Each counterparty, netting set and hedge has an `id`, unique in the fixture. Each netting set names an existing `counterparty_id`. A single-name hedge names the `counterparty_id` it hedges; an index hedge has `counterparty_id: null` |
 | Hedges | Each hedge has `kind`, `single_name` or `index`, and an `inputs` object. Only eligible hedges appear: eligibility under Article 386 is the caller's responsibility, not tested by a case |
@@ -76,6 +76,10 @@ A case is one input file and one expected-result file per calculation regime:
 | Exposure | A netting set's exposure value is supplied (M5), never derived in a case: it is an input, not an expected output |
 | Currencies | `calculation_currency_code` is the currency of results. An object whose `inputs` hold an `_amount` key also holds `currency_code`, the currency of all its amounts, so a currency mismatch is always visible |
 | Signs | Amounts are unsigned unless the input contract defines a signed field |
+
+The rules above and the unit suffixes below hold for the calculation inputs
+of every category except `invalid`, whose inputs may break them
+([invalid inputs](#invalid-inputs)).
 
 **Unit suffixes.** A key without one of these suffixes is rejected:
 
@@ -213,11 +217,20 @@ Each fixture declares one `category`:
 - An `invalid` case is expected to be **rejected**, never calculated: each of
   its expected files holds at least one `_status` text output, and no numeric
   output for what it rejects.
-- In an `invalid` case the structure (envelope, identifiers, keys, unit
-  suffixes, links between items) must still hold, but not the domain of the
-  values: an unknown code, a value of the wrong type for its suffix or an
-  amount without `currency_code` are allowed, because they are what the case
-  tests.
+- An `invalid` case separates the harness metadata, which must always be
+  valid, from the calculation inputs, which may break any input rule, because
+  that is what the case tests:
+  - **Always valid:** `schema_version`, `kind`, `id`, `synthetic`,
+    `description`, `category` and `valuation_date`, and the case's expected
+    files.
+  - **May be invalid, missing or unknown:** `approach`,
+    `calculation_currency_code`, `counterparties`, `netting_sets` and
+    `hedges`, with their identifiers, links between items, keys, unit
+    suffixes and values. A hedge for an unknown counterparty, a missing or
+    unknown field, a duplicate identifier, a wrong type for a suffix or an
+    amount without `currency_code` all reach the implementation, which must
+    reject them.
+  - The `description` names the input rule the case breaks.
 - The status texts are fixed with the output contract. A rejection never
   substitutes a default value
   ([VBA_HOUSE_STYLE.md](../VBA_HOUSE_STYLE.md#contracts-units-and-errors)).
