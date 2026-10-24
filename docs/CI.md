@@ -62,7 +62,7 @@ run by the Python tooling tests.
 | --- | --- |
 | `vba-source` | Components only in their homes (`src/core/`, `src/modules/`, `src/classes/`, `src/workbook/`, `src/forms/`, `tests/modules/`, `examples/modules/`, no subdirectories), named with their role's prefix (`CORE_`, `CVA_`, `C`, `M_`, `ThisWorkbook` or `sh`, `frm`, `TEST_`, `Example`), at most 31 characters, `VB_Name` equal to the file name and unique ignoring case; ASCII only, no byte-order mark; `Option Explicit`, and `Option Private Module` in `src/core/` and `tests/modules/`; no `Option Base`, tab, trailing white space or unclosed string literal; each form beside its `.frx`; stored with LF and checked out with CRLF; no committed workbook (`check_vba_source.py`). |
 | `vba-conditionals` | Every `#If` block evaluates in each modeled host; a project `#Const`, an unknown symbol or an unbalanced block fails; a `Declare` reachable under VBA7 is `PtrSafe` (`check_vba_conditionals.py`). |
-| `vba-jumps` | Every `GoTo`, `GoSub` and `Resume` target is a label of the same procedure, labels are unique per procedure and every procedure is closed, in each modeled host (`check_vba_jumps.py`). |
+| `vba-jumps` | Every `GoTo`, `GoSub` and `Resume` target is a label of the same procedure, labels are unique per procedure and every procedure is closed, in each modeled host; a member call such as `Application.Goto` is not a jump (`check_vba_jumps.py`). |
 | `vba-public-api` | Every procedure and module-level declaration states its visibility; a standard module declares no public variable and no public `Declare`; the public declarations of `src/modules/` and [PUBLIC_API.txt](PUBLIC_API.txt) match one to one with their signatures; no public name collides (`check_vba_public_api.py`). |
 | `vba-dependencies` | `src/core/` and `src/classes/` name no Excel or UI global or type, use no `[...]` evaluation, no VBA file, file-metadata, registry, environment, process, form-loading or system-clock statement or function, no native `Declare`, no external object model (`Scripting` other than `Dictionary`, `ADODB`, `MSXML2` and similar) or file-system type, no `CallByName`, `Evaluate`, `ExecuteExcel4Macro` or `AddressOf`, no `CreateObject` other than `"Scripting.Dictionary"` and no `GetObject`, and name no facade, adapter, form, test or example component; `src/core/` standard modules hold no module-level or `Static` variable and no `Static` procedure; `examples/modules/` name only the facade, not core, model classes, adapters, forms or tests (`check_vba_dependencies.py`). |
 
@@ -127,7 +127,8 @@ K-SACCR and EXCEL-VBA-PROJECT-TEMPLATE ([NOTICE.md](../NOTICE.md)). Changed
 here: the `CVA_` facade prefix and `examples/modules/` home; every
 `Option Base` rejected, not only `Option Base 1`; public variables and public
 `Declare` statements rejected in standard modules, so the supported kinds are
-those listed in REPOSITORY_STRUCTURE.md; fixtures without SFT names. The
+those listed in REPOSITORY_STRUCTURE.md; a `GoTo`, `GoSub` or `Resume`
+after a dot read as a member call, not a jump; fixtures without SFT names. The
 dependency check and its fixtures are written for this repository. Not
 adopted: SFTs' test-case format checker, which depends on its methodology
 (#8 defines this repository's fixture contract), and its separate quality

@@ -37,12 +37,14 @@ NAMED_LABEL = re.compile(r"^\s*([A-Za-z_]\w*|\d+):")
 # A line number, followed by a statement or by nothing once a comment such
 # as "100 Rem target" or "100 ' target" has been stripped.
 NUMBERED_LABEL = re.compile(r"^\s*(\d+)(?=\s|$)")
-JUMP = re.compile(r"\b(GoTo|GoSub|Resume)\b(?:\s+([A-Za-z_]\w*|\d+|-1))?", re.IGNORECASE)
+# A keyword after a dot is a member call, such as Application.Goto or .Goto
+# in a With block, not a jump.
+JUMP = re.compile(r"(?<![\w.])(GoTo|GoSub|Resume)\b(?:\s+([A-Za-z_]\w*|\d+|-1))?", re.IGNORECASE)
 ON_ERROR = re.compile(r"\bon\s+error\s*$", re.IGNORECASE)
 # On <expression> GoTo|GoSub <label>, <label>, ...: every listed target.
 LABEL = r"(?:[A-Za-z_]\w*|\d+)"
-COMPUTED_JUMP = re.compile(rf"\bOn\b(?!\s+Error\b).*?\b(GoTo|GoSub)\s+({LABEL}(?:\s*,\s*{LABEL})*)",
-                           re.IGNORECASE)
+COMPUTED_JUMP = re.compile(rf"\bOn\b(?!\s+Error\b).*?(?<![\w.])(GoTo|GoSub)\s+"
+                           rf"({LABEL}(?:\s*,\s*{LABEL})*)", re.IGNORECASE)
 # Statements that can stand alone before a colon, as in "Else: x = 1"; a
 # keyword is never a label.
 KEYWORDS = frozenset({"beep", "do", "else", "end", "loop", "next", "resume", "return", "stop",
