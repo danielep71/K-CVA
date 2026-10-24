@@ -1,8 +1,10 @@
 # Verification
 
 No numerical CVA test suite or host certification exists yet. The deterministic
-scaffold is tracked in #10; methodology and fixture conventions in #8; evidence
-and host smoke validation in #11.
+scaffold is tracked in #10; evidence and host smoke validation in #11. The
+fixture and expected-result format, reference classes and tolerances are
+defined in [TEST_CASES.md](../docs/methodology/TEST_CASES.md) (#8); the only
+case is an illustrative format example.
 
 Reserve fixtures for synthetic inputs, expected for independently justified
 outputs, derivations for Python reference work, and evidence for deliberately

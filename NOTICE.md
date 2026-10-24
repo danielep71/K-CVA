@@ -117,6 +117,23 @@ actions/setup-node was first pinned to a v6 commit resolved on the same date;
 PR #34 updated every use to the v7.1.0 commit
 `949feb2413d6458794dcd2491c4babbbce0c15c1`.
 
+## Methodology and test-case contract (#8)
+
+docs/methodology/README.md and docs/methodology/TEST_CASES.md follow the
+structure of CCR-K-SFTs at `dc293037111816ec1c9768a4aa890919892ebcef`
+(blobs `1ac75db19d6b61d5f35acae373545a1b10f7acc7` and
+`bb531493aee592bf85e8218058768bed122130bb`), under its MPL-2.0 notice
+(Copyright 2026 Daniele Penza and contributors); docs/methodology/sources/README.md
+follows the record format of its blob `02ca5fa8e2a916531446f9cb70f0b18d301dbdb0`.
+The CVA content, sources, approaches, fixture fields and the illustrative case
+were written locally. No SFT method, source, threshold or value is imported.
+
+The copy in docs/methodology/sources/ is an extract of the consolidated
+Regulation (EU) No 575/2013 published by the Publications Office of the
+European Union. It is not covered by this repository's licence; its source,
+hash and reuse terms are recorded in
+[docs/methodology/sources/README.md](docs/methodology/sources/README.md).
+
 ## VBA static checks (#9)
 
 Adapted from CCR-K-SFTs under its MPL-2.0 notice (Copyright 2026 Daniele Penza

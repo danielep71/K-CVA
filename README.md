@@ -13,8 +13,10 @@ reference testing, not as a runtime calculation dependency.
 
 The initial scope is regulatory CVA capital. Economic/accounting CVA valuation,
 a general exposure simulation engine and a parallel Python product are outside
-the initial scope. EU CRR is the proposed jurisdictional basis; the controlling
-text, applicability dates and initial approach remain decisions for issue #8.
+the initial scope. The regulatory basis is the EU CRR as amended by CRR3; the
+basic approach (BA-CVA) comes first and the standardised approach (SA-CVA)
+after it. See the [methodology](docs/methodology/README.md); nothing is
+implemented yet.
 
 ## Project guides
 
