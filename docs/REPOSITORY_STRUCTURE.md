@@ -19,7 +19,7 @@ not evidence of implemented or validated functionality.
 
 | Location | Responsibility | Current status |
 | --- | --- | --- |
-| `.github/` | Workflow configuration, issue forms and canonical labels | Present, including Repository integrity CI, Dependabot version updates (#6) and PR template (#7). Required-check enforcement configured under #12; controlled enforcement demonstration remains #13. |
+| `.github/` | Workflow configuration, issue forms and canonical labels | Present, including Repository integrity CI, Dependabot version updates (#6) and PR template (#7). Required-check enforcement configured under #12 and demonstrated under #13. |
 | `docs/` | Governance, architecture, decisions and API inventory | Present. |
 | `docs/methodology/` | Dated source register, approach decisions and fixture contract | Methodology skeleton, source register with a copy of the controlling text, and test-case contract (#8); no formula transcribed. |
 | `docs/contracts/` | Versioned public input/output contracts | Reserved until the first real contract. |
@@ -28,7 +28,7 @@ not evidence of implemented or validated functionality.
 | `src/modules/` | Public facade and supported entry points | Reserved. |
 | `src/classes/` | Host-independent record/model classes if required | Reserved. |
 | `src/workbook/`, `src/forms/` | Excel adapters, document modules and optional forms | Reserved. |
-| `tests/` | Verification guide, harness, synthetic fixtures and expected values | Guide only; scaffold pending #10. |
+| `tests/` | Verification guide, harness, synthetic fixtures and expected values | Guide, VBA harness and neutral example suite in `tests/modules/` (#10); not yet run in Excel (#11). |
 | `tests/fixtures/`, `tests/expected/` | Inputs and independently justified expected results | One illustrative format example ([TEST_CASES.md](methodology/TEST_CASES.md)); no regulatory case. |
 | `tests/derivations/` | Independent Python reference calculations | Reserved. |
 | `tests/evidence/` | Deliberately retained, reviewed evidence tied to a source commit | Reserved; evidence contract pending #11. |

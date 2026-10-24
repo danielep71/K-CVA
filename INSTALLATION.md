@@ -1,8 +1,9 @@
 # Developer setup and VBA import/export
 
-**Setup only:** no VBA components, template or workbook exist yet.
-The procedures below define the convention for future components; they have
-not been executed in Excel. The first real host run belongs to #11.
+**Setup only:** no production VBA component, template or workbook exists yet;
+tests/modules holds the test harness and its neutral example suite (#10). The
+procedures below define the convention for components; they have not been
+executed in Excel. The first real host run belongs to #11.
 Complete onboarding follows in #16; portable CI is documented in [docs/CI.md](docs/CI.md).
 
 ## Host policy
@@ -61,8 +62,9 @@ conversion, even though archives retain configuration. Do not mix revisions.
    serialized VERSION/BEGIN/END headers and all Attribute metadata lines.
    Hidden attributes require a reviewed round-trip method before such components
    are accepted; do not silently lose them.
-6. Development workbooks may additionally import tests/modules. Production
-   workbooks exclude tests and examples. No harness is provided yet.
+6. Development workbooks may additionally import tests/modules, which holds
+   the harness and its example suite ([running the harness](#running-the-harness)).
+   Production workbooks exclude tests and examples.
 7. Run Debug > Compile VBAProject, save and run the documented tests when they
    exist. Record the full SHA, Excel build/bitness, Windows version, references,
    commands/entry points and outputs. Reopen in a clean session when required.
@@ -93,7 +95,48 @@ These checks validate repository infrastructure, not VBA compilation or CVA
 correctness. See [CI coverage and prerequisites](docs/CI.md). The
 [VBA static checks](docs/CI.md#vba-static-checks) are part of that command and
 are not compilation. Required-check and strict up-to-date enforcement are
-configured under #12; the controlled failing/passing demonstration remains #13.
+configured under #12 and were demonstrated under #13
+([demonstrated enforcement](docs/GOVERNANCE.md#demonstrated-enforcement)).
+
+<a id="running-the-harness"></a>
+
+## Running the harness
+
+Not yet run: the first host run, with its evidence, is #11. In a
+**development** workbook built as above, open the Immediate window
+(**Ctrl+G**) and type:
+
+```text
+TEST_Examples.RunExampleTests
+```
+
+It runs the example suite through `TEST_Harness` and writes one record per
+line. A passing run ends with:
+
+```text
+RESULT=PASS; suite=examples; operation=PASS; completeness=COMPLETE; cases=12; assertions=27; failures=0; cleanup=PASS; recovery=NONE
+```
+
+Anything else, or the error *Suite examples did not pass*, is a failure. Two
+more entry points show the failure paths and are expected to fail:
+
+| Entry point | Expected end |
+| --- | --- |
+| `TEST_Examples.RunExampleTestsWithInjectedFailure` | `RESULT=FAIL`, `operation=FAIL`, `completeness=COMPLETE`, `failures=1`, then *Suite examples did not pass* |
+| `TEST_Examples.RunExampleTestsWithSkippedCase` | `RESULT=FAIL`, `operation=PASS`, `completeness=INCOMPLETE`, `cases=11`, `assertions=25`, `failures=1`, then *Suite examples did not pass* |
+
+- **Complete log.** The Immediate window keeps only its last 200 lines. To
+  keep the whole run, type `TEST_Harness.SaveLog "<folder>\examples.log"`
+  after it, with a folder outside the checkout or the ignored
+  `test-results/` directory.
+- **Recovery.** A run that stopped half way, or that changed Excel settings it
+  did not restore, leaves `recovery=REQUIRED`, and the next run is refused.
+  Check **File → Options → Formulas** (calculation) and the other settings the
+  log names, then type `TEST_Harness.ResetTests`.
+- **What it proves.** The suite exercises the harness itself: assertions,
+  tolerances, error values, raised errors, completeness and the cleanup
+  pattern. It contains no CVA calculation, and a passing run validates none.
+  The log format is in [tests/README.md](tests/README.md#log-format).
 
 ## Git hygiene verification
 

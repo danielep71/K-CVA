@@ -1,7 +1,8 @@
 # VBA house style
 
 These conventions apply to the first and subsequent VBA components.
-No VBA implementation exists yet. The mechanical rules are checked
+No production VBA exists yet; tests/modules holds the test harness and its
+example suite (#10). The mechanical rules are checked
 statically by the [VBA static checks](CI.md#vba-static-checks), which also
 list what they cannot see; runtime verification and failure-path evidence
 belong to #10/#11.
@@ -111,7 +112,9 @@ StatusBar to assumed defaults. Capture only those actually needed. Worksheet
 ownership and created artifacts need equivalent explicit cleanup rules.
 Failure-path tests must cover partial capture, mutation failure, primary failure,
 each restoration failure and simultaneous primary/cleanup failure (#10/#11).
-No cleanup reference implementation or Excel execution is claimed here.
+`TEST_Examples.RunExampleOperation` is the reference implementation, with a
+case for each of these paths ([tests/README.md](../tests/README.md#vba-harness));
+it has not been run in Excel yet (#11).
 
 ## Source representation
 

@@ -134,6 +134,28 @@ European Union. It is not covered by this repository's licence; its source,
 hash and reuse terms are recorded in
 [docs/methodology/sources/README.md](docs/methodology/sources/README.md).
 
+## Regression scaffold (#10)
+
+Adapted from CCR-K-SFTs under its MPL-2.0 notice (Copyright 2026 Daniele Penza
+and contributors), read at commit `dc293037111816ec1c9768a4aa890919892ebcef`
+on 2026-10-24:
+
+| Local file | Source blob | Local changes |
+| --- | --- | --- |
+| `tests/modules/TEST_Harness.bas` | `e3109649cf02e4e630ea08ee2e03c2a216ac01ae` | Project name in the header. |
+| `tests/modules/TEST_Examples.bas` | `fae967e20147bd3526d80b8f55c7414fd17c8606` | `RunExampleOperation` registers each restoration before its change and restores only registered settings; three failure-path cases added (partial capture, change failure, each restoration failure); counts 12 cases and 27 assertions. |
+| `tools/check_test_cases.py` | `d096e7911a1a70bad87529e2ff8f9b33c4e2637a` | CVA fixture format (approach, counterparties, netting sets, hedges; counterparty and netting-set output scope); only the harness metadata of an invalid case is checked; CRR the only regime. |
+| `tools/test_check_test_cases.py` | `a69b5de21b35e716c7ba6e296931e780310ff383` | Rewritten for the CVA format and the invalid-case rule. |
+| `tools/test_vba_harness.py` | `4acdd6c346b029a4713fcdc2af0b9733b36c22b4` | Provenance line. |
+
+The harness section and log format of tests/README.md and the *Running the
+harness* section of INSTALLATION.md follow CCR-K-SFTs blobs
+`4114a4e4d3fb5621035d3de5423832e5fc3df2bb` and
+`1ebd092636ca9a908670c81a5dc457ac8dc6183d`, with local counts, links and
+status. CCR-K-SFTs adapted the structure of its numerical test-case checks
+from K-SACCR; preserve that attribution. No SFT case, value or method is
+imported.
+
 ## VBA static checks (#9)
 
 Adapted from CCR-K-SFTs under its MPL-2.0 notice (Copyright 2026 Daniele Penza
