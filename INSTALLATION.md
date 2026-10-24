@@ -4,7 +4,8 @@
 tests/modules holds the test harness and its neutral example suite (#10). The
 procedures below define the convention for components; they have not been
 executed in Excel. The first real host run belongs to #11.
-Complete onboarding follows in #16; portable CI is documented in [docs/CI.md](docs/CI.md).
+Contribution rules are in [CONTRIBUTING.md](CONTRIBUTING.md); portable CI is documented in
+[docs/CI.md](docs/CI.md).
 
 ## Host policy
 
@@ -41,6 +42,38 @@ release/0.1.0 under [governance](docs/GOVERNANCE.md).
 Use a Git checkout for VBA import: .gitattributes produces CRLF working files.
 Raw downloads and source archives use stored blobs and do not apply the checkout
 conversion, even though archives retain configuration. Do not mix revisions.
+
+<a id="developer-setup"></a>
+
+## Developer setup
+
+| Prerequisite | Version | Used for |
+| --- | --- | --- |
+| Git | Any current release | Checkout with the repository's line-ending rules |
+| Python | 3.12.14 (the CI baseline) | `tools/check_repository.py` and its standard-library checks |
+| Node.js | 24.22.1 (the CI baseline) | Label scripts and their self-tests; built-in modules only |
+| Microsoft 365 Excel, Windows, 64-bit | Not yet tested (#11) | Importing, compiling and running VBA ([host policy](#host-policy)) |
+
+No pip or npm package is installed. The first run downloads actionlint 1.7.12
+and verifies it against [tools/actionlint-lock.json](tools/actionlint-lock.json)
+([CI](docs/CI.md)). From the repository root, run every check:
+
+```sh
+python tools/check_repository.py
+```
+
+It ends with one `PASS` or `FAIL` line per check and exits nonzero on any
+failure. Stage new files before running it: untracked files are not checked.
+Other Python and Node versions may work; the declared versions are what CI
+runs, and evidence records the versions actually used.
+
+Where evidence goes:
+
+| Evidence | Location |
+| --- | --- |
+| Repository checks: one log per check and a JSON report with the checkout commit, tracked-file hashes and tool versions | `test-results/integrity/` (ignored, not committed); CI uploads it as an artifact kept 30 days |
+| Harness log | The Immediate window, or `TEST_Harness.SaveLog` to `test-results/` or a folder outside the checkout ([running the harness](#running-the-harness)) |
+| Retained, reviewed evidence tied to a commit | `tests/evidence/`, under the evidence contract of #11 |
 
 ## Importing VBA into Excel
 
@@ -85,7 +118,7 @@ Compare exports with the exact checkout, reject non-ASCII source and unexpected
 case/metadata changes, then copy intended changes into the correct source paths.
 Do not hand-edit binary .frx files. Git normalizes source line endings on add.
 
-Run the checks that exist:
+Run the checks before committing ([developer setup](#developer-setup)):
 
 ```sh
 python tools/check_repository.py
