@@ -19,7 +19,7 @@ not evidence of implemented or validated functionality.
 
 | Location | Responsibility | Current status |
 | --- | --- | --- |
-| `.github/` | Workflow configuration, issue forms and canonical labels | Present, including Repository integrity CI, Dependabot version updates (#6) and PR template (#7). Required-check enforcement remains #12. |
+| `.github/` | Workflow configuration, issue forms and canonical labels | Present, including Repository integrity CI, Dependabot version updates (#6) and PR template (#7). Required-check enforcement configured under #12; controlled enforcement demonstration remains #13. |
 | `docs/` | Governance, architecture, decisions and API inventory | Present. |
 | `docs/methodology/` | Dated source register, approach decisions and fixture contract | Guide present; methodology pending #8. |
 | `docs/contracts/` | Versioned public input/output contracts | Reserved until the first real contract. |
