@@ -25,4 +25,5 @@ text, applicability dates and initial approach remain decisions for issue #8.
 - [Issue labels and triage](docs/ISSUE_LABELS.md)
 
 Task branches start from `release/0.1.0`; task PRs target that branch.
-Milestones belong to issues only. Licensing and security policy are pending #4.
+Milestones belong to issues only. See [LICENSE](LICENSE), [licensing and provenance](NOTICE.md) and
+[private security reporting](SECURITY.md).
