@@ -54,7 +54,7 @@ FILE_STATEMENT = re.compile(r"^(?:Open\b.*\bFor\b|Kill|FileCopy|MkDir|RmDir|ChDi
                             r"Reset|SaveSetting|DeleteSetting|SendKeys|AppActivate|Load|Unload|"
                             r"Name\b.*\bAs)\b|"
                             r"^(?:Print|Input|Line\s+Input|Write|Width)\s*#|^Close\b|"
-                            r"^(?:Get|Put|Seek|Lock|Unlock)\s*[#\w(]|^(?:Date|Time)\$?\s*=", re.I)
+                            r"^(?:Get|Put|Seek|Lock|Unlock)\b\s*[#\w(]|^(?:Date|Time)\$?\s*=", re.I)
 # VBA's file, registry, environment and process functions. Those that are
 # also ordinary words match only as calls.
 FILE_FUNCTION = re.compile(r"(?<![\w.])(?:(Dir|Shell|GetSetting|GetAllSettings|Environ|CurDir|"

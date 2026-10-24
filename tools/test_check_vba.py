@@ -1055,6 +1055,27 @@ class DependencyTest(unittest.TestCase):
                    "src/classes/CCalculationResult.cls": CLASS}
         self.assertEqual(run_check(check_vba_dependencies.check, counted), [])
 
+    def test_keywords_inside_ordinary_identifiers_are_not_reported(self) -> None:
+        # Every keyword the I/O, host and dynamic-call rules look for, used as
+        # the start of an ordinary identifier, in each statement position.
+        keywords = ("Open Kill FileCopy MkDir RmDir ChDir ChDrive SetAttr Reset SaveSetting "
+                    "DeleteSetting SendKeys AppActivate Load Unload Name Close Print Input Write "
+                    "Width Get Put Seek Lock Unlock Date Time Dir Shell GetSetting GetAllSettings "
+                    "Environ CurDir FreeFile FileLen FileDateTime GetAttr Command FileAttr EOF LOF "
+                    "Loc InputB Call Declare CallByName Evaluate AddressOf CreateObject GetObject "
+                    + " ".join(check_vba_dependencies.HOST_NAMES)).split()
+        body = "".join(f"        {word}Amount = 1\n        Total = {word}Amount\n"
+                       f"        Call {word}Rate(1)\n        If Flag Then {word}Count = 2\n"
+                       for word in keywords)
+        helpers = "".join(f"Private Sub {word}Rate(ByVal Value As Long)\nEnd Sub\n" for word in keywords)
+        source = core_module("Public Sub Work(ByVal Flag As Boolean)\n"
+                             f"        Dim Total As Long\n{body}End Sub\n{helpers}")
+        self.assertEqual(run_check(check_vba_dependencies.check, {CORE_PATH: source}), [])
+        hashless = in_procedure("        Get 1, , Value\n        Get #1, , Value\n        Lock 1\n"
+                                "        Unlock #1\n        Put 1, , Value")
+        findings = run_check(check_vba_dependencies.check, {CORE_PATH: hashless})
+        self.assertEqual(len(findings), 5, findings)
+
     def test_counts_only_restricted_homes(self) -> None:
         with repository(VALID) as root:
             _, components = check_vba_dependencies.check(root)
