@@ -34,7 +34,7 @@ not evidence of implemented or validated functionality.
 | `tests/evidence/` | Deliberately retained, reviewed evidence tied to a source commit | Reserved; evidence contract pending #11. |
 | `tools/` | Repository checks, build and evidence tooling | Issue-policy checker and tests present. |
 | `examples/` | Synthetic examples using supported API only | Reserved. |
-| `test-results/` | Disposable run output | Reserved; ignore rules pending #5. Do not commit run output. |
+| `test-results/` | Disposable run output | Ignored by .gitignore. Do not commit disposable run output. |
 
 Create reserved directories with their first useful file, not empty placeholders.
 Existing checker unit tests stay beside the checker in tools; numerical and
@@ -61,7 +61,8 @@ classes. Classes must not call the facade or host, avoiding dependency cycles.
 - Repository tooling is not a second calculation implementation.
 
 These boundaries are review rules now; automated checks follow in #9.
-Host support and conventions are finalized under #5 and validated under #11.
+Host policy and conventions are in [INSTALLATION.md](../INSTALLATION.md) and
+[VBA_HOUSE_STYLE.md](VBA_HOUSE_STYLE.md); host validation remains pending #11.
 
 ## Public API inventory
 

@@ -18,6 +18,9 @@ text, applicability dates and initial approach remain decisions for issue #8.
 
 ## Project guides
 
+- [Developer setup and import/export](INSTALLATION.md)
+- [VBA house style](docs/VBA_HOUSE_STYLE.md)
+
 - [Repository structure and contracts](docs/REPOSITORY_STRUCTURE.md)
 - [Scope and architecture decisions](docs/DECISIONS.md)
 - [Methodology work](docs/methodology/README.md)
