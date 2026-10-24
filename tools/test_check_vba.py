@@ -846,6 +846,15 @@ Public Function Count(ByVal Items As Object) As Long
         Count = Items.Count + Items.Rows + LIMIT
 End Function
 ''')),
+    "alternative-procedure-headers": (CORE_PATH, core_module('''#If Win64 Then
+Private Sub Work(ByVal Value As LongPtr)
+#Else
+Private Sub Work(ByVal Value As Long)
+#End If
+        Dim Local As Long
+        Local = 1
+End Sub
+''')),
     "class-instance-state": (CLASS_PATH, class_module('''Private mTotal As Double
 
 
@@ -959,6 +968,24 @@ DEPENDENCY_INVALID = {
     "static-procedure": (CORE_PATH, core_module("Private Static Function Next1() As Long\n"
                                                 "End Function\n"),
                          "Static procedure Next1 keeps state between calls"),
+    "module-variable-between-alternative-headers": (CORE_PATH, core_module('''#If Win64 Then
+Private Sub Work()
+#Else
+Private mCounter As Long
+Private Sub Work()
+#End If
+        Debug.Print 1
+End Sub
+'''), "module-level variable; core holds no ambient mutable run state"),
+    "static-in-one-branch-procedure": (CORE_PATH, core_module('''#If VBA7 Then
+Private Sub Work()
+        Static Calls As Long
+#Else
+Private Sub Work()
+#End If
+        Debug.Print 1
+End Sub
+'''), "Static variable; core holds no run state"),
     "inactive-branch-is-read": (CORE_PATH, in_procedure("#If VBA7 Then\n        Debug.Print 1\n#Else\n"
                                                         "        MsgBox \"legacy\"\n#End If"),
                                 "MsgBox reaches the Excel host"),

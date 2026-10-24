@@ -7,7 +7,9 @@ call whose target no check can see; neither may name a facade, adapter, form,
 test or example component. src/core/ standard modules also hold no ambient
 mutable run state: no module-level or Static variable. examples/modules/ use
 only the supported facade. These are name-based static rules over every
-#If branch at once, not a resolution of calls; docs/CI.md lists their limits.
+#If branch at once, and the state rules in each compilation environment of
+check_vba_conditionals.py; they are not a resolution of calls; docs/CI.md
+lists their limits.
 Written for this repository.
 """
 
@@ -19,6 +21,7 @@ import sys
 from collections.abc import Sequence
 from pathlib import Path
 
+from check_vba_conditionals import reachable_sources
 from check_vba_jumps import PROC_CLOSE, is_procedure
 from vba_lexer import (
     Finding,
@@ -203,29 +206,41 @@ def analyze(path: str, text: str, upper: re.Pattern[str] | None = None,
     """Findings for one component; ``upper`` and ``hidden`` match the tracked
     components that core and classes, or examples, may not name."""
     findings: list[Finding] = []
-    core_module = path.startswith(CORE) and path.lower().endswith(".bas")
-    inside = False
     for line, code, raw in statements(text):
-        header = is_procedure(code)
         if path.startswith(INDEPENDENT):
             findings.extend(host_independent(path, line, code, raw, upper))
         elif path.startswith(EXAMPLES):
             findings.extend(Finding(path, line, f"{name} is behind the facade; examples use only "
                                                 "the supported API")
                             for name in references(code, (hidden, HIDDEN_ANY_CASE, HIDDEN)))
-        if core_module and header and re.match(r"^\s*(?:\w+\s+)?Static\b", code, re.I):
+    if path.startswith(CORE) and path.lower().endswith(".bas"):
+        # Procedure scope depends on which #If branches compile, so the state
+        # rules read each compilation environment on its own: a procedure
+        # opened in one branch must not hide a declaration in another.
+        for source in reachable_sources(path, text)[0].values():
+            findings.extend(core_state(path, source))
+    return list(dict.fromkeys(findings))
+
+
+def core_state(path: str, source: str) -> list[Finding]:
+    """Module-level and Static state in one environment's source of a core module."""
+    findings: list[Finding] = []
+    inside = False
+    for line, code, _ in statements(source):
+        header = is_procedure(code)
+        if header and re.match(r"^\s*(?:\w+\s+)?Static\b", code, re.I):
             findings.append(Finding(path, line, f"Static procedure {header.group(2)} keeps state "
                                                 "between calls; core holds no run state"))
-        elif core_module and not inside and MODULE_VARIABLE.match(code.strip()):
+        elif not inside and MODULE_VARIABLE.match(code.strip()):
             findings.append(Finding(path, line, "module-level variable; core holds no ambient "
                                                 "mutable run state"))
-        elif core_module and inside and STATIC.match(code.strip()):
+        elif inside and STATIC.match(code.strip()):
             findings.append(Finding(path, line, "Static variable; core holds no run state"))
         if header:
             inside = True
         elif PROC_CLOSE.match(code):
             inside = False
-    return list(dict.fromkeys(findings))
+    return findings
 
 
 def check(root: Path) -> tuple[list[Finding], int]:
