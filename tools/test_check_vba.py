@@ -515,6 +515,13 @@ Legacy:
 #End If
 End Sub
 ''',
+    "member-calls-named-like-jumps": '''Private Sub First()
+        Application.Goto Reference:=ThisWorkbook.Worksheets("Inputs").Range("A1"), Scroll:=True
+        With Application
+            .Goto ThisWorkbook.Worksheets("Inputs").Range("A1")
+        End With
+End Sub
+''',
 }
 JUMPS_INVALID = {
     "cross-procedure": ('''Private Sub First()
@@ -563,6 +570,9 @@ End Sub
                                         "GoTo target 'Lost'"),
     "one-line-procedure-missing-label": ("Private Sub First(): GoTo Lost: End Sub\n",
                                          "GoTo target 'Lost'"),
+    "jump-after-member-call": ("Private Sub First()\n"
+                               "        Application.Goto Reference:=\"R1C1\": GoTo Lost\nEnd Sub\n",
+                               "GoTo target 'Lost'"),
 }
 
 
