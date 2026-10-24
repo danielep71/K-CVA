@@ -13,9 +13,8 @@ case, value or threshold is reused.
 > `illustrative-format-example`, shows the format and holds no regulatory
 > value. The input and output fields of real cases are fixed with the input
 > and output contract (`docs/contracts/`, not yet written) once M4 to M7 are
-> decided. No tool checks these files yet: the deterministic regression
-> scaffold ([#10](https://github.com/danielep71/MKT-K-CVA/issues/10)) is to
-> enforce what a file can show.
+> decided. `python tools/check_repository.py` (gate `test-cases`) enforces
+> what a file can show ([checking](#checking)); it never runs a calculation.
 
 ## Files
 
@@ -253,3 +252,34 @@ Each fixture declares one `category`:
 - A release states which rules are validated, under which version of the
   controlling text, and lists every rule that is implemented but not
   validated.
+
+<a id="checking"></a>
+
+## Checking
+
+`tools/check_test_cases.py` runs as gate `test-cases` of
+`python tools/check_repository.py` and checks the files under
+`tests/fixtures/` and `tests/expected/`:
+
+- strict JSON, with no duplicate key and only finite numbers, in every
+  category;
+- the harness metadata of every fixture, and, outside an `invalid` case, its
+  calculation inputs: the approach and its hedges, identifiers and the links
+  between counterparties, netting sets and hedges, keys, unit suffixes and
+  value types, and currencies;
+- each expected file's name, envelope and outputs: their scope against the
+  fixture, form, unit, tolerance and rule ID; the reference class, its source
+  against the [register](README.md#source-register) and its script; the
+  calculation date against the
+  [version applicability](README.md#version-applicability) table; the
+  `illustrative-` naming rule; and a `_status` text output in every expected
+  file of an `invalid` case.
+
+It does not check:
+
+- whether an input key or a quantity name belongs to the input and output
+  contract, which does not exist yet;
+- that an `invalid` case has no numeric output for what it rejects, or any
+  link between its outputs and its inputs;
+- any value: nothing is computed or compared. Running cases in Excel belongs
+  to the VBA harness ([tests/README.md](../../tests/README.md#vba-harness)).

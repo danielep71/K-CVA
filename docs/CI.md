@@ -18,8 +18,9 @@ archive and extract only the named executable. Supported tooling platforms are
 Linux, Windows and macOS on x64/ARM64. This is not Excel host certification.
 
 The command checks issue configuration, all Python tooling tests, canonical
-label self-tests, drift self-tests and CLI evidence regressions, the static
-[VBA checks](#vba-static-checks), Python/Node/JSON syntax, relative Markdown links, action SHA pins, checkout credential settings,
+label self-tests, drift self-tests and CLI evidence regressions, the format of
+the numerical [test-case files](methodology/TEST_CASES.md#checking) (gate
+`test-cases`), the static [VBA checks](#vba-static-checks), Python/Node/JSON syntax, relative Markdown links, action SHA pins, checkout credential settings,
 workflow syntax/expressions with actionlint, and whitespace in all committed
 content plus local staged/unstaged changes. The committed check compares HEAD
 with Git's empty tree, so it works in clean and shallow CI checkouts without
@@ -45,7 +46,8 @@ filters on PRs targeting main/release/**, pushes to those branches, and manual
 dispatch. It has contents:read only and does not receive a write token. Main and release/** rulesets require this check from GitHub Actions with strict
 up-to-date enforcement, configured under #12. Release creation alone is exempt;
 subsequent updates require checks. See [settings evidence](REPOSITORY_SETTINGS.md).
-The controlled failing/passing enforcement demonstration remains #13.
+The controlled failing/passing exercise of #13 is recorded in
+[GOVERNANCE.md](GOVERNANCE.md#demonstrated-enforcement).
 
 ## VBA static checks
 
