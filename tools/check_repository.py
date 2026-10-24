@@ -100,7 +100,9 @@ def main():
                     raise RuntimeError('Unpinned action: ' + use)
             if 'actions/checkout@' in text and 'persist-credentials: false' not in text:
                 raise RuntimeError('Checkout credentials persist: ' + path)
-        run('workflow-validation', [actionlint(), '-shellcheck=', '-pyflakes=', *workflows])
+        validator = actionlint()
+        run('actionlint-version', [validator, '-version'])
+        run('workflow-validation', [validator, '-shellcheck=', '-pyflakes=', *workflows])
         run('whitespace', ['git', 'diff', '--check', 'HEAD'])
     except Exception as error:
         report['checks'].append({'name': 'repository-validation', 'exit_code': 1, 'error': str(error)})
