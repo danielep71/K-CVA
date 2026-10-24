@@ -87,7 +87,7 @@ follow the same inventory convention when classes become supported API.
 The `vba-public-api` check verifies the inventory against src/modules/.
 
 A supported API change needs an issue, updated contract and inventory, tests and
-a changelog entry once a changelog exists. There are no supported entry points
+a [changelog](../CHANGELOG.md) entry. There are no supported entry points
 until these records and implementation are reviewed together.
 
 ## Input/output contract conventions

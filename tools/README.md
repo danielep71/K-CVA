@@ -12,7 +12,9 @@ check_vba_*.py and vba_lexer.py are the static VBA checks, with fixtures in
 test_check_vba.py; see docs/CI.md for their rules and limits.
 check_test_cases.py checks the numerical test-case files against
 docs/methodology/TEST_CASES.md, with fixtures in test_check_test_cases.py;
-test_vba_harness.py checks what the VBA harness source can show without Excel. Build and
+test_vba_harness.py checks what the VBA harness source can show without Excel.
+check_changelog.py checks CHANGELOG.md and VERSION against RELEASING.md, with
+fixtures in test_check_changelog.py; it never tags or publishes. Build and
 evidence scripts may be added here with their own contracts. Regulatory
 reference derivations belong in tests/derivations, never in repository policy
 checks. Python tooling is not shipped as part of the workbook runtime; no
