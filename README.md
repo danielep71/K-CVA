@@ -1,54 +1,107 @@
+<div align="center">
+
 # K-CVA
+
+**Regulatory capital for credit valuation adjustment risk**
+
+An Excel/VBA project for transparent methods and traceable CVA capital calculations.
+
+[![Stage: repository setup](https://img.shields.io/badge/Stage-Repository_setup-16324f?style=for-the-badge)](#project-status)
+[![Target: Excel VBA](https://img.shields.io/badge/Target-Excel_VBA-217346?style=for-the-badge)](INSTALLATION.md)
+[![Framework: EU CRR3](https://img.shields.io/badge/Framework-EU_CRR3-007f86?style=for-the-badge)](docs/methodology/README.md)
+[![License: MPL-2.0](https://img.shields.io/badge/License-MPL--2.0-16324f?style=for-the-badge)](LICENSE)
+
+**[Getting started](#getting-started) · [Methodology](docs/methodology/README.md) · [Project status](#project-status) · [Documentation](#documents)**
 
 ![K-CVA — CVA risk regulatory capital; research and development](docs/assets/K-CVA-social-preview.jpg)
 
-Regulatory capital for credit valuation adjustment (CVA) risk. K-CVA is
-intended to become an Excel/VBA application that calculates the own funds
-requirements for CVA risk under the EU Capital Requirements Regulation, from
-supplied exposures and hedges.
+*An independent project by [Daniele Penza](https://github.com/danielep71).*
 
-The repository was named MKT-K-CVA until 2026-10-24; GitHub redirects the
-old links.
+</div>
 
 > [!IMPORTANT]
-> **Status: repository setup only.** There is no calculation engine, public
-> API, workbook or validated method yet. Nothing here should be used to
-> compute capital. The regulatory basis is the EU CRR as amended by CRR3; the
-> basic approach (BA-CVA) comes first and the standardised approach (SA-CVA)
-> after it, with exposure values and effective maturities supplied by the
-> caller ([decisions](docs/DECISIONS.md)). Economic or accounting CVA, an
-> exposure simulation engine and a parallel Python product are out of scope.
+> **Repository setup only.** There is no calculation engine, public API,
+> workbook or validated method yet. Nothing here should be used to compute
+> capital. Repository CI checks infrastructure; it does not establish numerical
+> correctness or regulatory compliance.
 
-## What exists today
+## Purpose and scope
 
-- **Repository checks** (`python tools/check_repository.py`, also run by CI
-  on every pull request): tooling tests, label and issue-form configuration,
-  the format of the numerical test-case files, static rules on the exported
-  VBA source, and the workflows. They read files only: they compile no VBA
-  and check no calculation.
-- **A VBA regression harness** with a neutral example suite in
-  `tests/modules/`. It exercises the harness itself and contains no CVA
-  calculation. It has not yet been compiled or run in Excel (#11).
-- **Methodology and test-case documents**: the regulatory basis, a copy of the
-  CRR provisions relied on, the BA-CVA inputs, and the format of future test
-  cases.
+K-CVA is intended to calculate own funds requirements for CVA risk under the
+**EU Capital Requirements Regulation, as amended by CRR3**, using exposures,
+effective maturities and hedges supplied by the caller.
 
-Not available: a CVA calculation, a public API, a workbook or a release. No
-figure produced from this repository should be relied on.
+| Dimension | Project direction |
+| --- | --- |
+| First approach | **BA-CVA** — basic approach to CVA risk |
+| Subsequent approach | **SA-CVA** — standardised approach to CVA risk |
+| Intended application | **Excel/VBA**, with explicit inputs and traceable outputs |
+| Inputs | Supplied exposure values, effective maturities and hedges |
+| Outside scope | Economic or accounting CVA, exposure simulation and a parallel Python product |
+
+These are scope decisions, not implemented capabilities.
+See the [decision register](docs/DECISIONS.md) and
+[methodology guide](docs/methodology/README.md) for the controlling details.
+
+## Project status
+
+| Component | Available today | Remaining work |
+| --- | --- | --- |
+| Repository infrastructure | CI, issue policy, static checks and development conventions | Ongoing maintenance and milestone closeout |
+| Methodology | Regulatory basis, source copy, BA-CVA input definitions and test-case format | Calculation implementation and numerical validation |
+| VBA regression harness | Neutral example suite and evidence tooling | Compilation and execution in Excel under [#11](https://github.com/danielep71/K-CVA/issues/11) |
+| Calculation product | No engine, public API or workbook | Future implementation, testing and release |
+
+**No version, tag or workbook has been released.** The current milestone is
+**v0.1.0 — Repo setup**. Follow the [closeout checklist](docs/CLOSEOUT.md),
+[change history](CHANGELOG.md) and [release procedure](RELEASING.md).
 
 ## Getting started
 
-1. Clone the repository and switch to the active release branch
-   ([obtain the source](INSTALLATION.md#obtain-an-exact-source-revision)).
-2. Install Git, Python and Node.js and run `python tools/check_repository.py`
-   ([developer setup](INSTALLATION.md#developer-setup)).
-3. To try the harness, build a development workbook on the intended Excel host
-   and run `TEST_Examples.RunExampleTests`
-   ([importing VBA into Excel](INSTALLATION.md#importing-vba-into-excel),
-   [running the harness](INSTALLATION.md#running-the-harness)).
-4. Before proposing a change, read [CONTRIBUTING.md](CONTRIBUTING.md).
+Choose the route that fits your purpose:
+
+| I want to… | Start here |
+| --- | --- |
+| Understand the intended calculation | [Methodology](docs/methodology/README.md) and [scope decisions](docs/DECISIONS.md) |
+| Set up a development environment | [Installation guide](INSTALLATION.md) |
+| Explore the test scaffold | [Tests and evidence](tests/README.md) |
+| Contribute or report an issue | [Contribution guide](CONTRIBUTING.md) |
+| Review governance and limitations | [Governance](docs/GOVERNANCE.md) and [security policy](SECURITY.md) |
+
+For development:
+
+1. [Obtain the source](INSTALLATION.md#obtain-an-exact-source-revision) and
+   switch to `release/0.1.0`.
+2. Install Git, Python and Node.js using the
+   [developer setup](INSTALLATION.md#developer-setup), then run:
+
+   ```bash
+   python tools/check_repository.py
+   ```
+
+3. To explore the VBA harness, follow
+   [importing VBA into Excel](INSTALLATION.md#importing-vba-into-excel) and
+   [running the harness](INSTALLATION.md#running-the-harness), then run
+   `TEST_Examples.RunExampleTests`.
+4. Read [CONTRIBUTING.md](CONTRIBUTING.md) before proposing a change.
+
+## What exists today
+
+The repository checks cover tooling tests, label and issue-form configuration,
+numerical test-case **format**, exported VBA static rules and workflows.
+They read files only: they neither compile VBA nor test a CVA calculation.
+
+The regression harness exercises a neutral example suite, with no CVA formula.
+Its Excel execution remains unverified. The methodology documents retain the
+regulatory source and describe the inputs and evidence expected for future work.
+
+See [CI coverage](docs/CI.md), [tooling](tools/README.md) and
+[test-case contracts](docs/methodology/TEST_CASES.md) for the precise boundaries.
 
 ## Documents
+
+<details>
+<summary><strong>Browse the complete documentation index</strong></summary>
 
 | Document | Purpose |
 | --- | --- |
@@ -69,8 +122,19 @@ figure produced from this repository should be relied on.
 | [CHANGELOG.md](CHANGELOG.md), [RELEASING.md](RELEASING.md) | What changed, versions and the release procedure |
 | [docs/CLOSEOUT.md](docs/CLOSEOUT.md) | The v0.1.0 closeout checklist and evidence index |
 
-Task branches start from `release/0.1.0`, and task pull requests target it.
-Nothing has been released: no version, tag or workbook. Changes are recorded
-under `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md), and a version is
-prepared and published only by maintainer decision, as in
-[RELEASING.md](RELEASING.md).
+</details>
+
+## Development and governance
+
+Task branches start from `release/0.1.0`; task PRs target that branch.
+Integration into `main` follows the [governance policy](docs/GOVERNANCE.md).
+Changes are recorded under `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md).
+Publication requires a separate maintainer decision.
+
+Use synthetic data in issues and test cases. Report vulnerabilities through the
+[security policy](SECURITY.md). Code and documentation licensing and provenance
+are recorded in [LICENSE](LICENSE) and [NOTICE.md](NOTICE.md).
+
+---
+
+<sub>Previously named MKT-K-CVA until 2026-10-24. GitHub redirects the old repository links.</sub>
