@@ -58,8 +58,10 @@ Five gates apply the mechanical rules of [VBA_HOUSE_STYLE.md](VBA_HOUSE_STYLE.md
 and the placement, dependency and API rules of
 [REPOSITORY_STRUCTURE.md](REPOSITORY_STRUCTURE.md) to the `.bas`, `.cls` and
 `.frm` files Git tracks, staged ones included. Each prints how many components
-it examined. No VBA component exists yet, so today every gate passes over
-zero components; a PASS says only that nothing tracked breaks a rule. The
+it examined. The current tree includes the two test modules delivered under
+#10: `TEST_Harness.bas` and `TEST_Examples.bas`; no production CVA component
+exists yet. A PASS says only that the tracked source satisfies the mechanical
+rules checked by that gate, not that it compiles or runs in Excel (#11). The
 valid and invalid fixtures for every rule are in `tools/test_check_vba.py`,
 run by the Python tooling tests.
 
