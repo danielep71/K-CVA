@@ -19,7 +19,7 @@ Nothing in this document is complete until its row links the evidence.
 
 | Step | Issue | Needs | Produces |
 | ---: | --- | --- | --- |
-| 1 | The remaining setup issues: #11, #14, #15 and #17 | Each issue's own prerequisites | Their deliverables, merged and integrated into `main` |
+| 1 | The remaining setup issues: #11, #14 and #15 | Each issue's own prerequisites | Their deliverables, merged and integrated into `main` |
 | 2 | #18, file audit | Step 1 | The [file audit record](#file-audit-record), with relevance, provenance and owner references for every tracked file |
 | 3 | #19, comment audit | #18 | The comment columns of the same record |
 | 4 | #20, certification | #19 | The [candidate record](#candidate-record), this checklist and the [evidence index](#evidence-index) completed, the [scope statement](#scope-statement) |
@@ -89,12 +89,13 @@ commit.
 | #14 | Traffic history | Open | ☐ |
 | #15 | Repository About metadata | Open | ☐ |
 | #16 | Onboarding | Resolution of #16 | ☐ |
-| #17 | Versioning and closeout documents | Open | ☐ |
+| #17 | Versioning and closeout documents | Resolution of #17; main integration #83, sync #84 | ☐ |
 | #18 | File audit | Open | ☐ |
 | #19 | Comment audit | Open | ☐ |
 | #20 | Certification | Open | ☐ |
 | #35, #37, #41, #47 | Documentation and CI corrections | Their Resolutions | ☐ |
 | #56, #58, #60, #62, #64, #65 | Static-check defects | Their Resolutions | ☐ |
+| #85 | Repository/project rename to K-CVA | Resolution of #85; main integration #87, sync #88 | ☐ |
 
 An issue added to the milestone later gets a row here.
 
