@@ -32,7 +32,9 @@ Git's whitespace rules and binary-file handling apply.
 Actionlint's optional ShellCheck and Pyflakes integrations are explicitly off
 so local and hosted validation have the same declared dependencies. No VBA
 compiler, CVA engine, numerical certification or live issue audit is implied.
-Live issue triage retains its separate workflow.
+Live issue triage retains its separate workflow. The Traffic history workflow
+is repository analytics, not CI ([TRAFFIC.md](TRAFFIC.md)); its merge script
+is tested by the Python tooling tests and the workflow by actionlint.
 
 `test-results/integrity/` contains individual logs and a JSON report with the
 actual checkout commit, dirty flag, tracked-file SHA-256 digests, tool versions,
