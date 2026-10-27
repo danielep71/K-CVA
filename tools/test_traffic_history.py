@@ -120,7 +120,9 @@ class MergeTests(unittest.TestCase):
             ws.collect(window("2026-10-14", [(2, 1)] * 14))
             ws.merge("2026-10-14T06:00:00")
             before = ws.snapshot()
-            report = ws.merge("2026-10-14T09:30:00")
+            # The same collection merged again, for example a rerun of the
+            # merge step; a later identical one only moves observed_at.
+            report = ws.merge("2026-10-14T06:00:00")
             self.assertEqual(report.changed, {})
             self.assertEqual(ws.snapshot(), before)
 
@@ -213,6 +215,37 @@ class MergeTests(unittest.TestCase):
             report = ws.merge("2026-10-14T12:00:00")
             self.assertEqual(report.changed, {})
             self.assertEqual(ws.snapshot(), evening)
+
+    def test_a_replay_older_than_an_identical_newer_collection_changes_nothing(self) -> None:
+        def paths(title: str) -> list[dict[str, Any]]:
+            return [{"path": "/o/r", "title": title, "count": 3, "uniques": 1}]
+        with workspace() as ws:
+            days = window("2026-10-14", [(1, 1)] * 14)
+            ws.collect(days, paths=paths("Old title"))
+            ws.merge("2026-10-14T06:00:00")
+            ws.merge("2026-10-14T18:00:00")
+            evening = ws.snapshot()
+            # A 12:00 collection replayed afterwards saw a different title.
+            ws.collect(days, paths=paths("Midday title"))
+            report = ws.merge("2026-10-14T12:00:00")
+            self.assertEqual(report.changed, {})
+            self.assertEqual(ws.snapshot(), evening)
+            self.assertEqual(ws.rows(PATHS)[0]["title"], "Old title")
+
+    def test_an_identical_newer_collection_only_moves_observed_at(self) -> None:
+        with workspace() as ws:
+            ws.collect(window("2026-10-14", [(1, 1)] * 14))
+            ws.merge("2026-10-14T06:00:00")
+            before = ws.snapshot()
+            report = ws.merge("2026-10-14T18:00:00")
+            self.assertEqual(sorted(report.changed), [SNAPSHOTS])
+            snapshot = ws.rows(SNAPSHOTS)[0]
+            self.assertEqual((snapshot["collected_at"], snapshot["observed_at"]),
+                             ("2026-10-14T06:00:00Z", "2026-10-14T18:00:00Z"))
+            after = ws.snapshot()
+            self.assertEqual({name: after[name] for name in after if name != SNAPSHOTS},
+                             {name: before[name] for name in before if name != SNAPSHOTS})
+            self.assertEqual(ws.merge("2026-10-14T18:00:00").changed, {})
 
     def test_rankings_order_ties_by_uniques_then_name(self) -> None:
         with workspace() as ws:
