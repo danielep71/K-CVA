@@ -18,7 +18,7 @@ It was recorded before the repository was renamed and names it MKT-K-CVA.
 | Main | PR required, zero mandatory approvals, resolved threads, merge commits only, no deletion/force pushes. Repository integrity from GitHub Actions (15368), strict up-to-date true, creation exemption false. |
 | Release | Same checks and PR safeguards for release/**; squash and merge allowed, no linear-history rule. Creation exemption true permits starting a release branch; subsequent updates require checks. Separate deletion guard retained. |
 | Tags | v* updates, deletion and force pushes blocked. |
-| Traffic | traffic-history deletion and force pushes blocked; no PR requirement. Local branch/workflow/credentials remain #14 work. |
+| Traffic | traffic-history deletion and force pushes blocked; no PR requirement. Workflow and guide in [TRAFFIC.md](TRAFFIC.md); the branch, the `analytics` environment and its token are #14 work. |
 | Bypasses | Both repositories' five rulesets active, with no bypass actors or excluded refs. |
 | Actions | All actions allowed with full-length SHA pinning required; default token reads contents/packages; Actions-created/approved PRs off. Private-fork workflows and cross-repository access off; retention 90 days. |
 | Dependency security | Dependency graph and Dependabot alerts on; automatic dependency submission, malware alerts, security/grouped updates off; zero auto-triage rules. Version-update configuration present; standard GitHub runner. |

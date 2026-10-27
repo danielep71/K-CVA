@@ -17,7 +17,9 @@ check_changelog.py checks CHANGELOG.md and VERSION against RELEASING.md, with
 fixtures in test_check_changelog.py; it never tags or publishes.
 check_excel_run.py checks the evidence folder of an Excel run against its
 commit (INSTALLATION.md, Recording an Excel run), with fixtures in
-test_check_excel_run.py; it is not a gate, since it needs a host run. Build and
+test_check_excel_run.py; it is not a gate, since it needs a host run.
+traffic_history.py merges traffic API responses into the traffic-history
+branch (docs/TRAFFIC.md), with fixtures in test_traffic_history.py. Build and
 evidence scripts may be added here with their own contracts. Regulatory
 reference derivations belong in tests/derivations, never in repository policy
 checks. Python tooling is not shipped as part of the workbook runtime; no
