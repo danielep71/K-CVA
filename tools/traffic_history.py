@@ -124,19 +124,26 @@ def parse_series(data: Any, key: str, collected: date) -> Series:
 
 
 def parse_ranked(data: Any, name: str, fields: Sequence[str]) -> list[Row]:
+    """Validate a top-10 list and rank it by count, then uniques, then name.
+
+    The API orders ties arbitrarily; ranking them deterministically makes equal
+    collections produce equal rows, so a replayed collection cannot reorder the
+    rankings a newer one stored.
+    """
     if not isinstance(data, list):
         raise TrafficError(f"{name}: expected a list")
     rows = []
-    for rank, item in enumerate(data, start=1):
-        where = f"{name}[{rank - 1}]"
+    for index, item in enumerate(data):
+        where = f"{name}[{index}]"
         if not isinstance(item, dict):
             raise TrafficError(f"{where}: expected an object")
-        row = {"rank": str(rank)}
-        row.update({key: text(item.get(key), f"{where}.{key}") for key in fields})
+        row = {key: text(item.get(key), f"{where}.{key}") for key in fields}
         row["count"] = str(count(item.get("count"), f"{where}.count"))
         row["uniques"] = str(count(item.get("uniques"), f"{where}.uniques"))
         rows.append(row)
-    return rows
+    rows.sort(key=lambda row: (-int(row["count"]), -int(row["uniques"]),
+                               *(row[key] for key in fields)))
+    return [{"rank": str(rank)} | row for rank, row in enumerate(rows, start=1)]
 
 
 def load_json(path: Path) -> Any:

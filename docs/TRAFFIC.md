@@ -60,7 +60,9 @@ branch, and its history is not rewritten. Its creation commit is recorded in
 | `paths.csv` | `snapshot_date`, `rank` | The top 10 repository paths over the same window. |
 
 Referrers and paths are retained per collection day, because the API gives
-them only as 14-day totals, never per day.
+them only as 14-day totals, never per day. They are ranked by count, then
+unique visitors, then name, so ties do not depend on the order the API lists
+them in.
 
 ### Merge rules
 

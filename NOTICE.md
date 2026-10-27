@@ -172,8 +172,8 @@ contributors), read on branch `release/0.1.0` at commit `576bb588be6f01d2a75db64
 
 | Local file | Source blob | Local changes |
 | --- | --- | --- |
-| `tools/traffic_history.py` | `bde0142378e101a158022dee831a97d725f185cb` | Provenance line. |
-| `tools/test_traffic_history.py` | `f5ab875a477f36d1958fb43b9e6c74915e3c4cd2` | Provenance line. |
+| `tools/traffic_history.py` | `bde0142378e101a158022dee831a97d725f185cb` | Referrers and paths ranked by count, uniques and name rather than in API order, so a replayed collection that lists ties differently cannot reorder newer rankings; provenance line. |
+| `tools/test_traffic_history.py` | `f5ab875a477f36d1958fb43b9e6c74915e3c4cd2` | Tests for tie ranking and a replay that reorders ties; provenance line. |
 | `.github/workflows/traffic-history.yml` | `2645193af39191ceb1e782c42651f6d76150d4e7` | Python 3.12.14, this repository's CI baseline. |
 | `docs/TRAFFIC.md` | `651db4d5e6e53735ecde298742a302e92c2e8304` | This repository's name, issue and private visibility; the branch is created once from `init`, its commit recorded in #14; no K-SFTs dates, commits or visibility decision. |
 

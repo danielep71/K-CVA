@@ -198,6 +198,34 @@ class MergeTests(unittest.TestCase):
             self.assertEqual(ws.snapshot(), evening)
             self.assertEqual(ws.rows(REFERRERS)[0]["referrer"], "example.org")
 
+    def test_a_replay_reordering_tied_rankings_changes_nothing(self) -> None:
+        tied = [{"referrer": "a.example", "count": 3, "uniques": 1},
+                {"referrer": "b.example", "count": 3, "uniques": 1}]
+        with workspace() as ws:
+            days = window("2026-10-14", [(1, 1)] * 14)
+            ws.collect(days, referrers=tied)
+            ws.merge("2026-10-14T06:00:00")
+            ws.merge("2026-10-14T18:00:00")
+            evening = ws.snapshot()
+            # A 12:00 collection replayed afterwards: same counts, ties listed
+            # in the other order by the API.
+            ws.collect(days, referrers=list(reversed(tied)))
+            report = ws.merge("2026-10-14T12:00:00")
+            self.assertEqual(report.changed, {})
+            self.assertEqual(ws.snapshot(), evening)
+
+    def test_rankings_order_ties_by_uniques_then_name(self) -> None:
+        with workspace() as ws:
+            ws.collect(window("2026-10-14", [(1, 1)] * 14),
+                       referrers=[{"referrer": "c.example", "count": 3, "uniques": 1},
+                                  {"referrer": "b.example", "count": 3, "uniques": 2},
+                                  {"referrer": "a.example", "count": 3, "uniques": 1},
+                                  {"referrer": "d.example", "count": 9, "uniques": 1}])
+            ws.merge("2026-10-14T06:00:00")
+            self.assertEqual([(row["rank"], row["referrer"]) for row in ws.rows(REFERRERS)],
+                             [("1", "d.example"), ("2", "b.example"), ("3", "a.example"),
+                              ("4", "c.example")])
+
     def test_zero_activity_is_stored_and_uncollected_dates_are_unavailable(self) -> None:
         with workspace() as ws:
             ws.collect(window("2026-10-14", [(0, 0)] * 14))
