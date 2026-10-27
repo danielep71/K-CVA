@@ -121,6 +121,7 @@ See [CI coverage](docs/CI.md), [tooling](tools/README.md) and
 | [NOTICE.md](NOTICE.md), [LICENSE](LICENSE) | Copyright, provenance and the MPL-2.0 licence |
 | [CHANGELOG.md](CHANGELOG.md), [RELEASING.md](RELEASING.md) | What changed, versions and the release procedure |
 | [docs/CLOSEOUT.md](docs/CLOSEOUT.md) | The v0.1.0 closeout checklist and evidence index |
+| [docs/TRAFFIC.md](docs/TRAFFIC.md) | Repository traffic history: schedule, credential, stored data, recovery |
 
 </details>
 

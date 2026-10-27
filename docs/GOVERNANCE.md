@@ -22,7 +22,7 @@ are outside this milestone. Keep the repository private.
 | `release/0.1.0` | Active setup integration branch; created on 2026-10-24 from main at `f738d54e61535d63cf3f625303dae7611f434cf0`, by maintainer decision in #2. |
 | Other `release/X.Y.Z` | Created only by maintainer decision, without a v prefix. |
 | `docs/<issue>-<slug>`, `fix/<issue>-<slug>`, `chore/<issue>-<slug>`, `test/<issue>-<slug>` | Task branches cut from the active release branch, deleted after merge. |
-| `traffic-history` | Reserved for data-only automation under #14; not yet created. Never a task base or merged into source branches. |
+| `traffic-history` | Data-only branch written by the Traffic history workflow ([TRAFFIC.md](TRAFFIC.md), #14), created once as an orphan commit. Never a task base or merged into source branches. |
 
 A release branch does not imply publication.
 
@@ -87,7 +87,7 @@ evidence recorded in [#12](https://github.com/danielep71/K-CVA/issues/12):
 | Release ruleset 25781928 | Active for release/**; same protections, squash or merge allowed, no linear-history rule and no bypass. |
 | Release deletion ruleset 25781993 | Active for release/**; deletion blocked, no bypass. |
 | Tag ruleset 25781957 | Active for v*; updates, deletion and force pushes blocked, no bypass. |
-| Traffic ruleset 25782014 | Active for traffic-history; deletion and force pushes blocked; regular automation updates allowed, no PR requirement or bypass. Branch and workflow pending #14. |
+| Traffic ruleset 25782014 | Active for traffic-history; deletion and force pushes blocked; regular automation updates allowed, no PR requirement or bypass. Workflow and operating guide in [TRAFFIC.md](TRAFFIC.md) (#14). |
 | Required check and strict up-to-date rule | **Configured under #12**. Main and release/** require Repository integrity from GitHub Actions (integration 15368), with strict up-to-date checks. Checks apply on main creation; release creation alone is exempt. No bypass actors or excluded refs. See [settings evidence](REPOSITORY_SETTINGS.md). |
 | Enforcement demonstration | Exercised on 2026-10-24 under #13 for release/**; see [Demonstrated enforcement](#demonstrated-enforcement). Rules not triggered there remain verified by read-back only. |
 | General settings | Projects off; update-branch suggestion and automatic head-branch deletion on. Repository supports merge, squash and rebase, restricted by the branch rules above. |

@@ -165,6 +165,22 @@ follow K-SFTs' maintainer decisions and were confirmed for this repository by
 the maintainer on 2026-10-24 in #17 (PR #82).
 `docs/CLOSEOUT.md` was written for this repository.
 
+## Traffic history (#14)
+
+Adapted from K-SFTs under its MPL-2.0 notice (Copyright 2026 Daniele Penza and
+contributors), read on branch `release/0.1.0` at commit `576bb588be6f01d2a75db64e9867f68f71848bae` on 2026-10-27:
+
+| Local file | Source blob | Local changes |
+| --- | --- | --- |
+| `tools/traffic_history.py` | `bde0142378e101a158022dee831a97d725f185cb` | Provenance line. |
+| `tools/test_traffic_history.py` | `f5ab875a477f36d1958fb43b9e6c74915e3c4cd2` | Provenance line. |
+| `.github/workflows/traffic-history.yml` | `2645193af39191ceb1e782c42651f6d76150d4e7` | Python 3.12.14, this repository's CI baseline. |
+| `docs/TRAFFIC.md` | `651db4d5e6e53735ecde298742a302e92c2e8304` | This repository's name, issue and private visibility; the branch is created once from `init`, its commit recorded in #14; no K-SFTs dates, commits or visibility decision. |
+
+K-SFTs took the design of its traffic collection from K-SACCR's
+`daily-traffic.yml` and K-Risk-Engines' `docs/TRAFFIC.md` and rewrote it;
+preserve that attribution. No traffic data is copied.
+
 ## Excel-run evidence (#11)
 
 Adapted from K-SFTs (formerly CCR-K-SFTs) under its MPL-2.0 notice (Copyright
