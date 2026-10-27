@@ -34,7 +34,7 @@ PATHS = "paths.csv"
 HEADERS: dict[str, tuple[str, ...]] = {
     DAILY: ("date", "views", "unique_views", "views_collected_at",
             "clones", "unique_clones", "clones_collected_at"),
-    SNAPSHOTS: ("snapshot_date", "collected_at", "first_date", "last_date",
+    SNAPSHOTS: ("snapshot_date", "collected_at", "observed_at", "first_date", "last_date",
                 "views_14d", "unique_views_14d", "clones_14d", "unique_clones_14d"),
     REFERRERS: ("snapshot_date", "rank", "referrer", "count", "uniques"),
     PATHS: ("snapshot_date", "rank", "path", "title", "count", "uniques"),
@@ -46,7 +46,7 @@ ISO_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 STAMP = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
 NUMERIC = {"views", "unique_views", "clones", "unique_clones", "views_14d", "unique_views_14d",
            "clones_14d", "unique_clones_14d", "rank", "count", "uniques"}
-STAMPS = {"collected_at", "views_collected_at", "clones_collected_at"}
+STAMPS = {"collected_at", "observed_at", "views_collected_at", "clones_collected_at"}
 Row = dict[str, str]
 
 
@@ -252,6 +252,7 @@ def snapshot_row(collection: Collection) -> Row:
     return {
         "snapshot_date": collection.snapshot_date,
         "collected_at": collection.stamp,
+        "observed_at": collection.stamp,
         "first_date": reported[0] if reported else "",
         "last_date": reported[-1] if reported else "",
         "views_14d": str(collection.views.count),
@@ -276,20 +277,22 @@ def merge_day(current: Mapping[str, list[Row]], collection: Collection) -> dict[
     """Merge a collection day's snapshot, referrers and paths as one unit.
 
     The snapshot's ``collected_at`` is the time of the collection that last
-    changed any of the three. A later collection replaces the unit only if
-    something in it differs; an earlier one replayed afterwards never does.
+    changed any of the three, and ``observed_at`` that of the latest collection
+    of the day, changed or not. A later collection replaces the unit only if
+    something in it differs, and otherwise only moves ``observed_at``; one
+    older than ``observed_at``, replayed afterwards, never changes anything.
     """
     day = collection.snapshot_date
     unit = {name: current[name] for name in (SNAPSHOTS, REFERRERS, PATHS)}
     stored = on_day(current[SNAPSHOTS], day)
-    if stored and stored[0]["collected_at"] > collection.stamp:
+    if stored and stored[0]["observed_at"] > collection.stamp:
         return unit
     new = {
         SNAPSHOTS: [snapshot_row(collection)],
         REFERRERS: [{"snapshot_date": day} | row for row in collection.referrers],
         PATHS: [{"snapshot_date": day} | row for row in collection.paths],
     }
-    ignore = {"collected_at"}
+    ignore = {"collected_at", "observed_at"}
     unchanged = (
         bool(stored)
         and all(stored[0][key] == new[SNAPSHOTS][0][key]
@@ -298,6 +301,9 @@ def merge_day(current: Mapping[str, list[Row]], collection: Collection) -> dict[
         and on_day(current[PATHS], day) == new[PATHS]
     )
     if unchanged:
+        if collection.stamp > stored[0]["observed_at"]:
+            observed = stored[0] | {"observed_at": collection.stamp}
+            unit[SNAPSHOTS] = replace_day(current[SNAPSHOTS], day, [observed])
         return unit
     return {name: replace_day(current[name], day, rows) for name, rows in new.items()}
 

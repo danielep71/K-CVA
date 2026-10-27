@@ -55,7 +55,7 @@ branch, and its history is not rewritten. Its creation commit is recorded in
 | File | Key | Contents |
 | --- | --- | --- |
 | `daily.csv` | `date` | Views and unique views, clones and unique clones per UTC day. `views_collected_at` and `clones_collected_at` give the collection that last changed each pair. |
-| `snapshots.csv` | `snapshot_date` | One row per collection day: the first and last day the API reported, the 14-day totals, and `collected_at`, the collection that last changed that day's snapshot, referrers or paths. |
+| `snapshots.csv` | `snapshot_date` | One row per collection day: the first and last day the API reported, the 14-day totals, `collected_at`, the collection that last changed that day's snapshot, referrers or paths, and `observed_at`, the latest collection of that day, changed or not. |
 | `referrers.csv` | `snapshot_date`, `rank` | The top 10 referrers over the 14 days before each collection. |
 | `paths.csv` | `snapshot_date`, `rank` | The top 10 repository paths over the same window. |
 
@@ -80,15 +80,17 @@ them in.
   `snapshots.csv`.
 - **Same-day runs:** a collection day's snapshot, referrers and paths are one
   unit. A second collection on the same UTC day replaces the unit only if any
-  of the three changed. Running the workflow twice with the same data changes
-  nothing.
+  of the three changed; otherwise it moves only that day's `observed_at`.
+  Merging the same collection again changes nothing.
 - **Order:** "newest" means the latest collection time. Merging an older
   collection after a newer one, when a saved collection is replayed or a run
   is rebuilt on a newer branch tip, never replaces what the newer one stored;
-  it can only fill a date or metric that nothing newer reported. A stored
-  time is that of the collection that last *changed* the values; a day's
-  counts only grow until the day ends, so an older collection replayed later
-  cannot hold different values.
+  it can only fill a date or metric that nothing newer reported. For the
+  snapshot, referrers and paths, a collection older than the day's
+  `observed_at` is ignored, even if its titles or rankings differ. For the
+  daily counts, the stored time is that of the collection that last
+  *changed* them; a day's counts only grow until the day ends, so an older
+  collection replayed later cannot hold different values.
 
 ### Zero or unavailable
 
