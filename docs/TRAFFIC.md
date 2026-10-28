@@ -2,9 +2,10 @@
 
 GitHub keeps repository traffic for 14 days. The **Traffic history** workflow
 ([.github/workflows/traffic-history.yml](../.github/workflows/traffic-history.yml))
-collects it once a day and merges it into CSV files on the data-only
-`traffic-history` branch, so the history outlives that window. It is
-repository analytics, not CI: it builds and tests nothing (#14).
+collects views and clones once a day and merges them into CSV files on the
+data-only `traffic-history` branch, so the history outlives that window. It
+does not collect top referrers or popular paths ([visibility](#visibility)).
+It is repository analytics, not CI: it builds and tests nothing (#14).
 
 ## Schedule
 
@@ -55,14 +56,13 @@ branch, and its history is not rewritten. Its creation commit is recorded in
 | File | Key | Contents |
 | --- | --- | --- |
 | `daily.csv` | `date` | Views and unique views, clones and unique clones per UTC day. `views_collected_at` and `clones_collected_at` give the collection that last changed each pair. |
-| `snapshots.csv` | `snapshot_date` | One row per collection day: the first and last day the API reported, the 14-day totals, `collected_at`, the collection that last changed that day's snapshot, referrers or paths, and `observed_at`, the latest collection of that day, changed or not. |
-| `referrers.csv` | `snapshot_date`, `rank` | The top 10 referrers over the 14 days before each collection. |
-| `paths.csv` | `snapshot_date`, `rank` | The top 10 repository paths over the same window. |
+| `snapshots.csv` | `snapshot_date` | One row per collection day: the first and last day the API reported, the 14-day totals, `collected_at`, the collection that last changed that day's snapshot, and `observed_at`, the latest collection of that day, changed or not. |
 
-Referrers and paths are retained per collection day, because the API gives
-them only as 14-day totals, never per day. They are ranked by count, then
-unique visitors, then name, so ties do not depend on the order the API lists
-them in.
+The first collections, from 2026-10-27, also stored `referrers.csv` and
+`paths.csv`, the top 10 referrers and paths of each collection. Collecting
+them stopped once the repository was public (#14, #108); the commit that
+removed both files from the branch is recorded in #14. Earlier commits still
+hold them, since the branch's history is never rewritten.
 
 ### Merge rules
 
@@ -78,19 +78,18 @@ them in.
 - **No double counting:** values are replaced, never added. Unique counts are
   never summed across days or windows; a 14-day unique count is only in
   `snapshots.csv`.
-- **Same-day runs:** a collection day's snapshot, referrers and paths are one
-  unit. A second collection on the same UTC day replaces the unit only if any
-  of the three changed; otherwise it moves only that day's `observed_at`.
-  Merging the same collection again changes nothing.
+- **Same-day runs:** a second collection on the same UTC day replaces that
+  day's snapshot only if one of its values changed; otherwise it moves only
+  the snapshot's `observed_at`. Merging the same collection again changes
+  nothing.
 - **Order:** "newest" means the latest collection time. Merging an older
   collection after a newer one, when a saved collection is replayed or a run
   is rebuilt on a newer branch tip, never replaces what the newer one stored;
   it can only fill a date or metric that nothing newer reported. For the
-  snapshot, referrers and paths, a collection older than the day's
-  `observed_at` is ignored, even if its titles or rankings differ. For the
-  daily counts, the stored time is that of the collection that last
-  *changed* them; a day's counts only grow until the day ends, so an older
-  collection replayed later cannot hold different values.
+  snapshot, a collection older than the day's `observed_at` is ignored, even
+  if its totals differ. For the daily counts, the stored time is that of the
+  collection that last *changed* them; a day's counts only grow until the day
+  ends, so an older collection replayed later cannot hold different values.
 
 ### Zero or unavailable
 
@@ -107,11 +106,14 @@ stored day that have no row.
 
 ### Visibility
 
-The repository is private, and so is the branch: only people with read access
-to the repository can read its CSV files. The data is aggregate (counts,
-referrers and paths) and identifies no visitor. It is not published through
-GitHub Pages or badges. The counts include the maintainer's own visits and
-every clone made by CI checkouts.
+The repository is public, and so is the `traffic-history` branch: anyone can
+read its CSV files. Branch protection controls writing and deletion, not
+reading. The workflow therefore keeps counts only: views, clones and their
+unique visitors, per day and over 14 days. It does not collect top referrers
+or popular paths, which could name the sites and pages visitors came from.
+The data identifies no visitor and is not published through GitHub Pages or
+badges. The counts include the maintainer's own visits and every clone made by
+CI checkouts.
 
 ## Branch protection
 
