@@ -2,10 +2,19 @@
 
 ## Reporting privately
 
-Email **danielep71@gmail.com** with subject **Private security report — K-CVA**.
-The maintainer confirmed this route on 2026-10-24 for issue #4. No test email
-was sent. Do not put vulnerability details, credentials or confidential data
-in issues, PRs, commits, logs or screenshots, even while the repository is private.
+Use GitHub's **private vulnerability reporting**: on the repository's
+[Security tab](https://github.com/danielep71/K-CVA/security), choose
+**Report a vulnerability**, or open the
+[advisory form](https://github.com/danielep71/K-CVA/security/advisories/new)
+directly. Only you and the maintainer can see the report. It was enabled on
+2026-10-28 (#108).
+
+If you cannot use it, email **danielep71@gmail.com** with subject
+**Private security report — K-CVA**. The maintainer confirmed this route on
+2026-10-24 for issue #4. No test email was sent.
+
+Do not put vulnerability details, credentials or confidential data in issues,
+PRs, commits, logs or screenshots, whatever the repository's visibility.
 
 Include the full commit SHA, affected paths, impact, minimal synthetic
 reproduction, environment/tool versions and any tested workaround.
@@ -31,8 +40,8 @@ private workbooks. Redact logs and evidence before retaining or sharing them.
 Keep secrets in authorized secret storage, with narrowly scoped permissions;
 never embed them in source or print them.
 
-If credentials are exposed, revoke/rotate them promptly and contact the owner
-privately. Deleting a file does not remove it from Git history or logs.
+If credentials are exposed, revoke/rotate them promptly and contact the
+maintainer privately. Deleting a file does not remove it from Git history or logs.
 Coordinate any history rewrite separately; do not force-push protected branches.
 Do not weaken organization macro or endpoint policy to run a workbook.
 
@@ -53,7 +62,27 @@ through PR #30 and integrated into main by PR #32; required-check enforcement
 was configured under #12 for main and release/**. The controlled enforcement
 demonstration remains #13. A green metadata check is not a security scan.
 
-## Feature status and limitations
+<a id="current-visibility"></a>
+
+## Current visibility — verified 2026-10-28
+
+The repository is public. On 2026-10-28 the maintainer enabled private
+vulnerability reporting, Secret Protection and push protection (#108), and
+the repository API read the settings below back the same day:
+
+| Feature | Status |
+| --- | --- |
+| Private vulnerability reporting | Enabled; the reporting route above, with the email route as the alternative. |
+| Secret scanning (Secret Protection) | Enabled, for GitHub's supported secret patterns. Non-provider patterns and validity checks are disabled. |
+| Push protection | Enabled: pushes containing a supported secret are blocked. |
+| Code scanning (CodeQL) | Not configured; no code scanning coverage is claimed. |
+| Dependency graph, Dependabot alerts | Enabled; Dependabot security updates disabled, as in the snapshot below. |
+
+Secret scanning covers the patterns GitHub supports, not every credential
+format; the data and credential rules above still apply. The 2026-10-24
+observations below describe the former private configuration.
+
+## Historical feature status and limitations
 
 Snapshot: **2026-10-24**, verified in this repository's signed-in
 [Advanced Security settings](https://github.com/danielep71/K-CVA/settings/security_analysis)
@@ -87,8 +116,9 @@ does not establish coverage for this private repository.
 
 The missing controls and documented eligibility together establish the current
 availability limitation; an omitted API security_and_analysis field alone does
-not. Reassess after any ownership, plan or visibility change. Retain private
-visibility. Manual review and the data/credential rules above remain necessary.
+not. Reassess after any ownership, plan or visibility change. Private
+visibility was retained at this historical baseline. Manual review and the
+data/credential rules above remain necessary.
 
 Existing [issue #12](https://github.com/danielep71/K-CVA/issues/12) evidence
 also records required full-SHA action pinning and default workflow-token read

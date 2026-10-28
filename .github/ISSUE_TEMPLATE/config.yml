@@ -8,4 +8,4 @@ contact_links:
     about: "Branch rules, reviews, integration and repository ownership."
   - name: "Report a security vulnerability privately"
     url: "https://github.com/danielep71/K-CVA/blob/main/SECURITY.md"
-    about: "Do not open an issue. Use the private email route in SECURITY.md."
+    about: "Do not open an issue. Report it privately from the Security tab, as SECURITY.md describes."
