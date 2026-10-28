@@ -115,5 +115,8 @@ CVA calculation, public API or workbook.
 - There is no calculation, public API, workbook or numerical test case other
   than an illustrative format example. Methodology decisions M4 and M6 are
   open, and M5 and M7 in part ([docs/DECISIONS.md](docs/DECISIONS.md)).
+- The repository is public. Code scanning is not configured; secret scanning
+  and push protection cover GitHub's supported secret patterns only
+  ([SECURITY.md](SECURITY.md#current-visibility); #108).
 
 [Unreleased]: https://github.com/danielep71/K-CVA/commits/main
