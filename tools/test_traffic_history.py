@@ -17,7 +17,7 @@ from pathlib import Path
 from typing import Any
 
 import traffic_history
-from traffic_history import DAILY, PATHS, REFERRERS, SNAPSHOTS, TrafficError
+from traffic_history import DAILY, SNAPSHOTS, TrafficError
 
 Day = tuple[str, int, int]
 
@@ -50,15 +50,10 @@ class Workspace:
         self.data = root / "data"
         self.raw.mkdir()
 
-    def collect(self, views: Sequence[Day], clones: Sequence[Day] | None = None,
-                referrers: Any = None, paths: Any = None) -> None:
+    def collect(self, views: Sequence[Day], clones: Sequence[Day] | None = None) -> None:
         responses: dict[str, Any] = {
             "views.json": series("views", views),
             "clones.json": series("clones", views if clones is None else clones),
-            "referrers.json": [{"referrer": "github.com", "count": 3, "uniques": 1}]
-            if referrers is None else referrers,
-            "paths.json": [{"path": "/o/r", "title": "r", "count": 3, "uniques": 1}]
-            if paths is None else paths,
         }
         for name, body in responses.items():
             (self.raw / name).write_text(json.dumps(body), encoding="utf-8")
@@ -97,7 +92,6 @@ class MergeTests(unittest.TestCase):
             self.assertEqual((snapshot["first_date"], snapshot["last_date"]),
                              ("2026-10-01", "2026-10-14"))
             self.assertEqual(snapshot["collected_at"], "2026-10-14T06:17:00Z")
-            self.assertEqual(ws.rows(REFERRERS)[0]["rank"], "1")
 
     def test_overlapping_windows_keep_older_history_and_take_newer_values(self) -> None:
         with workspace() as ws:
@@ -132,24 +126,20 @@ class MergeTests(unittest.TestCase):
             ws.merge("2026-10-13T06:00:00")
             ws.collect(window("2026-10-14", [(1, 1)] * 14))
             ws.merge("2026-10-14T06:00:00")
-            ws.collect(window("2026-10-14", [(1, 1)] * 13 + [(4, 2)]),
-                       referrers=[{"referrer": "example.org", "count": 4, "uniques": 2}])
+            ws.collect(window("2026-10-14", [(1, 1)] * 13 + [(4, 2)]))
             ws.merge("2026-10-14T18:00:00")
             snapshots = ws.rows(SNAPSHOTS)
-            self.assertEqual([row["snapshot_date"] for row in snapshots],
-                             ["2026-10-13", "2026-10-14"])
-            self.assertEqual(snapshots[1]["collected_at"], "2026-10-14T18:00:00Z")
-            referrers = ws.rows(REFERRERS)
-            self.assertEqual([(row["snapshot_date"], row["referrer"]) for row in referrers],
-                             [("2026-10-13", "github.com"), ("2026-10-14", "example.org")])
+            self.assertEqual([(row["snapshot_date"], row["views_14d"], row["collected_at"])
+                              for row in snapshots],
+                             [("2026-10-13", "14", "2026-10-13T06:00:00Z"),
+                              ("2026-10-14", "17", "2026-10-14T18:00:00Z")])
 
     def test_replaying_an_older_collection_keeps_newer_values(self) -> None:
         with workspace() as ws:
             ws.collect(window("2026-10-14", [(1, 1)] * 13 + [(2, 1)]))
             ws.raw.rename(ws.raw.parent / "morning")
             ws.raw.mkdir()
-            ws.collect(window("2026-10-14", [(1, 1)] * 13 + [(5, 2)]),
-                       referrers=[{"referrer": "example.org", "count": 5, "uniques": 2}])
+            ws.collect(window("2026-10-14", [(1, 1)] * 13 + [(5, 2)]))
             ws.merge("2026-10-14T18:00:00")
             evening = ws.snapshot()
             # The 06:00 collection is merged after the 18:00 one, as when a
@@ -183,54 +173,21 @@ class MergeTests(unittest.TestCase):
             self.assertEqual((row["clones"], row["clones_collected_at"]),
                              ("2", "2026-10-14T06:00:00Z"))
 
-    def test_replay_keeps_newer_rankings_when_totals_are_unchanged(self) -> None:
-        with workspace() as ws:
-            ws.collect(window("2026-10-14", [(1, 1)] * 14))
-            ws.raw.rename(ws.raw.parent / "morning")
-            ws.raw.mkdir()
-            traffic_history.merge(ws.raw.parent / "morning", ws.data, at("2026-10-14T06:00:00"))
-            ws.collect(window("2026-10-14", [(1, 1)] * 14),
-                       referrers=[{"referrer": "example.org", "count": 4, "uniques": 2}])
-            ws.merge("2026-10-14T18:00:00")
-            self.assertEqual(ws.rows(SNAPSHOTS)[0]["collected_at"], "2026-10-14T18:00:00Z")
-            evening = ws.snapshot()
-            report = traffic_history.merge(ws.raw.parent / "morning", ws.data,
-                                           at("2026-10-14T06:00:00"))
-            self.assertEqual(report.changed, {})
-            self.assertEqual(ws.snapshot(), evening)
-            self.assertEqual(ws.rows(REFERRERS)[0]["referrer"], "example.org")
-
-    def test_a_replay_reordering_tied_rankings_changes_nothing(self) -> None:
-        tied = [{"referrer": "a.example", "count": 3, "uniques": 1},
-                {"referrer": "b.example", "count": 3, "uniques": 1}]
-        with workspace() as ws:
-            days = window("2026-10-14", [(1, 1)] * 14)
-            ws.collect(days, referrers=tied)
-            ws.merge("2026-10-14T06:00:00")
-            ws.merge("2026-10-14T18:00:00")
-            evening = ws.snapshot()
-            # A 12:00 collection replayed afterwards: same counts, ties listed
-            # in the other order by the API.
-            ws.collect(days, referrers=list(reversed(tied)))
-            report = ws.merge("2026-10-14T12:00:00")
-            self.assertEqual(report.changed, {})
-            self.assertEqual(ws.snapshot(), evening)
-
     def test_a_replay_older_than_an_identical_newer_collection_changes_nothing(self) -> None:
-        def paths(title: str) -> list[dict[str, Any]]:
-            return [{"path": "/o/r", "title": title, "count": 3, "uniques": 1}]
         with workspace() as ws:
             days = window("2026-10-14", [(1, 1)] * 14)
-            ws.collect(days, paths=paths("Old title"))
+            ws.collect(days)
             ws.merge("2026-10-14T06:00:00")
             ws.merge("2026-10-14T18:00:00")
             evening = ws.snapshot()
-            # A 12:00 collection replayed afterwards saw a different title.
-            ws.collect(days, paths=paths("Midday title"))
+            # A 12:00 collection replayed afterwards saw a different 14-day
+            # unique count over the same daily values.
+            (ws.raw / "views.json").write_text(
+                json.dumps(series("views", days) | {"uniques": 3}), encoding="utf-8")
             report = ws.merge("2026-10-14T12:00:00")
             self.assertEqual(report.changed, {})
             self.assertEqual(ws.snapshot(), evening)
-            self.assertEqual(ws.rows(PATHS)[0]["title"], "Old title")
+            self.assertEqual(ws.rows(SNAPSHOTS)[0]["unique_views_14d"], "1")
 
     def test_an_identical_newer_collection_only_moves_observed_at(self) -> None:
         with workspace() as ws:
@@ -246,18 +203,6 @@ class MergeTests(unittest.TestCase):
             self.assertEqual({name: after[name] for name in after if name != SNAPSHOTS},
                              {name: before[name] for name in before if name != SNAPSHOTS})
             self.assertEqual(ws.merge("2026-10-14T18:00:00").changed, {})
-
-    def test_rankings_order_ties_by_uniques_then_name(self) -> None:
-        with workspace() as ws:
-            ws.collect(window("2026-10-14", [(1, 1)] * 14),
-                       referrers=[{"referrer": "c.example", "count": 3, "uniques": 1},
-                                  {"referrer": "b.example", "count": 3, "uniques": 2},
-                                  {"referrer": "a.example", "count": 3, "uniques": 1},
-                                  {"referrer": "d.example", "count": 9, "uniques": 1}])
-            ws.merge("2026-10-14T06:00:00")
-            self.assertEqual([(row["rank"], row["referrer"]) for row in ws.rows(REFERRERS)],
-                             [("1", "d.example"), ("2", "b.example"), ("3", "a.example"),
-                              ("4", "c.example")])
 
     def test_zero_activity_is_stored_and_uncollected_dates_are_unavailable(self) -> None:
         with workspace() as ws:
@@ -279,6 +224,23 @@ class MergeTests(unittest.TestCase):
             ws.merge("2026-10-14T06:00:00")
             self.assertEqual(ws.daily()["2026-10-14"][:2], ("1", ""))
 
+    def test_referrers_and_paths_are_neither_fetched_nor_written(self) -> None:
+        with workspace() as ws:
+            ws.data.mkdir()
+            # Files from before the history kept counts only stay as they are.
+            stale = {"referrers.csv": "snapshot_date,rank,referrer,count,uniques\n",
+                     "paths.csv": "not,a,history,file\n"}
+            for name, content in stale.items():
+                (ws.data / name).write_text(content, encoding="utf-8")
+            ws.collect(window("2026-10-14", [(1, 1)] * 14))
+            self.assertEqual(sorted(path.name for path in ws.raw.iterdir()),
+                             sorted(traffic_history.RESPONSES))
+            report = ws.merge("2026-10-14T06:00:00")
+            self.assertEqual(sorted(report.changed), [DAILY, SNAPSHOTS])
+            self.assertEqual(sorted(traffic_history.HEADERS), [DAILY, SNAPSHOTS])
+            for name, content in stale.items():
+                self.assertEqual((ws.data / name).read_text(encoding="utf-8"), content)
+
 
 class FailureTests(unittest.TestCase):
     def assert_refused(self, ws: Workspace, message: str) -> None:
@@ -291,12 +253,14 @@ class FailureTests(unittest.TestCase):
         with workspace() as ws:
             ws.collect(window("2026-10-14", [(1, 1)] * 14))
             ws.merge("2026-10-14T06:00:00")
-            ws.collect(window("2026-10-15", [(1, 1)] * 14), paths={"message": "Bad credentials"})
-            self.assert_refused(ws, "paths: expected a list")
             ws.collect(window("2026-10-15", [(1, 1)] * 14))
-            (ws.raw / "referrers.json").unlink()
-            self.assert_refused(ws, "referrers.json: response missing")
-            (ws.raw / "referrers.json").write_text("{not json", encoding="utf-8")
+            (ws.raw / "clones.json").write_text(json.dumps({"message": "Bad credentials"}),
+                                                encoding="utf-8")
+            self.assert_refused(ws, "clones: expected an object")
+            ws.collect(window("2026-10-15", [(1, 1)] * 14))
+            (ws.raw / "clones.json").unlink()
+            self.assert_refused(ws, "clones.json: response missing")
+            (ws.raw / "clones.json").write_text("{not json", encoding="utf-8")
             self.assert_refused(ws, "unreadable response")
 
     def test_malformed_values_are_rejected(self) -> None:
@@ -337,7 +301,7 @@ class CommandTests(unittest.TestCase):
     def test_init_creates_headers_and_keeps_existing_files(self) -> None:
         with workspace() as ws:
             self.assertEqual(traffic_history.initialize(ws.data), list(traffic_history.HEADERS))
-            self.assertEqual(ws.rows(PATHS), [])
+            self.assertEqual(ws.rows(SNAPSHOTS), [])
             (ws.data / DAILY).write_text(traffic_history.render(DAILY, [
                 {"date": "2026-10-01", "views": "1", "unique_views": "1", "clones": "",
                  "unique_clones": "", "views_collected_at": "2026-10-01T06:00:00Z",
