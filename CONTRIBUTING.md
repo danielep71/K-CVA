@@ -2,8 +2,8 @@
 
 K-CVA has one maintainer, who decides scope, priorities and what is
 integrated ([docs/GOVERNANCE.md](docs/GOVERNANCE.md#ownership-and-scope)).
-The repository is public (verified on 2026-10-28). Every change starts from an issue and arrives
-through a pull request.
+The repository is public (verified on 2026-10-28). Every change starts from
+an issue and arrives through a pull request.
 
 The repository is in **setup**: there is no calculation engine, workbook or
 validated method yet ([README.md](README.md)). Contributions today are to the

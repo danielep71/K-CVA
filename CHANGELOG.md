@@ -56,13 +56,6 @@ Use only the categories an entry needs.
 
 ## [Unreleased]
 
-### Changed
-
-- Reconcile repository and traffic-data visibility with the public repository;
-  preserve historical private-baseline evidence and identify security-feature
-  and regulatory-source distribution verification still outstanding (#108).
-
-
 Planned as 0.1.0, *Repo setup*: repository infrastructure only. It contains no
 CVA calculation, public API or workbook.
 
@@ -122,5 +115,8 @@ CVA calculation, public API or workbook.
 - There is no calculation, public API, workbook or numerical test case other
   than an illustrative format example. Methodology decisions M4 and M6 are
   open, and M5 and M7 in part ([docs/DECISIONS.md](docs/DECISIONS.md)).
+- The repository is public. Secret scanning, push protection and code
+  scanning have not been verified since it became public
+  ([SECURITY.md](SECURITY.md#current-visibility); #108).
 
 [Unreleased]: https://github.com/danielep71/K-CVA/commits/main

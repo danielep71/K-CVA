@@ -26,9 +26,10 @@ It was recorded before the repository was renamed and names it MKT-K-CVA.
 The controls above are aligned. Local release/0.1.0 and setup-only workflow scope
 are intentional project differences. Source credentials, collaborators,
 integrations and access grants were not copied. Traffic implementation in the
-reference does not establish local completion. Private-repository scanning and
-reporting availability remains documented in [SECURITY.md](../SECURITY.md);
-no additional scanner coverage is claimed by this settings change.
+reference does not establish local completion. Scanning and reporting
+availability, before and after the repository became public, is documented in
+[SECURITY.md](../SECURITY.md); no additional scanner coverage is claimed by
+this settings change.
 
 ## Saved target rulesets
 

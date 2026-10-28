@@ -9,7 +9,9 @@ implementation discussion. Code, documentation, workflows and configuration
 are covered by [LICENSE](LICENSE), unless a separate notice states otherwise.
 Repository visibility is public, verified on 2026-10-28. This does not mean
 that a version, tag or workbook has been released. Third-party material retains
-its own terms; public-distribution verification is tracked in #108.
+its own terms; those of the regulatory source copies, checked for public
+distribution, are in
+[docs/methodology/sources/README.md](docs/methodology/sources/README.md#terms-of-use).
 
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
