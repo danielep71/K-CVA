@@ -107,8 +107,9 @@ stored day that have no row.
 
 ### Visibility
 
-The repository is private, and so is the branch: only people with read access
-to the repository can read its CSV files. The data is aggregate (counts,
+The repository is public, verified on 2026-10-28. The `traffic-history`
+branch has the same visibility: its CSV files are publicly readable.
+Branch protection controls writes and deletion; it does not make the data private. The data is aggregate (counts,
 referrers and paths) and identifies no visitor. It is not published through
 GitHub Pages or badges. The counts include the maintainer's own visits and
 every clone made by CI checkouts.
