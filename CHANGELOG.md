@@ -56,6 +56,13 @@ Use only the categories an entry needs.
 
 ## [Unreleased]
 
+### Changed
+
+- Reconcile repository and traffic-data visibility with the public repository;
+  preserve historical private-baseline evidence and identify security-feature
+  and regulatory-source distribution verification still outstanding (#108).
+
+
 Planned as 0.1.0, *Repo setup*: repository infrastructure only. It contains no
 CVA calculation, public API or workbook.
 
