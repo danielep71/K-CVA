@@ -65,5 +65,9 @@ under its publisher's terms.
 | --- | --- | --- |
 | European Union (Publications Office) | Commission Decision 2011/833/EU on the reuse of Commission documents: documents published by the Commission or by the Publications Office on its behalf are available for commercial or non-commercial reuse without charge (Article 4), under conditions that may include acknowledging the source and not distorting the original meaning (Article 6) | Articles 1, 2, 4 and 6 read on 2026-10-24 from <https://publications.europa.eu/resource/celex/32011D0833> |
 
-The repository is private and non-commercial. Making it public, or any
-commercial use, needs these terms checked again first.
+At registration on 2026-10-24, the repository was private and non-commercial.
+The repository is now public (verified on 2026-10-28). The required review of
+these terms for public distribution has not been revalidated in this audit
+and remains tracked in #108; the earlier private-use baseline is not evidence
+that this review is complete. The publisher's terms and source record above
+remain unchanged.
