@@ -12,7 +12,9 @@ truthful authorship. Bot authorship does not permit bypassing review or rules.
 The milestone **v0.1.0 - Repo setup** covers repository infrastructure.
 Architecture and the initial CVA product scope were established in [#3](https://github.com/danielep71/K-CVA/issues/3);
 production calculations, numerical certification and production workbook packaging
-are outside this milestone. Keep the repository private.
+are outside this milestone. The repository is public, verified on 2026-10-28.
+This supersedes the original private-visibility policy; the dated settings
+snapshot below records the earlier baseline.
 
 ## Branches
 
@@ -77,7 +79,7 @@ The exact `Repository integrity` check from GitHub Actions and up-to-date
 branches are required by the main and release rulesets. The unfiltered workflow was delivered by #6. Path-filtered
 label workflows must not serve as the universal required check.
 
-Snapshot verified on **2026-10-24** through GitHub API reads and the settings
+Historical snapshot verified on **2026-10-24** through GitHub API reads and the settings
 evidence recorded in [#12](https://github.com/danielep71/K-CVA/issues/12):
 
 | Control | Configured or pending |
