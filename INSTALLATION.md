@@ -29,7 +29,7 @@ workbook. Follow organizational macro policy; do not weaken security settings.
 
 ## Obtain an exact source revision
 
-With authorized access to the private repository:
+Clone the public repository:
 
 ```sh
 git clone https://github.com/danielep71/K-CVA.git
