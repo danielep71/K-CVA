@@ -5,7 +5,7 @@
 Email **danielep71@gmail.com** with subject **Private security report — K-CVA**.
 The maintainer confirmed this route on 2026-10-24 for issue #4. No test email
 was sent. Do not put vulnerability details, credentials or confidential data
-in issues, PRs, commits, logs or screenshots, even while the repository is private.
+in issues, PRs, commits, logs or screenshots, regardless of repository visibility.
 
 Include the full commit SHA, affected paths, impact, minimal synthetic
 reproduction, environment/tool versions and any tested workaround.
@@ -31,7 +31,7 @@ private workbooks. Redact logs and evidence before retaining or sharing them.
 Keep secrets in authorized secret storage, with narrowly scoped permissions;
 never embed them in source or print them.
 
-If credentials are exposed, revoke/rotate them promptly and contact the owner
+If credentials are exposed, revoke/rotate them promptly and contact the maintainer
 privately. Deleting a file does not remove it from Git history or logs.
 Coordinate any history rewrite separately; do not force-push protected branches.
 Do not weaken organization macro or endpoint policy to run a workbook.
@@ -53,7 +53,16 @@ through PR #30 and integrated into main by PR #32; required-check enforcement
 was configured under #12 for main and release/**. The controlled enforcement
 demonstration remains #13. A green metadata check is not a security scan.
 
-## Feature status and limitations
+## Current visibility — verified 2026-10-28
+
+The repository is now public. The 2026-10-24 feature and eligibility observations
+below describe its former private configuration; they do not establish current
+feature availability or enabled coverage. Current secret scanning, push
+protection, code scanning and private vulnerability reporting settings require
+fresh verification under #108. No control is enabled or disabled by this
+documentation correction. The confirmed private email route remains available.
+
+## Historical feature status and limitations
 
 Snapshot: **2026-10-24**, verified in this repository's signed-in
 [Advanced Security settings](https://github.com/danielep71/K-CVA/settings/security_analysis)
@@ -87,8 +96,8 @@ does not establish coverage for this private repository.
 
 The missing controls and documented eligibility together establish the current
 availability limitation; an omitted API security_and_analysis field alone does
-not. Reassess after any ownership, plan or visibility change. Retain private
-visibility. Manual review and the data/credential rules above remain necessary.
+not. Reassess after any ownership, plan or visibility change. Private visibility
+was retained at this historical baseline. Manual review and the data/credential rules above remain necessary.
 
 Existing [issue #12](https://github.com/danielep71/K-CVA/issues/12) evidence
 also records required full-SHA action pinning and default workflow-token read
