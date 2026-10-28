@@ -102,8 +102,9 @@ CVA calculation, public API or workbook.
   [INSTALLATION.md](INSTALLATION.md#recording-an-excel-run); #10, #11).
 - Onboarding: README, developer setup and contributing guide
   ([CONTRIBUTING.md](CONTRIBUTING.md); #16).
-- Repository traffic history kept beyond GitHub's 14 days, on the data-only
-  `traffic-history` branch ([docs/TRAFFIC.md](docs/TRAFFIC.md); #14).
+- Repository traffic history (views and clones) kept beyond GitHub's 14
+  days, on the data-only `traffic-history` branch
+  ([docs/TRAFFIC.md](docs/TRAFFIC.md); #14).
 - This changelog, the release procedure and the closeout checklist
   ([RELEASING.md](RELEASING.md), [docs/CLOSEOUT.md](docs/CLOSEOUT.md); #17).
 

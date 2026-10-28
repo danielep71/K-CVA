@@ -174,10 +174,10 @@ contributors), read on branch `release/0.1.0` at commit `576bb588be6f01d2a75db64
 
 | Local file | Source blob | Local changes |
 | --- | --- | --- |
-| `tools/traffic_history.py` | `bde0142378e101a158022dee831a97d725f185cb` | Referrers and paths ranked by count, uniques and name rather than in API order; an `observed_at` column in `snapshots.csv`, the latest collection of each day, so a replayed older collection cannot replace a day's snapshot, referrers or paths; provenance line. |
-| `tools/test_traffic_history.py` | `f5ab875a477f36d1958fb43b9e6c74915e3c4cd2` | Tests for tie ranking, replays older than the latest observation and `observed_at`; provenance line. |
-| `.github/workflows/traffic-history.yml` | `2645193af39191ceb1e782c42651f6d76150d4e7` | Python 3.12.14, this repository's CI baseline. |
-| `docs/TRAFFIC.md` | `651db4d5e6e53735ecde298742a302e92c2e8304` | This repository's name, issue and initial private-visibility baseline; the branch is created once from `init`, its commit recorded in #14; `observed_at` and the replay rule; no K-SFTs dates, commits or visibility decision. |
+| `tools/traffic_history.py` | `bde0142378e101a158022dee831a97d725f185cb` | Views and clones only: referrers and paths are neither read nor written, the repository being public; an `observed_at` column in `snapshots.csv`, the latest collection of each day, so a replayed older collection cannot replace a day's snapshot; provenance line. |
+| `tools/test_traffic_history.py` | `f5ab875a477f36d1958fb43b9e6c74915e3c4cd2` | Tests for replays older than the latest observation, `observed_at`, and referrer and path files left untouched; the referrer and path tests removed; provenance line. |
+| `.github/workflows/traffic-history.yml` | `2645193af39191ceb1e782c42651f6d76150d4e7` | Python 3.12.14, this repository's CI baseline; fetches views and clones only. |
+| `docs/TRAFFIC.md` | `651db4d5e6e53735ecde298742a302e92c2e8304` | This repository's name, issue and public visibility, with views and clones only; the branch is created once from `init`, its commit recorded in #14; `observed_at` and the replay rule; no K-SFTs dates, commits or visibility decision. |
 
 K-SFTs took the design of its traffic collection from K-SACCR's
 `daily-traffic.yml` and K-Risk-Engines' `docs/TRAFFIC.md` and rewrote it;
