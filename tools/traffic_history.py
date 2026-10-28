@@ -5,6 +5,8 @@ The traffic API keeps 14 days. Each collection is merged by date and metric:
 the newest collection wins for every date it reports, dates it does not report
 keep their stored values, and nothing is ever summed across collections. A
 date that no collection reported has no row: it is unavailable, not zero.
+Only views and clones are collected: the history is as public as the
+repository, so top referrers and popular paths are not kept.
 
 The merge reads only local files and needs no token (docs/TRAFFIC.md). Every
 response and every existing file is validated before anything is written, so
@@ -29,23 +31,19 @@ from typing import Any
 
 DAILY = "daily.csv"
 SNAPSHOTS = "snapshots.csv"
-REFERRERS = "referrers.csv"
-PATHS = "paths.csv"
 HEADERS: dict[str, tuple[str, ...]] = {
     DAILY: ("date", "views", "unique_views", "views_collected_at",
             "clones", "unique_clones", "clones_collected_at"),
     SNAPSHOTS: ("snapshot_date", "collected_at", "observed_at", "first_date", "last_date",
                 "views_14d", "unique_views_14d", "clones_14d", "unique_clones_14d"),
-    REFERRERS: ("snapshot_date", "rank", "referrer", "count", "uniques"),
-    PATHS: ("snapshot_date", "rank", "path", "title", "count", "uniques"),
 }
-RESPONSES = ("views.json", "clones.json", "referrers.json", "paths.json")
+RESPONSES = ("views.json", "clones.json")
 MIDNIGHT = re.compile(r"^(\d{4}-\d{2}-\d{2})T00:00:00Z$")
 ISO_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 # Collection times are always written in this form, so they compare as strings.
 STAMP = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
 NUMERIC = {"views", "unique_views", "clones", "unique_clones", "views_14d", "unique_views_14d",
-           "clones_14d", "unique_clones_14d", "rank", "count", "uniques"}
+           "clones_14d", "unique_clones_14d"}
 STAMPS = {"collected_at", "observed_at", "views_collected_at", "clones_collected_at"}
 Row = dict[str, str]
 
@@ -68,8 +66,6 @@ class Collection:
     collected_at: datetime
     views: Series
     clones: Series
-    referrers: list[Row]
-    paths: list[Row]
 
     @property
     def snapshot_date(self) -> str:
@@ -123,29 +119,6 @@ def parse_series(data: Any, key: str, collected: date) -> Series:
                   count(data.get("uniques"), f"{key}.uniques"), days)
 
 
-def parse_ranked(data: Any, name: str, fields: Sequence[str]) -> list[Row]:
-    """Validate a top-10 list and rank it by count, then uniques, then name.
-
-    The API orders ties arbitrarily; ranking them deterministically makes equal
-    collections produce equal rows, so a replayed collection cannot reorder the
-    rankings a newer one stored.
-    """
-    if not isinstance(data, list):
-        raise TrafficError(f"{name}: expected a list")
-    rows = []
-    for index, item in enumerate(data):
-        where = f"{name}[{index}]"
-        if not isinstance(item, dict):
-            raise TrafficError(f"{where}: expected an object")
-        row = {key: text(item.get(key), f"{where}.{key}") for key in fields}
-        row["count"] = str(count(item.get("count"), f"{where}.count"))
-        row["uniques"] = str(count(item.get("uniques"), f"{where}.uniques"))
-        rows.append(row)
-    rows.sort(key=lambda row: (-int(row["count"]), -int(row["uniques"]),
-                               *(row[key] for key in fields)))
-    return [{"rank": str(rank)} | row for rank, row in enumerate(rows, start=1)]
-
-
 def load_json(path: Path) -> Any:
     try:
         return json.loads(path.read_text(encoding="utf-8"))
@@ -156,14 +129,12 @@ def load_json(path: Path) -> Any:
 
 
 def load_collection(raw: Path, collected_at: datetime) -> Collection:
-    """Validate the four responses of one collection; all of them or none."""
+    """Validate both responses of one collection; both of them or neither."""
     collected = collected_at.date()
     return Collection(
         collected_at=collected_at,
         views=parse_series(load_json(raw / "views.json"), "views", collected),
         clones=parse_series(load_json(raw / "clones.json"), "clones", collected),
-        referrers=parse_ranked(load_json(raw / "referrers.json"), "referrers", ("referrer",)),
-        paths=parse_ranked(load_json(raw / "paths.json"), "paths", ("path", "title")),
     )
 
 
@@ -262,50 +233,28 @@ def snapshot_row(collection: Collection) -> Row:
     }
 
 
-def on_day(rows: Sequence[Row], day: str) -> list[Row]:
-    return [row for row in rows if row["snapshot_date"] == day]
+def merge_snapshot(rows: list[Row], collection: Collection) -> list[Row]:
+    """Merge a collection day's snapshot; other days are never touched.
 
-
-def replace_day(rows: Sequence[Row], day: str, new: Sequence[Row]) -> list[Row]:
-    """Replace one snapshot date's rows; other dates are never touched."""
-    kept = [row for row in rows if row["snapshot_date"] != day]
-    return sorted([*kept, *new],
-                  key=lambda row: (row["snapshot_date"], int(row.get("rank") or 0)))
-
-
-def merge_day(current: Mapping[str, list[Row]], collection: Collection) -> dict[str, list[Row]]:
-    """Merge a collection day's snapshot, referrers and paths as one unit.
-
-    The snapshot's ``collected_at`` is the time of the collection that last
-    changed any of the three, and ``observed_at`` that of the latest collection
-    of the day, changed or not. A later collection replaces the unit only if
-    something in it differs, and otherwise only moves ``observed_at``; one
-    older than ``observed_at``, replayed afterwards, never changes anything.
+    ``collected_at`` is the time of the collection that last changed the
+    snapshot, and ``observed_at`` that of the latest collection of the day,
+    changed or not. A later collection replaces the snapshot only if a value
+    differs, and otherwise only moves ``observed_at``; one older than
+    ``observed_at``, replayed afterwards, never changes anything.
     """
     day = collection.snapshot_date
-    unit = {name: current[name] for name in (SNAPSHOTS, REFERRERS, PATHS)}
-    stored = on_day(current[SNAPSHOTS], day)
-    if stored and stored[0]["observed_at"] > collection.stamp:
-        return unit
-    new = {
-        SNAPSHOTS: [snapshot_row(collection)],
-        REFERRERS: [{"snapshot_date": day} | row for row in collection.referrers],
-        PATHS: [{"snapshot_date": day} | row for row in collection.paths],
-    }
+    by_day = {row["snapshot_date"]: row for row in rows}
+    stored = by_day.get(day)
+    if stored and stored["observed_at"] > collection.stamp:
+        return rows
+    new = snapshot_row(collection)
     ignore = {"collected_at", "observed_at"}
-    unchanged = (
-        bool(stored)
-        and all(stored[0][key] == new[SNAPSHOTS][0][key]
-                for key in HEADERS[SNAPSHOTS] if key not in ignore)
-        and on_day(current[REFERRERS], day) == new[REFERRERS]
-        and on_day(current[PATHS], day) == new[PATHS]
-    )
-    if unchanged:
-        if collection.stamp > stored[0]["observed_at"]:
-            observed = stored[0] | {"observed_at": collection.stamp}
-            unit[SNAPSHOTS] = replace_day(current[SNAPSHOTS], day, [observed])
-        return unit
-    return {name: replace_day(current[name], day, rows) for name, rows in new.items()}
+    if stored and all(stored[key] == new[key] for key in HEADERS[SNAPSHOTS] if key not in ignore):
+        if collection.stamp == stored["observed_at"]:
+            return rows
+        new = stored | {"observed_at": collection.stamp}
+    by_day[day] = new
+    return [by_day[key] for key in sorted(by_day)]
 
 
 def gaps(daily: Sequence[Mapping[str, str]]) -> list[tuple[str, str]]:
@@ -323,8 +272,8 @@ def merge(raw: Path, data: Path, collected_at: datetime) -> Report:
     """Validate everything, then write only the files whose content changed."""
     collection = load_collection(raw, collected_at)
     current = {name: read_history(data / name) for name in HEADERS}
-    merged = {DAILY: merge_daily([dict(row) for row in current[DAILY]], collection)}
-    merged.update(merge_day(current, collection))
+    merged = {DAILY: merge_daily([dict(row) for row in current[DAILY]], collection),
+              SNAPSHOTS: merge_snapshot(current[SNAPSHOTS], collection)}
     report = Report(gaps=gaps(merged[DAILY]))
     pending = {}
     for name, rows in merged.items():
