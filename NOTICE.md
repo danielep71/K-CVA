@@ -7,7 +7,9 @@ Copyright 2026 Daniele Penza and contributors.
 The maintainer selected **MPL-2.0** for K-CVA on 2026-10-24 in issue #4's
 implementation discussion. Code, documentation, workflows and configuration
 are covered by [LICENSE](LICENSE), unless a separate notice states otherwise.
-Repository visibility remains private; this change does not publish the project.
+Repository visibility is public, verified on 2026-10-28. This does not mean
+that a version, tag or workbook has been released. Third-party material retains
+its own terms; public-distribution verification is tracked in #108.
 
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -175,7 +177,7 @@ contributors), read on branch `release/0.1.0` at commit `576bb588be6f01d2a75db64
 | `tools/traffic_history.py` | `bde0142378e101a158022dee831a97d725f185cb` | Referrers and paths ranked by count, uniques and name rather than in API order; an `observed_at` column in `snapshots.csv`, the latest collection of each day, so a replayed older collection cannot replace a day's snapshot, referrers or paths; provenance line. |
 | `tools/test_traffic_history.py` | `f5ab875a477f36d1958fb43b9e6c74915e3c4cd2` | Tests for tie ranking, replays older than the latest observation and `observed_at`; provenance line. |
 | `.github/workflows/traffic-history.yml` | `2645193af39191ceb1e782c42651f6d76150d4e7` | Python 3.12.14, this repository's CI baseline. |
-| `docs/TRAFFIC.md` | `651db4d5e6e53735ecde298742a302e92c2e8304` | This repository's name, issue and private visibility; the branch is created once from `init`, its commit recorded in #14; `observed_at` and the replay rule; no K-SFTs dates, commits or visibility decision. |
+| `docs/TRAFFIC.md` | `651db4d5e6e53735ecde298742a302e92c2e8304` | This repository's name, issue and initial private-visibility baseline; the branch is created once from `init`, its commit recorded in #14; `observed_at` and the replay rule; no K-SFTs dates, commits or visibility decision. |
 
 K-SFTs took the design of its traffic collection from K-SACCR's
 `daily-traffic.yml` and K-Risk-Engines' `docs/TRAFFIC.md` and rewrote it;
