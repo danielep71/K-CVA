@@ -66,14 +66,21 @@ demonstration remains #13. A green metadata check is not a security scan.
 
 ## Current visibility — verified 2026-10-28
 
-The repository is public. Private vulnerability reporting was enabled on
-2026-10-28 and read back as enabled through the repository API (#108); it is
-the reporting route above, with the email route as the alternative.
+The repository is public. On 2026-10-28 the maintainer enabled private
+vulnerability reporting, Secret Protection and push protection (#108), and
+the repository API read the settings below back the same day:
 
-The 2026-10-24 observations below describe the former private configuration
-and do not establish what is available or enabled now. Secret scanning, push
-protection and code scanning have not been verified since the repository
-became public; no coverage is claimed for them.
+| Feature | Status |
+| --- | --- |
+| Private vulnerability reporting | Enabled; the reporting route above, with the email route as the alternative. |
+| Secret scanning (Secret Protection) | Enabled, for GitHub's supported secret patterns. Non-provider patterns and validity checks are disabled. |
+| Push protection | Enabled: pushes containing a supported secret are blocked. |
+| Code scanning (CodeQL) | Not configured; no code scanning coverage is claimed. |
+| Dependency graph, Dependabot alerts | Enabled; Dependabot security updates disabled, as in the snapshot below. |
+
+Secret scanning covers the patterns GitHub supports, not every credential
+format; the data and credential rules above still apply. The 2026-10-24
+observations below describe the former private configuration.
 
 ## Historical feature status and limitations
 
