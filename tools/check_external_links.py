@@ -17,7 +17,6 @@ one retry, is *broken* and fails the run.
 from __future__ import annotations
 
 import argparse
-import re
 import sys
 import time
 import urllib.error
@@ -26,10 +25,8 @@ from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from pathlib import Path
 
-from check_links import INLINE_CODE, ROOT, link_targets, prose_lines, tracked_markdown
+from check_links import ROOT, links, reference_definitions, tracked_markdown
 
-AUTOLINK = re.compile(r"<(https?://[^>\s]+)>")
-REFERENCE = re.compile(r"^ {0,3}\[[^\]]+\]:\s*<?(https?://[^>\s]+)>?")
 UNVERIFIED = {401, 403, 429}
 # URL prefixes that need a signed-in maintainer; an anonymous check cannot tell.
 SIGN_IN_REQUIRED = ("https://github.com/danielep71/K-CVA/settings/",)
@@ -46,16 +43,13 @@ class Result:
 
 
 def external_links(text: str) -> list[str]:
-    """The http(s) URLs a Markdown document links to, outside code."""
-    found: list[str] = []
-    for line in prose_lines(text):
-        prose = INLINE_CODE.sub("", line)
-        found += [target for target in link_targets(prose) if target.startswith(("http://", "https://"))]
-        found += AUTOLINK.findall(prose)
-        reference = REFERENCE.match(prose)
-        if reference:
-            found.append(reference.group(1))
-    return found
+    """The http(s) URLs a Markdown document links to, outside code.
+
+    Links, images and autolinks are read by the CommonMark parser of
+    tools/check_links.py; reference definitions count even when unused.
+    """
+    found = [*links(text), *reference_definitions(text)]
+    return list(dict.fromkeys(url for url in found if url.startswith(("http://", "https://"))))
 
 
 def collect(paths: Iterable[Path], root: Path = ROOT) -> dict[str, list[str]]:

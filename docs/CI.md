@@ -180,23 +180,28 @@ Git's SHA-1 blob id in `check_excel_run.py` is computed with
 ## Markdown links
 
 **Relative links, every run.** `tools/check_links.py` (gate `markdown-links`)
-reads every tracked Markdown file. Each relative link or image, including an
-image inside a link, must name a file that exists. When the link has a `#fragment` and points to Markdown, the anchor
-must exist there too: a heading, ATX (`#`) or Setext (underlined with `=`
-or `-`), or an explicit `<a id="…">` or
-`<a name="…">`. Links and headings inside fenced code blocks or inline code
-are ignored, and links to other file types are checked for the file only.
+reads every tracked Markdown file with markdown-it-py, a CommonMark parser
+(hash-locked in [tools/requirements.txt](../tools/requirements.txt)), with
+GitHub's tables and strikethrough. Code blocks, code spans, Setext headings,
+reference-style links, character references and images inside links are
+therefore read as GitHub reads them, not approximated with patterns. Each
+relative link or image must name a file that exists. When the link has a
+`#fragment` and points to Markdown, the anchor must exist there too: a heading
+or an explicit `<a id="…">` or `<a name="…">`. Links to other file types are
+checked for the file only.
 
 A heading's anchor follows GitHub's slug rule, applied to the heading as
 rendered:
 
-1. Code spans keep their text; links and images become their text; HTML tags
-   and emphasis markers are removed, and character references such as `&amp;`
-   become their character.
+1. The heading is rendered: code spans keep their text; links (reference-style
+   ones included) and images become their text; HTML tags and emphasis markers
+   are removed; character references such as `&amp;` become their character;
+   the line break of a two-line Setext heading is a newline.
 2. The text is lower-cased.
 3. Unicode letters, marks, decimal digits, connector punctuation (such as
-   `_`), `-` and spaces are kept, and every other character is dropped. An
-   emoji is dropped, but the U+FE0F that may follow it is a mark and stays.
+   `_`), `-` and spaces are kept, and every other character, a newline
+   included, is dropped. An emoji is dropped, but the U+FE0F that may follow it
+   is a mark and stays.
 4. Each space becomes `-`.
 5. A repeated slug gets `-1`, `-2` and so on, in order, skipping any slug an
    earlier heading already produced: `Foo`, `Foo`, `Foo-1` give `foo`,

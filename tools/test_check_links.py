@@ -69,7 +69,9 @@ class SlugTests(unittest.TestCase):
     def test_setext_headings(self) -> None:
         text = ("Setup\n=====\n\nTwo-line\nheading\n---\n\nText\n\n---\n\n"
                 "| a | b |\n| --- | --- |\n\n- item\n---\n")
-        self.assertEqual(anchors(text), {"setup", "two-line-heading"})
+        # The line break of a two-line heading is a newline in its text, which
+        # the slug rule drops, as GitHub's own anchor shows.
+        self.assertEqual(anchors(text), {"setup", "two-lineheading"})
 
     def test_explicit_anchors_and_closing_hashes(self) -> None:
         text = '<a id="kept-anchor"></a>\n\n## Title ##\n\n<a name="old-name"></a>\n'
@@ -87,8 +89,19 @@ class SlugTests(unittest.TestCase):
                 "[a](<three (x).md> \"Title\") \\[not](a link) [esc](four\\).md)\n")
         self.assertEqual(list(links(text)), [
             "https://en.wikipedia.org/wiki/Value_(mathematics)", "a_(b_(c)).md", "one.md", "two.md",
-            "three (x).md", "four\\).md"])
+            "three%20(x).md", "four).md"])
         self.assertEqual(list(links("[open](unclosed.md and [ok](ok.md)\n")), ["ok.md"])
+
+    def test_an_inline_code_span_does_not_open_a_fence(self) -> None:
+        # A backtick fence's info string cannot hold a backtick: this line is code, not a fence.
+        text = "```inline``` code\n\n# After\n\n[broken](missing.md)\n"
+        self.assertEqual(anchors(text), {"after"})
+        self.assertEqual(list(links(text)), ["missing.md"])
+
+    def test_reference_links_resolve_in_headings_and_links(self) -> None:
+        text = "# [API][api-docs] notes\n\nSee [it][api-docs].\n\n[api-docs]: api.md#intro\n"
+        self.assertEqual(anchors(text), {"api-notes"})
+        self.assertEqual(list(links(text)), ["api.md#intro", "api.md#intro"])
 
     def test_link_forms(self) -> None:
         text = ('[a](one.md#x) ![img](pic.png) [b](<two.md> "title") '
@@ -154,12 +167,12 @@ opener_for = FakeOpener
 class ExternalLinkTests(unittest.TestCase):
     def test_external_links_are_found_outside_code(self) -> None:
         text = ("[![b](https://img.example/b.svg)](https://a.example/x#frag) <https://b.example> [rel](local.md)\n"
-                "[ref]: https://c.example/doc\n"
+                "\n[ref]: https://c.example/doc\n\n"
                 "`https://d.example` and [e](https://e.example)\n"
                 "```\n[f](https://f.example)\n```\n")
         self.assertEqual(external_links(text), ["https://a.example/x#frag", "https://img.example/b.svg",
-                                                "https://b.example",
-                                                "https://c.example/doc", "https://e.example"])
+                                                "https://b.example", "https://e.example",
+                                                "https://c.example/doc"])
 
     def test_classification(self) -> None:
         url = "https://x.example"

@@ -25,8 +25,8 @@ test_check_links.py (docs/CI.md, Markdown links).
 check_workflows.py parses the workflows as YAML and checks their permissions,
 timeouts, pins, checkout credentials and the required check
 (docs/CI.md, Workflow rules), with fixtures in test_check_workflows.py.
-requirements.txt locks the Python packages the checks use (PyYAML, Ruff,
-mypy and their dependencies) with the hash of every wheel; pyproject.toml
+requirements.txt locks the Python packages the checks use (PyYAML,
+markdown-it-py, Ruff, mypy and their dependencies) with the hash of every wheel; pyproject.toml
 configures Ruff and strict mypy (docs/CI.md, Python quality gates).
 traffic_history.py merges traffic API responses into the traffic-history
 branch (docs/TRAFFIC.md), with fixtures in test_traffic_history.py. Build and
