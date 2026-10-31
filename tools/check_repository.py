@@ -4,7 +4,6 @@ import io
 import json
 import os
 import platform
-import re
 import subprocess
 import sys
 import tarfile
@@ -110,12 +109,7 @@ def main() -> int:
                 compile(Path(path).read_text(encoding='utf-8'), path, 'exec')
             if path.endswith('.json'):
                 json.loads(Path(path).read_text(encoding='utf-8'))
-        for path in tracked:
-            if path.endswith('.md'):
-                for target in re.findall(r'\]\(([^)]+)\)', Path(path).read_text(encoding='utf-8')):
-                    relative = '://' not in target and not target.startswith(('#', 'mailto:'))
-                    if relative and not (Path(path).parent / target.split('#')[0]).exists():
-                        raise RuntimeError('Missing relative link: ' + path + ': ' + target)
+        run('markdown-links', [sys.executable, 'tools/check_links.py'])
         workflows = sorted(str(p) for p in Path('.github/workflows').glob('*.y*ml'))
         run('workflow-rules', [sys.executable, 'tools/check_workflows.py'])
         validator = actionlint()
