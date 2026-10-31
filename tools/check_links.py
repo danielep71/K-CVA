@@ -10,6 +10,7 @@ are left to tools/check_external_links.py, which runs on a schedule
 
 from __future__ import annotations
 
+import html
 import re
 import subprocess
 import sys
@@ -26,7 +27,7 @@ SETEXT_UNDERLINE = re.compile(r"^ {0,3}(=+|-+)[ \t]*$")
 NOT_PARAGRAPH = re.compile(r"^\s*(?:[-*+]\s|\d+[.)]\s|>|<|\|)|\|")
 EXPLICIT_ANCHOR = re.compile(r"""<a\s[^>]*?\b(?:id|name)\s*=\s*["']([^"']+)["']""", re.I)
 INLINE_CODE = re.compile(r"(`+)(.+?)\1")
-LINK = re.compile(r"!?\[(?:[^\[\]]|\[[^\[\]]*\])*\]\(\s*<?([^)\s>]+)>?(?:\s+[\"'(][^)]*)?\s*\)")
+LINK = re.compile(r"!?\[((?:[^\[\]]|\[[^\[\]]*\])*)\]\(\s*<?([^)\s>]+)>?(?:\s+[\"'(][^)]*)?\s*\)")
 IMAGE_OR_LINK_TEXT = re.compile(r"!?\[((?:[^\[\]]|\[[^\[\]]*\])*)\]\([^)]*\)")
 HTML_TAG = re.compile(r"<[^>]+>")
 EMPHASIS = re.compile(r"(?<![\w*_])[*_]{1,3}(?=\S)|(?<=\S)[*_]{1,3}(?![\w*_])")
@@ -66,7 +67,8 @@ def rendered_heading(markdown: str) -> str:
 def _plain(text: str) -> str:
     text = IMAGE_OR_LINK_TEXT.sub(r"\1", text)
     text = HTML_TAG.sub("", text)
-    return EMPHASIS.sub("", text)
+    # Character references render as their character: "&amp;" is "&".
+    return html.unescape(EMPHASIS.sub("", text))
 
 
 def prose_lines(text: str) -> Iterator[str]:
@@ -133,10 +135,18 @@ def anchors(text: str) -> set[str]:
     return found
 
 
+def link_targets(text: str) -> Iterator[str]:
+    """The targets of the inline links and images in ``text``, nested ones included."""
+    for match in LINK.finditer(text):
+        yield match.group(2)
+        # A linked image, [![alt](image)](target), has a target of its own.
+        yield from link_targets(match.group(1))
+
+
 def links(text: str) -> Iterator[str]:
-    """The inline-link targets of a Markdown document, outside code."""
+    """The inline-link and image targets of a Markdown document, outside code."""
     for line in prose_lines(text):
-        yield from LINK.findall(INLINE_CODE.sub("", line))
+        yield from link_targets(INLINE_CODE.sub("", line))
 
 
 def check_file(path: Path, root: Path, cache: dict[Path, set[str]]) -> list[str]:

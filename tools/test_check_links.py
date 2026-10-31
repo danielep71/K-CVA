@@ -50,6 +50,8 @@ class SlugTests(unittest.TestCase):
         self.assertEqual(slug("**Bold** and *italic*"), "bold-and-italic")
         self.assertEqual(slug("[Linked](x.md) heading"), "linked-heading")
         self.assertEqual(slug("<span>HTML</span> tag"), "html-tag")
+        self.assertEqual(slug("Research &amp; development"), "research--development")
+        self.assertEqual(slug("Caf&eacute; &#169; `&amp;`"), "café--amp")
         self.assertEqual(slug("mid_word_name"), "mid_word_name")
 
     def test_repeated_headings_are_numbered(self) -> None:
@@ -78,9 +80,10 @@ class SlugTests(unittest.TestCase):
 
     def test_link_forms(self) -> None:
         text = ('[a](one.md#x) ![img](pic.png) [b](<two.md> "title") '
-                "[c](https://example.org/x#y) [[d]](three.md)\n")
+                "[c](https://example.org/x#y) [[d]](three.md) [![badge](badge.svg)](four.md)\n")
         self.assertEqual(list(links(text)),
-                         ["one.md#x", "pic.png", "two.md", "https://example.org/x#y", "three.md"])
+                         ["one.md#x", "pic.png", "two.md", "https://example.org/x#y", "three.md",
+                          "four.md", "badge.svg"])
 
 
 class CheckTests(unittest.TestCase):
@@ -138,11 +141,12 @@ opener_for = FakeOpener
 
 class ExternalLinkTests(unittest.TestCase):
     def test_external_links_are_found_outside_code(self) -> None:
-        text = ("[a](https://a.example/x#frag) <https://b.example> [rel](local.md)\n"
+        text = ("[![b](https://img.example/b.svg)](https://a.example/x#frag) <https://b.example> [rel](local.md)\n"
                 "[ref]: https://c.example/doc\n"
                 "`https://d.example` and [e](https://e.example)\n"
                 "```\n[f](https://f.example)\n```\n")
-        self.assertEqual(external_links(text), ["https://a.example/x#frag", "https://b.example",
+        self.assertEqual(external_links(text), ["https://a.example/x#frag", "https://img.example/b.svg",
+                                                "https://b.example",
                                                 "https://c.example/doc", "https://e.example"])
 
     def test_classification(self) -> None:

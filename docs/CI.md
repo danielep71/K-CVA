@@ -180,8 +180,8 @@ Git's SHA-1 blob id in `check_excel_run.py` is computed with
 ## Markdown links
 
 **Relative links, every run.** `tools/check_links.py` (gate `markdown-links`)
-reads every tracked Markdown file. Each relative link must name a file that
-exists. When the link has a `#fragment` and points to Markdown, the anchor
+reads every tracked Markdown file. Each relative link or image, including an
+image inside a link, must name a file that exists. When the link has a `#fragment` and points to Markdown, the anchor
 must exist there too: a heading, ATX (`#`) or Setext (underlined with `=`
 or `-`), or an explicit `<a id="…">` or
 `<a name="…">`. Links and headings inside fenced code blocks or inline code
@@ -191,7 +191,8 @@ A heading's anchor follows GitHub's slug rule, applied to the heading as
 rendered:
 
 1. Code spans keep their text; links and images become their text; HTML tags
-   and emphasis markers are removed.
+   and emphasis markers are removed, and character references such as `&amp;`
+   become their character.
 2. The text is lower-cased.
 3. Unicode letters, marks, decimal digits, connector punctuation (such as
    `_`), `-` and spaces are kept, and every other character is dropped. An
@@ -209,8 +210,8 @@ the rule and its edge cases.
 (`.github/workflows/external-links.yml`) runs `tools/check_external_links.py`
 every Monday and on manual dispatch, never on pull requests, and it is not a
 required check: an outside site can be down without any change here. It
-requests each http(s) URL from an inline link, an autolink or a reference
-definition once, HEAD and then GET if HEAD fails with an error status or a
+requests each http(s) URL from an inline link or image (a badge inside a link
+included), an autolink or a reference definition once, HEAD and then GET if HEAD fails with an error status or a
 network error, and reports:
 
 - **broken**: a 4xx other than 401, 403 or 429, or a server or network error

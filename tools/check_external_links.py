@@ -26,7 +26,7 @@ from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from pathlib import Path
 
-from check_links import INLINE_CODE, LINK, ROOT, prose_lines, tracked_markdown
+from check_links import INLINE_CODE, ROOT, link_targets, prose_lines, tracked_markdown
 
 AUTOLINK = re.compile(r"<(https?://[^>\s]+)>")
 REFERENCE = re.compile(r"^ {0,3}\[[^\]]+\]:\s*<?(https?://[^>\s]+)>?")
@@ -50,7 +50,7 @@ def external_links(text: str) -> list[str]:
     found: list[str] = []
     for line in prose_lines(text):
         prose = INLINE_CODE.sub("", line)
-        found += [target for target in LINK.findall(prose) if target.startswith(("http://", "https://"))]
+        found += [target for target in link_targets(prose) if target.startswith(("http://", "https://"))]
         found += AUTOLINK.findall(prose)
         reference = REFERENCE.match(prose)
         if reference:
