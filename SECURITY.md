@@ -53,6 +53,9 @@ Do not weaken organization macro or endpoint policy to run a workbook.
 | Label drift | PR fixtures read contents; live checks read contents/issues. No label mutation. |
 | Issue triage | Reads contents, issues and pull requests; reports metadata violations without editing issues. |
 | Repository integrity | Reads contents; runs unfiltered PR/push checks for main and release/**, plus manual dispatch. Uploads diagnostic evidence retained for 30 days. No source or issue mutation; see [CI coverage](docs/CI.md). |
+| CodeQL | On PRs and pushes to main and release/**, and weekly. A gate job reads the visibility with contents:read; only the analysis job holds security-events:write, to upload results. See [code scanning](docs/CI.md#code-scanning). |
+| External links | Weekly and on dispatch; reads contents and requests the external URLs linked from the documentation. No write permission. |
+| Pull request milestones | On pull_request_target, pushes to main and daily. Holds pull-requests:write only, never checks out or runs pull-request code, and refuses to change an issue. See [pull request milestones](docs/CI.md#pull-request-milestones). |
 | Dependabot version updates | Weekly GitHub Actions dependency-update PRs targeting release/0.1.0, assigned to the maintainer. No automatic approval or merge; maintainer final-head review is required. |
 
 The workflow files pin actions to full SHAs and disable persisted checkout
@@ -75,7 +78,7 @@ the repository API read the settings below back the same day:
 | Private vulnerability reporting | Enabled; the reporting route above, with the email route as the alternative. |
 | Secret scanning (Secret Protection) | Enabled, for GitHub's supported secret patterns. Non-provider patterns and validity checks are disabled. |
 | Push protection | Enabled: pushes containing a supported secret are blocked. |
-| Code scanning (CodeQL) | Not configured; no code scanning coverage is claimed. |
+| Code scanning (CodeQL) | Advanced setup since 2026-10-31 (#117): [`.github/workflows/codeql.yml`](.github/workflows/codeql.yml) analyses the Python tooling, the JavaScript label scripts and the workflows with the `security-extended` queries. The VBA source is not scanned: CodeQL has no VBA support. GitHub's **default setup must stay off**; it cannot run beside an advanced-setup workflow. |
 | Dependency graph, Dependabot alerts | Enabled; Dependabot security updates disabled, as in the snapshot below. |
 
 Secret scanning covers the patterns GitHub supports, not every credential

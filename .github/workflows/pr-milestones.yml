@@ -1,0 +1,64 @@
+name: Pull request milestones
+run-name: "Pull request milestones — ${{ github.event_name }}"
+
+# Milestones belong to issues only (docs/GOVERNANCE.md, docs/ISSUE_LABELS.md).
+# This workflow clears the milestone from any pull request that has one.
+# It never checks out or runs code: it only calls the GitHub API with the
+# workflow token, which holds pull-requests: write and nothing else. Each
+# number is confirmed through the pulls API, which answers 404 for an issue,
+# before anything is changed, so an issue's milestone is never touched.
+
+on:
+  pull_request_target:
+    types: [opened, reopened, edited, milestoned]
+  push:
+    branches: [main]
+  schedule:
+    - cron: "37 6 * * *"
+
+permissions: {}
+
+concurrency:
+  group: pr-milestones-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  clear:
+    name: Clear pull request milestones
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Clear milestones from pull requests
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENT_NAME: ${{ github.event_name }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          clear_milestone() {
+            local number="$1" milestone
+            # The pulls API answers 404 for an issue: refuse anything else.
+            if ! milestone="$(gh api "repos/$GITHUB_REPOSITORY/pulls/$number" --jq '.milestone.title // ""')"; then
+              echo "::error::#$number is not a pull request; it was not changed"
+              return 1
+            fi
+            if [ -z "$milestone" ]; then
+              echo "Pull request #$number has no milestone."
+              return 0
+            fi
+            gh api --method PATCH "repos/$GITHUB_REPOSITORY/issues/$number" -F milestone=null --silent
+            echo "Cleared milestone '$milestone' from pull request #$number."
+            echo "- Cleared milestone '$milestone' from pull request #$number" >> "$GITHUB_STEP_SUMMARY"
+          }
+          if [ "$EVENT_NAME" = "pull_request_target" ]; then
+            clear_milestone "$PR_NUMBER"
+          else
+            numbers="$(gh api --paginate "repos/$GITHUB_REPOSITORY/pulls?state=all&per_page=100" \
+              --jq '.[] | select(.milestone != null) | .number')"
+            for number in $numbers; do
+              clear_milestone "$number"
+            done
+            echo "Pull requests with a milestone: ${numbers:-none}"
+          fi

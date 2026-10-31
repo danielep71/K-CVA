@@ -215,7 +215,8 @@ def analyze(path: str, text: str, upper: re.Pattern[str] | None = None,
     components that core and classes, or examples, may not name."""
     findings: list[Finding] = []
     member = False
-    for line, code, raw in statements(text):
+    for line, statement, raw_statement in statements(text):
+        code, raw = statement, raw_statement
         # A procedure header also ends a block, so that a missing End Type
         # cannot hide the statements after it.
         if BLOCK_CLOSE.match(code) or is_procedure(code):

@@ -181,7 +181,8 @@ def check_sources(root: Path, commit: str, folder: Path, evidence: Evidence) -> 
 
 def git_blob(data: bytes) -> str:
     """The Git blob id of ``data``, as ``git hash-object`` gives it."""
-    return hashlib.sha1(b"blob %d\0" % len(data) + data).hexdigest()
+    # Git names objects by SHA-1; this is an identifier, not a security control.
+    return hashlib.sha1(b"blob %d\0" % len(data) + data, usedforsecurity=False).hexdigest()
 
 
 def first_difference(actual: bytes, expected: bytes) -> int:
@@ -237,8 +238,8 @@ def sequence(plan: Plan, suite: Suite) -> list[tuple[str, str]]:
     records += [("CASES", str(len(plan.cases))), ("ASSERTIONS", str(len(plan.assertions))),
                 ("FAILURES", str(len(plan.failing)))]
     records += [("PRIMARY_FAILURE", plan.failing[0])] if plan.failing else []
-    return records + [("CLEANUP", "PASS"), ("RECOVERY", "NONE"),
-                      ("RESULT", plan.result["RESULT"])]
+    return [*records, ("CLEANUP", "PASS"), ("RECOVERY", "NONE"),
+            ("RESULT", plan.result["RESULT"])]
 
 
 def check_sequence(name: str, records: list[Record], expected: list[tuple[str, str]],

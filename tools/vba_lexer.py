@@ -136,7 +136,7 @@ def split_statements(code: str) -> list[str]:
                 index += 2
                 continue
             in_string = not in_string
-        elif in_string or in_date and char != "#":
+        elif in_string or (in_date and char != "#"):
             pass
         elif char == "#" and date_delimiter(code, index, in_date):
             in_date = not in_date
