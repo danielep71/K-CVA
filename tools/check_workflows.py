@@ -31,6 +31,7 @@ WORKFLOWS = ROOT / ".github" / "workflows"
 MAX_TIMEOUT = 60
 # (workflow file, job id) -> the only write scopes that job may hold.
 WRITE_ALLOWED: dict[tuple[str, str], frozenset[str]] = {
+    ("codeql.yml", "analyze"): frozenset({"security-events"}),
     ("labels-sync.yml", "reconcile"): frozenset({"issues"}),
     ("traffic-history.yml", "collect"): frozenset({"contents"}),
 }

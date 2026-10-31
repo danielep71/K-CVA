@@ -243,9 +243,34 @@ error, so a later key cannot silently replace an earlier one.
 | Every `actions/checkout` step sets `persist-credentials: false` | The token is not left in the checkout for later steps |
 | `repository-integrity.yml` runs on `pull_request` and `push` without `paths` or `paths-ignore`, its job `integrity` has no `if:` and keeps the name `Repository integrity` | The required check must report on every pull request and push it protects |
 
-The current allowlist: `labels-sync.yml` job `reconcile` may write `issues`;
-`traffic-history.yml` job `collect` may write `contents`. Fixtures for every
+The current allowlist: `codeql.yml` job `analyze` may write `security-events`;
+`labels-sync.yml` job `reconcile` may write `issues`; `traffic-history.yml`
+job `collect` may write `contents`. Fixtures for every
 rule are in `tools/test_check_workflows.py`.
+
+## Code scanning
+
+The *CodeQL* workflow (`.github/workflows/codeql.yml`) is GitHub code
+scanning in **advanced setup**. GitHub's default setup must stay off: the two
+cannot run together, and an enabled default setup makes this workflow's
+uploads fail.
+
+- **Triggers:** pushes and pull requests to `main` and `release/**`, and
+  every Sunday.
+- **Languages:** `python` (the tooling), `javascript-typescript` (the label
+  scripts in `.github/scripts/`) and `actions` (the workflows), one matrix
+  job each, without a build (`build-mode: none`). The VBA source is not
+  scanned; CodeQL does not support VBA.
+- **Queries:** `security-extended`.
+- **Gate:** a first job reads the repository's visibility from the API
+  (`gh api "repos/$GITHUB_REPOSITORY" --jq .visibility`), because a
+  scheduled event may not carry the repository payload. The analysis runs only
+  for a public repository, the case in which this plan can upload results.
+- **Permissions:** only the `analyze` job holds `security-events: write`, to
+  upload its results; the gate reads with `contents: read`.
+
+Alerts appear on the repository's Security tab. CodeQL is not a required
+check; triage its alerts like any other finding.
 
 ## Dependency updates
 
