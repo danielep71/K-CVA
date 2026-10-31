@@ -244,8 +244,9 @@ error, so a later key cannot silently replace an earlier one.
 | `repository-integrity.yml` runs on `pull_request` and `push` without `paths` or `paths-ignore`, its job `integrity` has no `if:` and keeps the name `Repository integrity` | The required check must report on every pull request and push it protects |
 
 The current allowlist: `codeql.yml` job `analyze` may write `security-events`;
-`labels-sync.yml` job `reconcile` may write `issues`; `traffic-history.yml`
-job `collect` may write `contents`. Fixtures for every
+`labels-sync.yml` job `reconcile` may write `issues`; `pr-milestones.yml` job
+`clear` may write `pull-requests`; `traffic-history.yml` job `collect` may
+write `contents`. Fixtures for every
 rule are in `tools/test_check_workflows.py`.
 
 ## Code scanning
@@ -271,6 +272,23 @@ uploads fail.
 
 Alerts appear on the repository's Security tab. CodeQL is not a required
 check; triage its alerts like any other finding.
+
+## Pull request milestones
+
+Milestones belong to issues only. The *Pull request milestones* workflow
+(`.github/workflows/pr-milestones.yml`) enforces it:
+
+- **Triggers:** `pull_request_target` when a pull request is opened,
+  reopened, edited or given a milestone; a push to `main`; and a daily sweep
+  of every pull request, open or closed.
+- **Action:** it clears the milestone of any pull request that has one and
+  lists what it cleared in the run summary.
+- **Safety:** it never checks out or runs code from a pull request. It only
+  calls the GitHub API, with a token that holds `pull-requests: write` and
+  nothing else (top-level permissions are empty). Before changing anything it
+  reads the number through the pulls API, which answers 404 for an issue, and
+  it refuses, with an error, anything that is not a pull request; an issue's
+  milestone is never changed.
 
 ## Dependency updates
 

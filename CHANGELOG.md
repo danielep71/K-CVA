@@ -88,6 +88,8 @@ CVA calculation, public API or workbook.
   ([docs/CI.md](docs/CI.md); #6, #9, #118, #119, #120).
 - CodeQL code scanning in advanced setup for the Python tooling, the label
   scripts and the workflows ([docs/CI.md](docs/CI.md#code-scanning); #117).
+- A workflow that clears milestones set on pull requests, so that milestones
+  stay on issues ([docs/CI.md](docs/CI.md#pull-request-milestones); #122).
 - The issue forms, labels and issue-triage check, and the pull request
   template (PR #1, #7).
 - The regulatory basis (the EU CRR as amended by CRR3, BA-CVA first, then
