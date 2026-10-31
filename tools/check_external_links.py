@@ -2,7 +2,8 @@
 
 Run weekly by the External links workflow, never on pull requests and never
 as a required check: an outside site can be down for a day without any change
-here (docs/CI.md, Markdown links). Uses only the standard library.
+here (docs/CI.md, Markdown links). Requests use only the standard library;
+the Markdown is read by check_links.py's parser.
 
 Each http(s) URL from an inline link, an autolink ``<https://...>`` or a
 reference definition is requested once (HEAD, then GET if HEAD is refused).

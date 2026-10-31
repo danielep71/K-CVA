@@ -213,8 +213,9 @@ the rule and its edge cases.
 
 **External links, weekly.** The *External links* workflow
 (`.github/workflows/external-links.yml`) runs `tools/check_external_links.py`
-every Monday and on manual dispatch, never on pull requests, and it is not a
-required check: an outside site can be down without any change here. It
+every Monday and on manual dispatch, after installing the hash-locked
+`tools/requirements.txt` as Repository integrity does. It never runs on pull
+requests, and it is not a required check: an outside site can be down without any change here. It
 requests each http(s) URL from an inline link or image (a badge inside a link
 included), an autolink or a reference definition once, HEAD and then GET if HEAD fails with an error status or a
 network error, and reports:
