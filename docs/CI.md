@@ -182,7 +182,8 @@ Git's SHA-1 blob id in `check_excel_run.py` is computed with
 **Relative links, every run.** `tools/check_links.py` (gate `markdown-links`)
 reads every tracked Markdown file. Each relative link must name a file that
 exists. When the link has a `#fragment` and points to Markdown, the anchor
-must exist there too: a heading, or an explicit `<a id="…">` or
+must exist there too: a heading, ATX (`#`) or Setext (underlined with `=`
+or `-`), or an explicit `<a id="…">` or
 `<a name="…">`. Links and headings inside fenced code blocks or inline code
 are ignored, and links to other file types are checked for the file only.
 
@@ -196,7 +197,9 @@ rendered:
    `_`), `-` and spaces are kept, and every other character is dropped. An
    emoji is dropped, but the U+FE0F that may follow it is a mark and stays.
 4. Each space becomes `-`.
-5. A repeated slug gets `-1`, `-2` and so on, in order.
+5. A repeated slug gets `-1`, `-2` and so on, in order, skipping any slug an
+   earlier heading already produced: `Foo`, `Foo`, `Foo-1` give `foo`,
+   `foo-1` and `foo-1-1`.
 
 Every anchor of the Markdown on main was compared with GitHub's own rendering
 on 2026-10-31 (155 anchors, no difference); `tools/test_check_links.py` pins
@@ -207,7 +210,8 @@ the rule and its edge cases.
 every Monday and on manual dispatch, never on pull requests, and it is not a
 required check: an outside site can be down without any change here. It
 requests each http(s) URL from an inline link, an autolink or a reference
-definition once, HEAD and then GET if HEAD fails, and reports:
+definition once, HEAD and then GET if HEAD fails with an error status or a
+network error, and reports:
 
 - **broken**: a 4xx other than 401, 403 or 429, or a server or network error
   after one retry. A broken link fails the run, so it shows in the Actions

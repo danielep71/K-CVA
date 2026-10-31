@@ -85,21 +85,24 @@ def probe(url: str, opener: Opener = urlopen_status, timeout: float = 20.0,
         return "unverified", "sign-in required; not requested"
     detail = ""
     for attempt in range(2):
-        try:
-            # Some servers mishandle HEAD, so any failed HEAD is retried as GET.
-            for method in ("HEAD", "GET"):
-                request = urllib.request.Request(  # noqa: S310 - http(s) URLs from external_links only
-                    url, method=method, headers={"User-Agent": USER_AGENT})
+        code: int | None = None
+        # Some servers mishandle HEAD, so a HEAD that fails in any way,
+        # with an error status or a network error, is retried as GET.
+        for method in ("HEAD", "GET"):
+            request = urllib.request.Request(  # noqa: S310 - http(s) URLs from external_links only
+                url, method=method, headers={"User-Agent": USER_AGENT})
+            try:
                 code = opener(request, timeout)
-                detail = f"{method} {code}"
-                if code < 400:
-                    return "ok", detail
-            if code in UNVERIFIED:
-                return "unverified", detail
-            if code < 500:
-                return "broken", detail
-        except (urllib.error.URLError, TimeoutError, OSError) as error:
-            detail = f"{type(error).__name__}: {error}"
+            except (urllib.error.URLError, TimeoutError, OSError) as error:
+                code, detail = None, f"{method} {type(error).__name__}: {error}"
+                continue
+            detail = f"{method} {code}"
+            if code < 400:
+                return "ok", detail
+        if code is not None and code in UNVERIFIED:
+            return "unverified", detail
+        if code is not None and code < 500:
+            return "broken", detail
         if attempt == 0:
             time.sleep(retry_delay)  # one retry for server errors and network failures
     return "broken", detail

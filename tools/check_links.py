@@ -21,6 +21,9 @@ from urllib.parse import unquote
 ROOT = Path(__file__).resolve().parents[1]
 FENCE = re.compile(r"^ {0,3}(`{3,}|~{3,})")
 HEADING = re.compile(r"^ {0,3}(#{1,6})[ \t]+(.*?)(?:[ \t]+#+)?[ \t]*$")
+SETEXT_UNDERLINE = re.compile(r"^ {0,3}(=+|-+)[ \t]*$")
+# Lines that cannot be the text of a Setext heading: block starts and table rows.
+NOT_PARAGRAPH = re.compile(r"^\s*(?:[-*+]\s|\d+[.)]\s|>|<|\|)|\|")
 EXPLICIT_ANCHOR = re.compile(r"""<a\s[^>]*?\b(?:id|name)\s*=\s*["']([^"']+)["']""", re.I)
 INLINE_CODE = re.compile(r"(`+)(.+?)\1")
 LINK = re.compile(r"!?\[(?:[^\[\]]|\[[^\[\]]*\])*\]\(\s*<?([^)\s>]+)>?(?:\s+[\"'(][^)]*)?\s*\)")
@@ -82,18 +85,51 @@ def prose_lines(text: str) -> Iterator[str]:
         yield line
 
 
+class Slugger:
+    """Unique heading anchors in document order, as GitHub's slugger numbers them.
+
+    A repeated slug gets ``-1``, ``-2`` and so on, skipping any suffixed slug
+    an earlier heading already produced: ``Foo``, ``Foo``, ``Foo-1`` give
+    ``foo``, ``foo-1`` and ``foo-1-1``.
+    """
+
+    def __init__(self) -> None:
+        self.occurrences: dict[str, int] = {}
+
+    def slug(self, heading: str) -> str:
+        original = result = github_slug(rendered_heading(heading))
+        while result in self.occurrences:
+            self.occurrences[original] += 1
+            result = f"{original}-{self.occurrences[original]}"
+        self.occurrences[result] = 0
+        return result
+
+
+def headings(text: str) -> Iterator[str]:
+    """The inline Markdown of every heading, ATX or Setext, in document order."""
+    paragraph: list[str] = []
+    for line in prose_lines(text):
+        atx = HEADING.match(line)
+        underline = SETEXT_UNDERLINE.match(line)
+        if atx:
+            paragraph = []
+            yield atx.group(2)
+        elif underline and paragraph:
+            yield " ".join(part.strip() for part in paragraph)
+            paragraph = []
+        elif not line.strip() or NOT_PARAGRAPH.match(line):
+            paragraph = []
+        else:
+            paragraph.append(line)
+
+
 def anchors(text: str) -> set[str]:
     """Every anchor a Markdown document defines."""
     found: set[str] = set()
-    counts: dict[str, int] = {}
     for line in prose_lines(text):
         found.update(EXPLICIT_ANCHOR.findall(INLINE_CODE.sub("", line)))
-        heading = HEADING.match(line)
-        if heading:
-            slug = github_slug(rendered_heading(heading.group(2)))
-            seen = counts.get(slug, 0)
-            counts[slug] = seen + 1
-            found.add(slug if seen == 0 else f"{slug}-{seen}")
+    slugger = Slugger()
+    found.update(slugger.slug(heading) for heading in headings(text))
     return found
 
 

@@ -56,6 +56,16 @@ class SlugTests(unittest.TestCase):
         text = "# Notes\n\n## Notes\n\n### Notes\n\n## Other\n"
         self.assertEqual(anchors(text), {"notes", "notes-1", "notes-2", "other"})
 
+    def test_numbering_skips_slugs_already_produced(self) -> None:
+        # GitHub: Foo, Foo, Foo-1 give foo, foo-1 and foo-1-1.
+        self.assertEqual(anchors("# Foo\n\n# Foo\n\n# Foo-1\n"), {"foo", "foo-1", "foo-1-1"})
+        self.assertEqual(anchors("# Foo-1\n\n# Foo\n\n# Foo\n"), {"foo-1", "foo", "foo-2"})
+
+    def test_setext_headings(self) -> None:
+        text = ("Setup\n=====\n\nTwo-line\nheading\n---\n\nText\n\n---\n\n"
+                "| a | b |\n| --- | --- |\n\n- item\n---\n")
+        self.assertEqual(anchors(text), {"setup", "two-line-heading"})
+
     def test_explicit_anchors_and_closing_hashes(self) -> None:
         text = '<a id="kept-anchor"></a>\n\n## Title ##\n\n<a name="old-name"></a>\n'
         self.assertEqual(anchors(text), {"kept-anchor", "title", "old-name"})
@@ -148,6 +158,8 @@ class ExternalLinkTests(unittest.TestCase):
             "rate limited": ({("*", url): 429}, "unverified"),
             "server error": ({("*", url): 503}, "broken"),
             "network": ({("*", url): urllib.error.URLError("no route")}, "broken"),
+            "head drops, get ok": ({("HEAD", url): TimeoutError("closed"), ("GET", url): 200}, "ok"),
+            "head drops, get 404": ({("HEAD", url): OSError("reset"), ("GET", url): 404}, "broken"),
             "timeout": ({("*", url): TimeoutError("slow")}, "broken"),
         }
         for name, (answers, expected) in cases.items():
