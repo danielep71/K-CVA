@@ -33,6 +33,7 @@ MAX_TIMEOUT = 60
 WRITE_ALLOWED: dict[tuple[str, str], frozenset[str]] = {
     ("codeql.yml", "analyze"): frozenset({"security-events"}),
     ("labels-sync.yml", "reconcile"): frozenset({"issues"}),
+    ("pr-milestones.yml", "clear"): frozenset({"pull-requests"}),
     ("traffic-history.yml", "collect"): frozenset({"contents"}),
 }
 REQUIRED_CHECK = ("repository-integrity.yml", "integrity", "Repository integrity")

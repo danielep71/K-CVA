@@ -147,7 +147,9 @@ criteria, dependency syntax and audit commands. These rules apply to every issue
   status label. After closing a prerequisite, review its dependants and remove
   `blocked` only when all prerequisites are resolved.
 - Give milestones to issues only. Task, integration, sync and bot PRs have no
-  milestone; link them to relevant issues and preceding PRs.
+  milestone; link them to relevant issues and preceding PRs. The *Pull request
+  milestones* workflow clears a milestone set on a pull request, at once and
+  in a daily sweep ([CI](CI.md#pull-request-milestones)).
 
 Issue forms cannot enforce all metadata. The read-only Issue triage workflow
 reports violations; the maintainer corrects them and verifies the next run.
