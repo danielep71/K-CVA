@@ -28,7 +28,8 @@ the numerical [test-case files](methodology/TEST_CASES.md#checking) (gate
 `test-cases`), the [changelog and `VERSION`](../CHANGELOG.md#date-and-version-rules)
 (gate `changelog`: headings, dates, order, link references, and no `VERSION`
 before a dated release, then equal to the newest; nothing is tagged or
-published), the static [VBA checks](#vba-static-checks), Python/Node/JSON syntax, relative Markdown links, the
+published), the static [VBA checks](#vba-static-checks), Python/Node/JSON syntax, [relative Markdown links and their anchors](#markdown-links)
+(gate `markdown-links`), the
 [workflow rules](#workflow-rules) (gate `workflow-rules`),
 workflow syntax/expressions with actionlint, and whitespace in all committed
 content plus local staged/unstaged changes. The committed check compares HEAD
@@ -175,6 +176,46 @@ Every exception, with its reason:
 
 Git's SHA-1 blob id in `check_excel_run.py` is computed with
 `usedforsecurity=False`: it names a file, it secures nothing.
+
+## Markdown links
+
+**Relative links, every run.** `tools/check_links.py` (gate `markdown-links`)
+reads every tracked Markdown file. Each relative link must name a file that
+exists. When the link has a `#fragment` and points to Markdown, the anchor
+must exist there too: a heading, or an explicit `<a id="…">` or
+`<a name="…">`. Links and headings inside fenced code blocks or inline code
+are ignored, and links to other file types are checked for the file only.
+
+A heading's anchor follows GitHub's slug rule, applied to the heading as
+rendered:
+
+1. Code spans keep their text; links and images become their text; HTML tags
+   and emphasis markers are removed.
+2. The text is lower-cased.
+3. Unicode letters, marks, decimal digits, connector punctuation (such as
+   `_`), `-` and spaces are kept, and every other character is dropped. An
+   emoji is dropped, but the U+FE0F that may follow it is a mark and stays.
+4. Each space becomes `-`.
+5. A repeated slug gets `-1`, `-2` and so on, in order.
+
+Every anchor of the Markdown on main was compared with GitHub's own rendering
+on 2026-10-31 (155 anchors, no difference); `tools/test_check_links.py` pins
+the rule and its edge cases.
+
+**External links, weekly.** The *External links* workflow
+(`.github/workflows/external-links.yml`) runs `tools/check_external_links.py`
+every Monday and on manual dispatch, never on pull requests, and it is not a
+required check: an outside site can be down without any change here. It
+requests each http(s) URL from an inline link, an autolink or a reference
+definition once, HEAD and then GET if HEAD fails, and reports:
+
+- **broken**: a 4xx other than 401, 403 or 429, or a server or network error
+  after one retry. A broken link fails the run, so it shows in the Actions
+  list; fix it or explain it in a pull request;
+- **unverified**: 401, 403 or 429, when the site refuses automated clients,
+  and pages that need a signed-in maintainer (`SIGN_IN_REQUIRED`, currently
+  the repository settings pages), which are not requested;
+- passing links are counted but not listed.
 
 ## Workflow rules
 

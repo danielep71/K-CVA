@@ -18,6 +18,10 @@ fixtures in test_check_changelog.py; it never tags or publishes.
 check_excel_run.py checks the evidence folder of an Excel run against its
 commit (INSTALLATION.md, Recording an Excel run), with fixtures in
 test_check_excel_run.py; it is not a gate, since it needs a host run.
+check_links.py checks relative Markdown links and their anchors by GitHub's
+slug rule; check_external_links.py, run weekly by the External links
+workflow, reports broken http(s) links; both have fixtures in
+test_check_links.py (docs/CI.md, Markdown links).
 check_workflows.py parses the workflows as YAML and checks their permissions,
 timeouts, pins, checkout credentials and the required check
 (docs/CI.md, Workflow rules), with fixtures in test_check_workflows.py.
