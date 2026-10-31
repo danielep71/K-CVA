@@ -52,6 +52,9 @@ class SlugTests(unittest.TestCase):
         self.assertEqual(slug("<span>HTML</span> tag"), "html-tag")
         self.assertEqual(slug("Research &amp; development"), "research--development")
         self.assertEqual(slug("Caf&eacute; &#169; `&amp;`"), "café--amp")
+        self.assertEqual(slug("[API `foo`](api.md)"), "api-foo")
+        self.assertEqual(slug("**[Bold link](x.md)** and `__init__`"), "bold-link-and-__init__")
+        self.assertEqual(slug("![logo](l.png) [outer ![in](i.png)](o.md)"), "logo-outer-in")
         self.assertEqual(slug("mid_word_name"), "mid_word_name")
 
     def test_repeated_headings_are_numbered(self) -> None:
@@ -77,6 +80,15 @@ class SlugTests(unittest.TestCase):
                 "~~~\n## nor this\n~~~\n\n`[y](also-missing.md)` and [z](real.md)\n")
         self.assertEqual(anchors(text), set())
         self.assertEqual(list(links(text)), ["real.md"])
+
+    def test_targets_with_parentheses_titles_and_escapes(self) -> None:
+        text = ("[w](https://en.wikipedia.org/wiki/Value_(mathematics)) "
+                "[n](a_(b_(c)).md) [t](one.md 'Title') [p](two.md (Title)) "
+                "[a](<three (x).md> \"Title\") \\[not](a link) [esc](four\\).md)\n")
+        self.assertEqual(list(links(text)), [
+            "https://en.wikipedia.org/wiki/Value_(mathematics)", "a_(b_(c)).md", "one.md", "two.md",
+            "three (x).md", "four\\).md"])
+        self.assertEqual(list(links("[open](unclosed.md and [ok](ok.md)\n")), ["ok.md"])
 
     def test_link_forms(self) -> None:
         text = ('[a](one.md#x) ![img](pic.png) [b](<two.md> "title") '

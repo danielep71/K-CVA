@@ -16,6 +16,7 @@ import subprocess
 import sys
 import unicodedata
 from collections.abc import Iterable, Iterator
+from dataclasses import dataclass
 from pathlib import Path
 from urllib.parse import unquote
 
@@ -27,8 +28,6 @@ SETEXT_UNDERLINE = re.compile(r"^ {0,3}(=+|-+)[ \t]*$")
 NOT_PARAGRAPH = re.compile(r"^\s*(?:[-*+]\s|\d+[.)]\s|>|<|\|)|\|")
 EXPLICIT_ANCHOR = re.compile(r"""<a\s[^>]*?\b(?:id|name)\s*=\s*["']([^"']+)["']""", re.I)
 INLINE_CODE = re.compile(r"(`+)(.+?)\1")
-LINK = re.compile(r"!?\[((?:[^\[\]]|\[[^\[\]]*\])*)\]\(\s*<?([^)\s>]+)>?(?:\s+[\"'(][^)]*)?\s*\)")
-IMAGE_OR_LINK_TEXT = re.compile(r"!?\[((?:[^\[\]]|\[[^\[\]]*\])*)\]\([^)]*\)")
 HTML_TAG = re.compile(r"<[^>]+>")
 EMPHASIS = re.compile(r"(?<![\w*_])[*_]{1,3}(?=\S)|(?<=\S)[*_]{1,3}(?![\w*_])")
 
@@ -48,27 +47,130 @@ def github_slug(text: str) -> str:
     return "".join(kept).replace(" ", "-")
 
 
+@dataclass(frozen=True)
+class InlineLink:
+    """An inline link or image: ``[label](target)`` or ``![label](target)``."""
+
+    start: int
+    end: int
+    label: str
+    target: str
+
+
+def inline_links(text: str) -> list[InlineLink]:
+    """The inline links and images of one line, outermost first.
+
+    A small scanner rather than a regular expression, so that labels may
+    nest brackets and hold code spans, and targets may hold balanced
+    parentheses or be written ``<like this>``, as CommonMark allows.
+    """
+    found = []
+    index = 0
+    while index < len(text):
+        char = text[index]
+        if char == "\\":
+            index += 2
+            continue
+        if char == "`":
+            code = INLINE_CODE.match(text, index)
+            index = code.end() if code else index + 1
+            continue
+        if char == "[" or text.startswith("![", index):
+            opening = index + (2 if char == "!" else 1)
+            closing = _closing_bracket(text, opening)
+            if closing is not None and text.startswith("(", closing + 1):
+                destination = _destination(text, closing + 2)
+                if destination is not None:
+                    target, end = destination
+                    found.append(InlineLink(index, end, text[opening:closing], target))
+                    index = end
+                    continue
+        index += 1
+    return found
+
+
+def _closing_bracket(text: str, index: int) -> int | None:
+    depth = 0
+    while index < len(text):
+        char = text[index]
+        if char == "\\":
+            index += 2
+            continue
+        if char == "`":
+            code = INLINE_CODE.match(text, index)
+            index = code.end() if code else index + 1
+            continue
+        if char == "[":
+            depth += 1
+        elif char == "]":
+            if depth == 0:
+                return index
+            depth -= 1
+        index += 1
+    return None
+
+
+def _destination(text: str, index: int) -> tuple[str, int] | None:
+    """Parse ``target "title")`` from ``index``; return the target and the end."""
+    while index < len(text) and text[index] in " \t":
+        index += 1
+    if text.startswith("<", index):
+        closing = text.find(">", index + 1)
+        if closing < 0:
+            return None
+        target, index = text[index + 1:closing], closing + 1
+    else:
+        start, depth = index, 0
+        while index < len(text):
+            char = text[index]
+            if char == "\\":
+                index += 2
+                continue
+            if char.isspace() or (char == ")" and depth == 0):
+                break
+            depth += {"(": 1, ")": -1}.get(char, 0)
+            index += 1
+        target = text[start:index]
+    while index < len(text) and text[index] in " \t":
+        index += 1
+    if index < len(text) and text[index] in "\"'(":
+        closing = text.find({"(": ")"}.get(text[index], text[index]), index + 1)
+        if closing < 0:
+            return None
+        index = closing + 1
+        while index < len(text) and text[index] in " \t":
+            index += 1
+    if not text.startswith(")", index):
+        return None
+    return target, index + 1
+
+
 def rendered_heading(markdown: str) -> str:
     """The text GitHub renders for a heading's inline Markdown.
 
-    Code spans keep their content as written; elsewhere links and images
-    become their text, HTML tags disappear and emphasis markers are removed.
+    Code spans keep their content as written. Elsewhere links and images
+    become their label, HTML tags disappear, emphasis markers are removed and
+    character references such as ``&amp;`` become their character.
     """
+    spans: list[str] = []
+
+    def protect(match: re.Match[str]) -> str:
+        spans.append(match.group(2).strip())
+        return f"\ue000{len(spans) - 1}\ue001"
+
+    text = _labels_only(INLINE_CODE.sub(protect, markdown))
+    text = html.unescape(EMPHASIS.sub("", HTML_TAG.sub("", text)))
+    return re.sub("\ue000(\\d+)\ue001", lambda match: spans[int(match.group(1))], text)
+
+
+def _labels_only(text: str) -> str:
+    """Replace each inline link or image, nested ones included, by its label."""
     parts = []
     last = 0
-    for match in INLINE_CODE.finditer(markdown):
-        parts.append(_plain(markdown[last:match.start()]))
-        parts.append(match.group(2).strip())
-        last = match.end()
-    parts.append(_plain(markdown[last:]))
-    return "".join(parts)
-
-
-def _plain(text: str) -> str:
-    text = IMAGE_OR_LINK_TEXT.sub(r"\1", text)
-    text = HTML_TAG.sub("", text)
-    # Character references render as their character: "&amp;" is "&".
-    return html.unescape(EMPHASIS.sub("", text))
+    for link in inline_links(text):
+        parts += [text[last:link.start], _labels_only(link.label)]
+        last = link.end
+    return "".join([*parts, text[last:]])
 
 
 def prose_lines(text: str) -> Iterator[str]:
@@ -137,10 +239,10 @@ def anchors(text: str) -> set[str]:
 
 def link_targets(text: str) -> Iterator[str]:
     """The targets of the inline links and images in ``text``, nested ones included."""
-    for match in LINK.finditer(text):
-        yield match.group(2)
+    for link in inline_links(text):
+        yield link.target
         # A linked image, [![alt](image)](target), has a target of its own.
-        yield from link_targets(match.group(1))
+        yield from link_targets(link.label)
 
 
 def links(text: str) -> Iterator[str]:
