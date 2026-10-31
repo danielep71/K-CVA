@@ -90,6 +90,12 @@ CVA calculation, public API or workbook.
   scripts and the workflows ([docs/CI.md](docs/CI.md#code-scanning); #117).
 - A workflow that clears milestones set on pull requests, so that milestones
   stay on issues ([docs/CI.md](docs/CI.md#pull-request-milestones); #122).
+- Repository settings as code: the desired general, security and Actions
+  settings and the five rulesets in `.github/repository-settings.json`, and
+  `tools/repository_settings.py` to preview, check and apply them with a
+  dated evidence report ([docs/REPOSITORY_SETTINGS.md](docs/REPOSITORY_SETTINGS.md);
+  #121). The governance and settings documents state current rules; their
+  delivery history is kept in the issues (#123).
 - The issue forms, labels and issue-triage check, and the pull request
   template (PR #1, #7).
 - The regulatory basis (the EU CRR as amended by CRR3, BA-CVA first, then

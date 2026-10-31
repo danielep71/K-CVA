@@ -10,21 +10,20 @@ Contributors and automation act within the maintainer's authorization and retain
 truthful authorship. Bot authorship does not permit bypassing review or rules.
 
 The milestone **v0.1.0 - Repo setup** covers repository infrastructure.
-Architecture and the initial CVA product scope were established in [#3](https://github.com/danielep71/K-CVA/issues/3);
-production calculations, numerical certification and production workbook packaging
-are outside this milestone. The repository is public, verified on 2026-10-28.
-This supersedes the original private-visibility policy; the dated settings
-snapshot below records the earlier baseline.
+Architecture and the initial CVA product scope are recorded in
+[DECISIONS.md](DECISIONS.md); production calculations, numerical certification
+and production workbook packaging are outside this milestone. The repository
+is public.
 
 ## Branches
 
 | Branch | Role |
 | --- | --- |
 | `main` | Integrated source; receives release integration PRs using merge commits. |
-| `release/0.1.0` | Active setup integration branch; created on 2026-10-24 from main at `f738d54e61535d63cf3f625303dae7611f434cf0`, by maintainer decision in #2. |
+| `release/0.1.0` | Active setup integration branch. |
 | Other `release/X.Y.Z` | Created only by maintainer decision, without a v prefix. |
 | `docs/<issue>-<slug>`, `fix/<issue>-<slug>`, `chore/<issue>-<slug>`, `test/<issue>-<slug>` | Task branches cut from the active release branch, deleted after merge. |
-| `traffic-history` | Data-only branch written by the Traffic history workflow ([TRAFFIC.md](TRAFFIC.md), #14), created once as an orphan commit. Never a task base or merged into source branches. |
+| `traffic-history` | Data-only branch written by the Traffic history workflow ([TRAFFIC.md](TRAFFIC.md)), created once as an orphan commit. Never a task base or merged into source branches. |
 
 A release branch does not imply publication.
 
@@ -63,53 +62,48 @@ finding and resolve applicable conversations. Older reviews do not cover a new
 head. Do not claim Codex coverage when it was skipped.
 
 Bot-authored PRs require maintainer final-head review; do not change authorship
-to obtain a review. Codex review was observed on the final heads of PRs #21 and #24. If required review is unavailable, keep the PR open and record the
-blocker rather than treating absent review as success.
+to obtain a review. If required review is unavailable, keep the PR open and
+record the blocker rather than treating absent review as success.
 
 A sync PR with a verified empty file diff needs only applicable CI, with that
 evidence recorded in the PR. A sync PR changing files needs normal final-head
-review. `Repository integrity`, installed by #6, must pass on the sync head
-as on other protected-branch PRs. Ruleset enforcement was configured and read back under #12 on 2026-10-24.
+review. `Repository integrity` must pass on the sync head as on other
+protected-branch PRs.
 
 ## Protection policy and verified controls
 
-Intended policy for main and release/**: require PRs, resolved conversations,
-zero mandatory approvals, no deletion, no force pushes and no bypass.
-The exact `Repository integrity` check from GitHub Actions and up-to-date
-branches are required by the main and release rulesets. The unfiltered workflow was delivered by #6. Path-filtered
-label workflows must not serve as the universal required check.
+Policy for main and release/**: require PRs, resolved conversations, zero
+mandatory approvals, no deletion, no force pushes and no bypass. Main accepts
+merge commits only; release/** accepts squash or merge. Both require the exact
+`Repository integrity` check from GitHub Actions on an up-to-date branch; only
+the creation of a release branch is exempt. Tags `v*` cannot be updated,
+deleted or force-pushed. `traffic-history` cannot be deleted or force-pushed
+and needs no PR. Path-filtered label workflows must not serve as the universal
+required check ([CI.md](CI.md#workflow-rules) checks that the required one has
+no filter).
 
-Historical snapshot verified on **2026-10-24** through GitHub API reads and the settings
-evidence recorded in [#12](https://github.com/danielep71/K-CVA/issues/12):
+These controls, the general and Actions settings and the security features
+are declared in [.github/repository-settings.json](../.github/repository-settings.json)
+and described in [REPOSITORY_SETTINGS.md](REPOSITORY_SETTINGS.md), which also
+says how to check them.
 
-| Control | Configured or pending |
-| --- | --- |
-| Visibility and default branch | Private; main. |
-| Main ruleset 25781886 | Active; PR required, 0 approvals, resolved conversations, deletion and force pushes blocked; merge commits only; no bypass. |
-| Release ruleset 25781928 | Active for release/**; same protections, squash or merge allowed, no linear-history rule and no bypass. |
-| Release deletion ruleset 25781993 | Active for release/**; deletion blocked, no bypass. |
-| Tag ruleset 25781957 | Active for v*; updates, deletion and force pushes blocked, no bypass. |
-| Traffic ruleset 25782014 | Active for traffic-history; deletion and force pushes blocked; regular automation updates allowed, no PR requirement or bypass. Workflow and operating guide in [TRAFFIC.md](TRAFFIC.md) (#14). |
-| Required check and strict up-to-date rule | **Configured under #12**. Main and release/** require Repository integrity from GitHub Actions (integration 15368), with strict up-to-date checks. Checks apply on main creation; release creation alone is exempt. No bypass actors or excluded refs. See [settings evidence](REPOSITORY_SETTINGS.md). |
-| Enforcement demonstration | Exercised on 2026-10-24 under #13 for release/**; see [Demonstrated enforcement](#demonstrated-enforcement). Rules not triggered there remain verified by read-back only. |
-| General settings | Projects off; update-branch suggestion and automatic head-branch deletion on. Repository supports merge, squash and rebase, restricted by the branch rules above. |
-| Actions | Full-SHA action pinning required; default token reads contents/packages; workflow PR creation/approval off. |
-| Security | Dependency graph and Dependabot alerts enabled. MPL-2.0 and security/provenance policies recorded in #4; weekly GitHub Actions version updates configured by #6 in [.github/dependabot.yml](../.github/dependabot.yml), targeting release/0.1.0; updates require review. |
-| Label automation and forms | Installed by #1. Label validation/drift fixtures are path-filtered; live reconciliation is on main. Issue triage is read-only. [PR template](../.github/pull_request_template.md) installed by #7 and integrated into main by PR #32. |
-| Codex review | Observed completed on PRs #21 and #24; coverage must still be verified per final head. |
-
-The universal check is documented in [CI.md](CI.md) and was integrated into
-main by [PR #32](https://github.com/danielep71/K-CVA/pull/32).
-Record applicable checks and explicit gaps in each PR. Absence of a check is not a passing check. Update this dated snapshot
-when a control changes; do not describe desired controls as configured.
-Before closing a setup issue, reconcile affected status tables, decision records
-and dependent issue progress with its delivered evidence and remaining work.
+- Change a control by changing that file in a reviewed PR, then apply it with
+  `python tools/repository_settings.py --apply` and confirm with `--check`.
+- Run `--check` before closing a milestone. Never describe a desired control
+  as configured until `--check` has read it back.
+- Record applicable checks and explicit gaps in each PR. Absence of a check is
+  not a passing check.
+- Before closing a setup issue, reconcile affected status tables, decision
+  records and dependent issue progress with its delivered evidence and
+  remaining work.
 
 <a id="demonstrated-enforcement"></a>
 
 ### Demonstrated enforcement
 
-Recorded on **2026-10-24** for [#13](https://github.com/danielep71/K-CVA/issues/13).
+Dated evidence, not a rule: a read-back shows that a rule is configured; this
+shows that GitHub enforces it. Recorded on **2026-10-24** for
+[#13](https://github.com/danielep71/K-CVA/issues/13).
 Each row is a merge GitHub refused on a real pull request into release/0.1.0.
 The refusal text is quoted from the API response.
 
@@ -171,10 +165,6 @@ decisions. The milestone closeout follows [CLOSEOUT.md](CLOSEOUT.md).
 
 Do not commit credentials or confidential client data. Security reporting,
 licensing and provenance are documented in [SECURITY.md](../SECURITY.md) and
-[NOTICE.md](../NOTICE.md). The maintainer selected MPL-2.0 in #4; security
+[NOTICE.md](../NOTICE.md), which also records this document's provenance.
+The project is licensed under MPL-2.0 ([LICENSE](../LICENSE)); security
 features are recorded with their verification limits.
-
-This policy was written for K-CVA using the process in
-[CCR-K-SFTs governance](https://github.com/danielep71/CCR-K-SFTs/blob/c13e1167e779ab1816db9d8c81e140abddbf6c66/docs/GOVERNANCE.md)
-as a design reference (source blob `bab2ca28c0e48cda98a58698003bbad65de1c9e4`).
-Its configured controls and domain-specific decisions were not copied as facts.
