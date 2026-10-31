@@ -52,15 +52,17 @@ conversion, even though archives retain configuration. Do not mix revisions.
 | Prerequisite | Version | Used for |
 | --- | --- | --- |
 | Git | Any current release | Checkout with the repository's line-ending rules |
-| Python | 3.12.14 (the CI baseline) | `tools/check_repository.py` and its standard-library checks |
+| Python | 3.12.14 (the CI baseline) | `tools/check_repository.py` and its checks; the hash-locked packages in [tools/requirements.txt](tools/requirements.txt) |
 | Node.js | 24.22.1 (the CI baseline) | Label scripts and their self-tests; built-in modules only |
 | Microsoft 365 Excel, Windows, 64-bit | Not yet tested (#11) | Importing, compiling and running VBA ([host policy](#host-policy)) |
 
-No pip or npm package is installed. The first run downloads actionlint 1.7.12
-and verifies it against [tools/actionlint-lock.json](tools/actionlint-lock.json)
-([CI](docs/CI.md)). From the repository root, run every check:
+Install the locked Python packages once, preferably in a virtual
+environment; no npm package is installed. The first run downloads actionlint
+1.7.12 and verifies it against [tools/actionlint-lock.json](tools/actionlint-lock.json)
+([CI](docs/CI.md)). From the repository root:
 
 ```sh
+python -m pip install --require-hashes --only-binary=:all: -r tools/requirements.txt
 python tools/check_repository.py
 ```
 

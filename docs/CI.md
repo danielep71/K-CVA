@@ -1,14 +1,18 @@
 # Repository integrity
 
-Run from a Git checkout with Python 3.12.14, Node.js 24.22.1 and Git on PATH:
+Run from a Git checkout with Python 3.12.14, Node.js 24.22.1 and Git on PATH,
+after installing the hash-locked Python packages once:
 
 ```sh
+python -m pip install --require-hashes --only-binary=:all: -r tools/requirements.txt
 python tools/check_repository.py
 ```
 
 This is the local and CI entry point. It exits nonzero on any failed check.
-Python uses only the standard library; Node uses only built-in modules. No pip
-or npm packages are required. The declared versions are the CI baseline; local
+Python needs only the packages in [tools/requirements.txt](../tools/requirements.txt),
+each pinned with the hash of every wheel, so pip installs nothing it has not
+been told the hash of and builds nothing from source; Node uses only built-in
+modules, and no npm package is required. The declared versions are the CI baseline; local
 versions are recorded in evidence. Issue triage uses the same pinned Python
 version; all label fixture, detection and reconciliation jobs explicitly set up
 the same pinned Node version. The first run downloads actionlint 1.7.12
@@ -23,7 +27,8 @@ the numerical [test-case files](methodology/TEST_CASES.md#checking) (gate
 `test-cases`), the [changelog and `VERSION`](../CHANGELOG.md#date-and-version-rules)
 (gate `changelog`: headings, dates, order, link references, and no `VERSION`
 before a dated release, then equal to the newest; nothing is tagged or
-published), the static [VBA checks](#vba-static-checks), Python/Node/JSON syntax, relative Markdown links, action SHA pins, checkout credential settings,
+published), the static [VBA checks](#vba-static-checks), Python/Node/JSON syntax, relative Markdown links, the
+[workflow rules](#workflow-rules) (gate `workflow-rules`),
 workflow syntax/expressions with actionlint, and whitespace in all committed
 content plus local staged/unstaged changes. The committed check compares HEAD
 with Git's empty tree, so it works in clean and shallow CI checkouts without
@@ -143,14 +148,38 @@ adopted: its separate quality tools (Ruff, mypy). The test-case format
 checker (#10) and the changelog check (#17) were adopted later; see
 [NOTICE.md](../NOTICE.md).
 
+## Workflow rules
+
+`tools/check_workflows.py` parses every workflow in `.github/workflows/` as
+YAML and fails when one breaks a rule. A duplicated YAML key is itself an
+error, so a later key cannot silently replace an earlier one.
+
+| Rule | Why |
+| --- | --- |
+| Top-level `permissions` is an explicit mapping with no write scope (`{}` or `read-all` also pass) | No job gets the default token permissions by omission |
+| A job may hold a write scope only if `WRITE_ALLOWED` in the checker names that job and scope | Each write permission is reviewed where it is granted; adding one changes the checker |
+| Every job sets `timeout-minutes` from 1 to 60, except one that calls a reusable workflow, which cannot | A stuck job cannot run for GitHub's default six hours |
+| Every `uses:` names an action or reusable workflow at a full 40-character commit SHA | Tags and branches can move |
+| Every `actions/checkout` step sets `persist-credentials: false` | The token is not left in the checkout for later steps |
+| `repository-integrity.yml` runs on `pull_request` and `push` without `paths` or `paths-ignore`, its job `integrity` has no `if:` and keeps the name `Repository integrity` | The required check must report on every pull request and push it protects |
+
+The current allowlist: `labels-sync.yml` job `reconcile` may write `issues`;
+`traffic-history.yml` job `collect` may write `contents`. Fixtures for every
+rule are in `tools/test_check_workflows.py`.
+
 ## Dependency updates
 
-Dependabot checks GitHub Actions weekly, targets release/0.1.0, assigns
+Dependabot checks GitHub Actions and the Python lock (`pip`, directory
+`/tools`) weekly, targets release/0.1.0, assigns
 @danielep71 and uses existing ci/P3 labels. Configuration becomes active when
 present on the default branch. PRs have no milestone; create/link an issue with
 the milestone when work needs tracking. There is no automatic approval, merge
 or alert dismissal. Review release notes, provenance and the complete action
 SHA, run integrity checks, and follow the final-head review policy.
+
+For a Python update, check that every changed `--hash` belongs to the new
+version on PyPI and that the lock still lists wheels for each supported
+platform; `--only-binary=:all:` refuses a version that has none.
 
 Runtime baselines and actionlint's checksum lock are manually reviewed updates;
 Dependabot does not update that custom lock. Obtain replacement archive digests
