@@ -20,7 +20,8 @@ has admin rights on the repository, for example `GH_TOKEN=$(gh auth token)`:
 
 - **Unread settings:** a setting the token may not read is reported as
   *unread*, never as matching, and `--apply` refuses to run while any setting
-  is unread.
+  is unread. This includes a ruleset's bypass actors, which GitHub leaves out
+  of the response when the token cannot write the ruleset.
 - **Never applied:** the visibility is checked but never applied, and a
   ruleset present live but absent from the file is reported, never deleted.
 - **Changing a control:** edit the file in a reviewed pull request, run

@@ -96,7 +96,12 @@ def normalize_ruleset(ruleset: Mapping[str, Any]) -> dict[str, Any]:
         names = ((data.get("conditions") or {}).get("ref_name") or {}).get(side)
         if isinstance(names, list):
             names.sort()
-    data["bypass_actors"] = sorted(data["bypass_actors"] or [], key=json.dumps)
+    # GitHub omits bypass_actors when the token cannot write the ruleset: that
+    # is not the same as an empty list, so it is unread, never "no bypass".
+    if "bypass_actors" in ruleset:
+        data["bypass_actors"] = sorted(data["bypass_actors"] or [], key=json.dumps)
+    else:
+        data["bypass_actors"] = UNREAD
     return data
 
 
@@ -168,7 +173,9 @@ def differences(desired: Mapping[str, Any], live: Mapping[str, Any]) -> tuple[li
             drift.append(f"rulesets.{name}: missing")
             continue
         for key in RULESET_KEYS:
-            if have[key] != want[key]:
+            if have[key] == UNREAD:
+                unread.append(f"rulesets.{name}.{key}")
+            elif have[key] != want[key]:
                 drift.append(f"rulesets.{name}.{key}: live {json.dumps(have[key])}, desired {json.dumps(want[key])}")
     drift += [f"rulesets.{name}: not in the desired state (not deleted by --apply)"
               for name in sorted(set(live["rulesets"]) - set(wanted))]

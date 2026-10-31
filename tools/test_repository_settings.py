@@ -138,6 +138,17 @@ class CheckTests(unittest.TestCase):
         self.assertIn("unread: security.vulnerability_alerts", output)
         self.assertIn("unread: actions.sha_pinning_required", output)
 
+    def test_omitted_bypass_actors_are_unread_not_empty(self) -> None:
+        # GitHub omits bypass_actors for a token without write access to the ruleset.
+        github = FakeGitHub()
+        del github.rulesets[1]["bypass_actors"]
+        code, output = run(github, "--check")
+        self.assertEqual(code, 2, output)
+        self.assertIn("unread: rulesets.Protect main.bypass_actors", output)
+        code, output = run(github, "--apply")
+        self.assertEqual(code, 2, output)
+        self.assertEqual(github.writes, [])
+
     def test_ruleset_order_does_not_matter(self) -> None:
         github = FakeGitHub()
         github.rulesets[1]["rules"].reverse()
