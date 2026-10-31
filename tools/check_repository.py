@@ -1,5 +1,4 @@
 """Portable, read-only repository checks; evidence describes the tested tree."""
-from pathlib import Path
 import hashlib
 import io
 import json
@@ -11,14 +10,17 @@ import sys
 import tarfile
 import urllib.request
 import zipfile
+from pathlib import Path
+from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / 'test-results' / 'integrity'
 
 
-def actionlint():
+def actionlint() -> str:
     lock = json.loads((ROOT / 'tools/actionlint-lock.json').read_text())
-    machine = {'x86_64': 'amd64', 'amd64': 'amd64', 'aarch64': 'arm64', 'arm64': 'arm64'}.get(platform.machine().lower())
+    machines = {'x86_64': 'amd64', 'amd64': 'amd64', 'aarch64': 'arm64', 'arm64': 'arm64'}
+    machine = machines.get(platform.machine().lower())
     key = platform.system().lower() + '_' + str(machine)
     if key not in lock['assets']:
         raise RuntimeError('Unsupported actionlint platform: ' + key)
@@ -26,7 +28,7 @@ def actionlint():
     archive = ROOT / '.cache' / ('actionlint-' + asset['sha256'])
     archive.parent.mkdir(exist_ok=True)
     if not archive.exists():
-        with urllib.request.urlopen(asset['url'], timeout=60) as response:
+        with urllib.request.urlopen(asset['url'], timeout=60) as response:  # noqa: S310 - https URL from the lock
             data = response.read()
         if hashlib.sha256(data).hexdigest() != asset['sha256']:
             raise RuntimeError('actionlint download checksum mismatch')
@@ -40,14 +42,17 @@ def actionlint():
             binary = package.read(name)
     else:
         with tarfile.open(fileobj=io.BytesIO(data), mode='r:gz') as package:
-            binary = package.extractfile(name).read()
+            member = package.extractfile(name)
+            if member is None:
+                raise RuntimeError('actionlint archive has no ' + name)
+            binary = member.read()
     executable = archive.parent / name
     executable.write_bytes(binary)
     executable.chmod(0o755)
     return str(executable)
 
 
-def whitespace_commands():
+def whitespace_commands() -> list[tuple[str, list[str]]]:
     """Check all committed content, then local changes, without needing history."""
     empty_tree = subprocess.check_output(
         ['git', 'hash-object', '-t', 'tree', '--stdin'], input=b''
@@ -58,28 +63,30 @@ def whitespace_commands():
     ]
 
 
-def main():
+def main() -> int:
     os.chdir(ROOT)
     OUT.mkdir(parents=True, exist_ok=True)
     paths = subprocess.check_output(['git', 'ls-files', '-z']).decode().split('\0')
     tracked = [p for p in paths if p]
     files = {p: hashlib.sha256(Path(p).read_bytes()).hexdigest() for p in tracked if Path(p).is_file()}
-    report = {
+    checks: list[dict[str, Any]] = []
+    report: dict[str, Any] = {
         'commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(),
         'dirty': bool(subprocess.check_output(['git', 'status', '--porcelain'])),
         'github_head_sha': os.environ.get('PR_HEAD_SHA'),
         'python': sys.version, 'platform': platform.platform(),
-        'files_sha256': files, 'checks': [],
+        'files_sha256': files, 'checks': checks,
         'scope': 'Repository infrastructure only; no numerical or Excel certification',
     }
-    def run(name, command):
+    def run(name: str, command: list[str]) -> None:
         try:
-            result = subprocess.run(command, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=180)
+            result = subprocess.run(command, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                    timeout=180, check=False)
             output, code = result.stdout, result.returncode
         except (OSError, subprocess.TimeoutExpired) as error:
             output, code = str(error), 1
         (OUT / (name + '.log')).write_text(output, encoding='utf-8')
-        report['checks'].append({'name': name, 'command': command, 'exit_code': code})
+        checks.append({'name': name, 'command': command, 'exit_code': code})
         print(name + ': ' + ('PASS' if code == 0 else 'FAIL'), flush=True)
         if code:
             print(output, flush=True)
@@ -87,6 +94,8 @@ def main():
         run('node-version', ['node', '--version'])
         run('issue-config', [sys.executable, 'tools/check_issues.py', '--check-config'])
         run('python-tests', [sys.executable, '-m', 'unittest', 'discover', '-s', 'tools', '-p', 'test_*.py'])
+        run('ruff', [sys.executable, '-m', 'ruff', 'check', '--no-cache', 'tools'])
+        run('mypy', [sys.executable, '-m', 'mypy', '--cache-dir', str(ROOT / '.cache' / 'mypy')])
         run('label-sync', ['node', '.github/scripts/labels-sync.mjs', '--self-test'])
         run('label-drift', ['node', '.github/scripts/labels-drift.mjs', '--self-test'])
         run('label-evidence', ['node', '--test', '.github/scripts/test-labels-drift.mjs'])
@@ -104,9 +113,9 @@ def main():
         for path in tracked:
             if path.endswith('.md'):
                 for target in re.findall(r'\]\(([^)]+)\)', Path(path).read_text(encoding='utf-8')):
-                    if '://' not in target and not target.startswith(('#', 'mailto:')):
-                        if not (Path(path).parent / target.split('#')[0]).exists():
-                            raise RuntimeError('Missing relative link: ' + path + ': ' + target)
+                    relative = '://' not in target and not target.startswith(('#', 'mailto:'))
+                    if relative and not (Path(path).parent / target.split('#')[0]).exists():
+                        raise RuntimeError('Missing relative link: ' + path + ': ' + target)
         workflows = sorted(str(p) for p in Path('.github/workflows').glob('*.y*ml'))
         run('workflow-rules', [sys.executable, 'tools/check_workflows.py'])
         validator = actionlint()
@@ -115,9 +124,9 @@ def main():
         for name, command in whitespace_commands():
             run(name, command)
     except Exception as error:
-        report['checks'].append({'name': 'repository-validation', 'exit_code': 1, 'error': str(error)})
+        checks.append({'name': 'repository-validation', 'exit_code': 1, 'error': str(error)})
         print(str(error), file=sys.stderr)
-    report['status'] = 'pass' if all(x['exit_code'] == 0 for x in report['checks']) else 'fail'
+    report['status'] = 'pass' if all(x['exit_code'] == 0 for x in checks) else 'fail'
     (OUT / 'report.json').write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
     return 0 if report['status'] == 'pass' else 1
 

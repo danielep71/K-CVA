@@ -19,6 +19,7 @@ from __future__ import annotations
 import argparse
 import csv
 import io
+import itertools
 import json
 import os
 import re
@@ -261,7 +262,7 @@ def gaps(daily: Sequence[Mapping[str, str]]) -> list[tuple[str, str]]:
     """Date ranges between the first and last stored day that no collection reported."""
     days = sorted(date.fromisoformat(row["date"]) for row in daily)
     found = []
-    for before, after in zip(days, days[1:], strict=False):
+    for before, after in itertools.pairwise(days):
         if after - before > timedelta(days=1):
             found.append(((before + timedelta(days=1)).isoformat(),
                           (after - timedelta(days=1)).isoformat()))
