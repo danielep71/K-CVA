@@ -78,11 +78,12 @@ CVA calculation, public API or workbook.
   [INSTALLATION.md](INSTALLATION.md); #5).
 - `python tools/check_repository.py`, run locally and by the
   `Repository integrity` workflow on every pull request: tooling tests, label
-  and issue-form configuration, the test-case format, the changelog, static
+  and issue-form configuration, Ruff and strict mypy on the Python tooling,
+  the test-case format, the changelog, static
   checks of the exported VBA source, the workflows (permissions, timeouts,
   pins and the required check, parsed as YAML) and whitespace; and
   reviewed Dependabot updates of the pinned actions and the hash-locked
-  Python packages ([docs/CI.md](docs/CI.md); #6, #9, #119).
+  Python packages ([docs/CI.md](docs/CI.md); #6, #9, #119, #120).
 - The issue forms, labels and issue-triage check, and the pull request
   template (PR #1, #7).
 - The regulatory basis (the EU CRR as amended by CRR3, BA-CVA first, then

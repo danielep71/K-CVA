@@ -188,12 +188,12 @@ def flow_list(text: str, key: str) -> list[str]:
 
 
 def fetch(url: str, token: str) -> Any:
-    request = urllib.request.Request(url, headers={
+    request = urllib.request.Request(url, headers={  # noqa: S310 - https API URLs only
         "Accept": "application/vnd.github+json",
         "Authorization": f"Bearer {token}",
         "X-GitHub-Api-Version": "2022-11-28",
     })
-    with urllib.request.urlopen(request, timeout=30) as response:
+    with urllib.request.urlopen(request, timeout=30) as response:  # noqa: S310 - https API URLs only
         return json.load(response)
 
 

@@ -21,7 +21,8 @@ from its official release and verifies the platform archive against
 archive and extract only the named executable. Supported tooling platforms are
 Linux, Windows and macOS on x64/ARM64. This is not Excel host certification.
 
-The command checks issue configuration, all Python tooling tests, canonical
+The command checks issue configuration, all Python tooling tests, the
+[Python quality gates](#python-quality-gates) (gates `ruff` and `mypy`), canonical
 label self-tests, drift self-tests and CLI evidence regressions, the format of
 the numerical [test-case files](methodology/TEST_CASES.md#checking) (gate
 `test-cases`), the [changelog and `VERSION`](../CHANGELOG.md#date-and-version-rules)
@@ -143,10 +144,37 @@ here: the `CVA_` facade prefix and `examples/modules/` home; every
 `Declare` statements rejected in standard modules, so the supported kinds are
 those listed in REPOSITORY_STRUCTURE.md; a `GoTo`, `GoSub` or `Resume`
 after a dot read as a member call, not a jump; fixtures without SFT names. The
-dependency check and its fixtures are written for this repository. Not
-adopted: its separate quality tools (Ruff, mypy). The test-case format
+dependency check and its fixtures are written for this repository. The
+Python quality gates use this repository's own configuration. The test-case format
 checker (#10) and the changelog check (#17) were adopted later; see
 [NOTICE.md](../NOTICE.md).
+
+## Python quality gates
+
+`pyproject.toml` configures both gates for the Python in `tools/`; the
+versions come from the hash-locked [tools/requirements.txt](../tools/requirements.txt).
+
+- **Ruff** (`python -m ruff check tools`) with an explicit rule selection, so
+  a new Ruff default cannot change the gate: pycodestyle (`E`, `W`), Pyflakes
+  (`F`), import order (`I`), bugbear (`B`), pyupgrade (`UP`), simplify
+  (`SIM`), Ruff's own rules (`RUF`), Pylint errors and warnings (`PLE`,
+  `PLW`) and the security rules (`S`). Lines may be 120 characters, the width
+  the tooling is written to.
+- **mypy** (`python -m mypy`) in strict mode for Python 3.12, with
+  unreachable-code warnings, over every module in `tools/`.
+
+Every exception, with its reason:
+
+| Exception | Scope | Reason |
+| --- | --- | --- |
+| `S603`, `S607` | All tools | The tools run fixed argument lists (`git`, `node`, the interpreter), never a shell or a command built from input; finding `git` and `node` on `PATH` is the documented setup |
+| `S101` | `tools/test_*.py` | unittest helpers may assert |
+| `E501` | `tools/test_check_vba.py` | The VBA fixtures reproduce real source lines; wrapping them would change the fixture |
+| `S310` (3 lines) | `check_issues.py`, `check_repository.py` | The URLs opened are the HTTPS GitHub API and the HTTPS release URL from the actionlint lock |
+| `S105` (1 line) | `check_vba_conditionals.py` | A VBA expression token compared with `"("`, not a password |
+
+Git's SHA-1 blob id in `check_excel_run.py` is computed with
+`usedforsecurity=False`: it names a file, it secures nothing.
 
 ## Workflow rules
 

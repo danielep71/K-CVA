@@ -1,15 +1,15 @@
 """Regressions for whitespace validation in clean and local Git checkouts."""
 import os
-from pathlib import Path
 import subprocess
 import tempfile
 import unittest
+from pathlib import Path
 
 from check_repository import whitespace_commands
 
 
 class WhitespaceTests(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.previous = Path.cwd()
@@ -20,18 +20,18 @@ class WhitespaceTests(unittest.TestCase):
         self.git('config', 'user.email', 'fixture@example.invalid')
         self.git('config', 'core.autocrlf', 'false')
 
-    def git(self, *args):
+    def git(self, *args: str) -> bytes:
         return subprocess.check_output(['git', *args], stderr=subprocess.STDOUT)
 
-    def commit(self):
+    def commit(self) -> None:
         self.git('add', '.')
         self.git('commit', '-qm', 'Fixture')
 
-    def outcomes(self):
-        return {name: subprocess.run(command, capture_output=True).returncode
+    def outcomes(self) -> dict[str, int]:
+        return {name: subprocess.run(command, capture_output=True, check=False).returncode
                 for name, command in whitespace_commands()}
 
-    def test_clean_committed_trailing_whitespace_fails(self):
+    def test_clean_committed_trailing_whitespace_fails(self) -> None:
         Path('fixture.txt').write_bytes(b'bad trailing space \n')
         self.commit()
         self.assertEqual(self.git('status', '--porcelain'), b'')
@@ -39,7 +39,7 @@ class WhitespaceTests(unittest.TestCase):
         self.assertEqual(self.git('diff', '--check', 'HEAD'), b'')
         self.assertNotEqual(self.outcomes()['whitespace-committed'], 0)
 
-    def test_clean_text_crlf_and_binary_pass(self):
+    def test_clean_text_crlf_and_binary_pass(self) -> None:
         Path('.gitattributes').write_text('*.cmd text eol=crlf\n*.bin binary\n')
         Path('fixture.txt').write_bytes(b'clean\n')
         Path('fixture.cmd').write_bytes(b'echo clean\r\n')
@@ -47,7 +47,7 @@ class WhitespaceTests(unittest.TestCase):
         self.commit()
         self.assertEqual(set(self.outcomes().values()), {0})
 
-    def test_local_staged_and_unstaged_whitespace_fail(self):
+    def test_local_staged_and_unstaged_whitespace_fail(self) -> None:
         Path('fixture.txt').write_bytes(b'clean\n')
         self.commit()
         Path('fixture.txt').write_bytes(b'bad\t\n')
