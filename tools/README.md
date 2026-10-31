@@ -22,6 +22,9 @@ check_links.py checks relative Markdown links and their anchors by GitHub's
 slug rule; check_external_links.py, run weekly by the External links
 workflow, reports broken http(s) links; both have fixtures in
 test_check_links.py (docs/CI.md, Markdown links).
+repository_settings.py compares the live repository settings with
+.github/repository-settings.json (preview, --check, --apply, --report), with
+offline tests in test_repository_settings.py (docs/REPOSITORY_SETTINGS.md).
 check_workflows.py parses the workflows as YAML and checks their permissions,
 timeouts, pins, checkout credentials and the required check
 (docs/CI.md, Workflow rules), with fixtures in test_check_workflows.py.

@@ -1,45 +1,78 @@
-# Repository settings verification
+# Repository settings
 
-Verified on 2026-10-24 for #12. This records configured controls. The controlled
-failing/passing enforcement exercise of #13 is recorded in
-[GOVERNANCE.md](GOVERNANCE.md#demonstrated-enforcement).
+The repository's settings are declared in
+[.github/repository-settings.json](../.github/repository-settings.json) and
+compared with the live repository by `tools/repository_settings.py`. This page
+describes that desired state and how to check and change it. The policy behind
+it is in [GOVERNANCE.md](GOVERNANCE.md#protection-policy-and-verified-controls).
 
-## Comparison with CCR-K-SFTs
+## Checking and changing the settings
 
-Live REST readback compared repository general settings and all five rulesets.
-Signed-in Actions and Advanced Security settings were inspected for both repos.
-[Retained ruleset readback](evidence/repository-rulesets-2026-10-24.json) records
-conditions, rules and bypass lists; it contains no credentials.
-It was recorded before the repository was renamed and names it MKT-K-CVA.
+From the repository root, with a token in `GH_TOKEN` (or `GITHUB_TOKEN`) that
+has admin rights on the repository, for example `GH_TOKEN=$(gh auth token)`:
 
-| Area | Verified result |
+| Command | Effect | Exit code |
+| --- | --- | --- |
+| `python tools/repository_settings.py` | Reads the live settings and prints every difference (preview) | 0 |
+| `python tools/repository_settings.py --check` | The same, as a check | 0 if all match, 1 on any difference, 2 if a setting could not be read |
+| `python tools/repository_settings.py --apply` | Changes the live settings to the desired state, then reads them again and verifies | as `--check`, after the change |
+| add `--report docs/evidence/repository-settings-YYYY-MM-DD.json` | Also writes a dated JSON report of everything read | unchanged |
+
+- **Unread settings:** a setting the token may not read is reported as
+  *unread*, never as matching, and `--apply` refuses to run while any setting
+  is unread. This includes a ruleset's bypass actors, which GitHub leaves out
+  of the response when the token cannot write the ruleset.
+- **Never applied:** the visibility is checked but never applied, and a
+  ruleset present live but absent from the file is reported, never deleted.
+- **Changing a control:** edit the file in a reviewed pull request, run
+  `--apply` once it is merged, and keep a `--check` report as evidence.
+
+The script uses only the standard library; its tests (`tools/test_repository_settings.py`,
+in the repository checks) run against a fake API, without network access.
+
+## Desired state
+
+**General.** Public; default branch `main`. Issues and the wiki on; Projects
+and Discussions off. The repository allows merge commits, squash and rebase
+merges, which the rulesets below narrow per branch. Auto-merge off,
+update-branch suggestions on, head branches deleted after merge, and no
+web-commit sign-off requirement.
+
+**Security.**
+
+| Feature | Desired |
 | --- | --- |
-| General | Both private, main default, Projects off, update-branch suggestions and merged-head deletion on. Repository merge/squash/rebase allowed; auto-merge off. Branch rules narrow merge methods. |
-| Main | PR required, zero mandatory approvals, resolved threads, merge commits only, no deletion/force pushes. Repository integrity from GitHub Actions (15368), strict up-to-date true, creation exemption false. |
-| Release | Same checks and PR safeguards for release/**; squash and merge allowed, no linear-history rule. Creation exemption true permits starting a release branch; subsequent updates require checks. Separate deletion guard retained. |
-| Tags | v* updates, deletion and force pushes blocked. |
-| Traffic | traffic-history deletion and force pushes blocked; no PR requirement. Workflow and guide in [TRAFFIC.md](TRAFFIC.md); the branch, the `analytics` environment and its token are #14 work. |
-| Bypasses | Both repositories' five rulesets active, with no bypass actors or excluded refs. |
-| Actions | All actions allowed with full-length SHA pinning required; default token reads contents/packages; Actions-created/approved PRs off. Private-fork workflows and cross-repository access off; retention 90 days. |
-| Dependency security | Dependency graph and Dependabot alerts on; automatic dependency submission, malware alerts, security/grouped updates off; zero auto-triage rules. Version-update configuration present; standard GitHub runner. |
+| Private vulnerability reporting | On |
+| Secret scanning (Secret Protection) and push protection | On |
+| Secret scanning: non-provider patterns, validity checks | Off |
+| Dependabot alerts | On |
+| Dependabot security updates | Off |
+| Code scanning default setup | Not configured; code scanning runs in advanced setup ([CI.md](CI.md#code-scanning)), which default setup would break |
 
-The controls above are aligned. Local release/0.1.0 and setup-only workflow scope
-are intentional project differences. Source credentials, collaborators,
-integrations and access grants were not copied. Traffic implementation in the
-reference does not establish local completion. Scanning and reporting
-availability, before and after the repository became public, is documented in
-[SECURITY.md](../SECURITY.md); no additional scanner coverage is claimed by
-this settings change.
+**Actions.** Actions enabled and all actions allowed, with full-length
+commit-SHA pinning required. The default workflow token is read-only, and
+workflows may not create or approve pull requests.
 
-## Saved target rulesets
+**Rulesets.** All five are active, with no bypass actors and no excluded refs.
 
-- [Protect main](https://github.com/danielep71/K-CVA/rules/25781886)
-- [Protect release branches](https://github.com/danielep71/K-CVA/rules/25781928)
-- [Release deletion guard](https://github.com/danielep71/K-CVA/rules/25781993)
-- [Release tags](https://github.com/danielep71/K-CVA/rules/25781957)
-- [Traffic history](https://github.com/danielep71/K-CVA/rules/25782014)
+| Ruleset (id) | Applies to | Rules |
+| --- | --- | --- |
+| Protect main (25781886) | The default branch | No deletion or force push. A pull request with resolved conversations and zero required approvals; merge commits only. `Repository integrity` from GitHub Actions (integration 15368) on an up-to-date branch, also when the branch is created. |
+| Protect release branches (25781928) | `release/**` | As main, but squash or merge commits allowed, and the check is not required when a release branch is created. |
+| Prevent release branch deletion (25781993) | `release/**` | No deletion. |
+| Protect release tags (25781957) | `v*` tags | No update, deletion or force push. |
+| Protect traffic history (25782014) | `traffic-history` | No deletion or force push; no pull request required, so the Traffic history workflow can push ([TRAFFIC.md](TRAFFIC.md)). |
 
-The UI confirmed both source-branch rulesets saved; independent REST readback
-confirmed the exact check name, GitHub Actions source, strict policy and creation
-settings. No visibility, credential, collaborator, integration or publication
-change was made. Future changes must update this snapshot and governance.
+## Evidence
+
+- [repository-settings-2026-10-31.json](evidence/repository-settings-2026-10-31.json)
+  is the first `--check` report. Every setting it could read matched. It
+  could not read the Dependabot-alert switch or the Actions permissions,
+  which the environment it ran in may not query; those six settings are
+  recorded as unread and await a check with the maintainer's token.
+- [repository-rulesets-2026-10-24.json](evidence/repository-rulesets-2026-10-24.json)
+  is the earlier, hand-made ruleset read-back, kept as history. It names the
+  repository by its former name, MKT-K-CVA.
+
+Scanning and reporting availability is described in
+[SECURITY.md](../SECURITY.md#current-visibility).
