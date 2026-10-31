@@ -86,6 +86,8 @@ CVA calculation, public API or workbook.
   reviewed Dependabot updates of the pinned actions and the hash-locked
   Python packages, and a weekly report of broken external links
   ([docs/CI.md](docs/CI.md); #6, #9, #118, #119, #120).
+- CodeQL code scanning in advanced setup for the Python tooling, the label
+  scripts and the workflows ([docs/CI.md](docs/CI.md#code-scanning); #117).
 - The issue forms, labels and issue-triage check, and the pull request
   template (PR #1, #7).
 - The regulatory basis (the EU CRR as amended by CRR3, BA-CVA first, then
@@ -119,8 +121,9 @@ CVA calculation, public API or workbook.
 - There is no calculation, public API, workbook or numerical test case other
   than an illustrative format example. Methodology decisions M4 and M6 are
   open, and M5 and M7 in part ([docs/DECISIONS.md](docs/DECISIONS.md)).
-- The repository is public. Code scanning is not configured; secret scanning
-  and push protection cover GitHub's supported secret patterns only
-  ([SECURITY.md](SECURITY.md#current-visibility); #108).
+- The repository is public. CodeQL scans the Python tooling, the label
+  scripts and the workflows, not the VBA source, which it cannot analyse;
+  secret scanning and push protection cover GitHub's supported secret
+  patterns only ([SECURITY.md](SECURITY.md#current-visibility); #108, #117).
 
 [Unreleased]: https://github.com/danielep71/K-CVA/commits/main

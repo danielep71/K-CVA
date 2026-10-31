@@ -75,7 +75,7 @@ the repository API read the settings below back the same day:
 | Private vulnerability reporting | Enabled; the reporting route above, with the email route as the alternative. |
 | Secret scanning (Secret Protection) | Enabled, for GitHub's supported secret patterns. Non-provider patterns and validity checks are disabled. |
 | Push protection | Enabled: pushes containing a supported secret are blocked. |
-| Code scanning (CodeQL) | Not configured; no code scanning coverage is claimed. |
+| Code scanning (CodeQL) | Advanced setup since 2026-10-31 (#117): [`.github/workflows/codeql.yml`](.github/workflows/codeql.yml) analyses the Python tooling, the JavaScript label scripts and the workflows with the `security-extended` queries. The VBA source is not scanned: CodeQL has no VBA support. GitHub's **default setup must stay off**; it cannot run beside an advanced-setup workflow. |
 | Dependency graph, Dependabot alerts | Enabled; Dependabot security updates disabled, as in the snapshot below. |
 
 Secret scanning covers the patterns GitHub supports, not every credential
