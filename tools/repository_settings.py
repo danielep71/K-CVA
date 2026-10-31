@@ -187,12 +187,16 @@ def apply(client: Client, desired: Mapping[str, Any], live: Mapping[str, Any]) -
 
     general = {key: want for key, want in desired["general"].items()
                if live["general"].get(key) != want and f"general.{key}" not in NEVER_APPLIED}
+    # The repository PATCH takes only the secret-scanning switches; Dependabot
+    # security updates have their own endpoint, below.
     analysis = {key: {"status": want} for key, want in desired["security"].items()
-                if key.startswith(("secret_scanning", "dependabot_security_updates"))
-                and live["security"].get(key) != want}
+                if key.startswith("secret_scanning") and live["security"].get(key) != want}
     if general or analysis:
         send("PATCH", "", general | ({"security_and_analysis": analysis} if analysis else {}))
     security = desired["security"]
+    updates = security.get("dependabot_security_updates")
+    if updates is not None and live["security"].get("dependabot_security_updates") != updates:
+        send("PUT" if updates == "enabled" else "DELETE", "/automated-security-fixes")
     if live["security"].get("private_vulnerability_reporting") != security["private_vulnerability_reporting"]:
         send("PUT" if security["private_vulnerability_reporting"] else "DELETE", "/private-vulnerability-reporting")
     if live["security"].get("vulnerability_alerts") != security["vulnerability_alerts"]:

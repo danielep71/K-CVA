@@ -19,9 +19,9 @@ RULESET: dict[str, Any] = {"name": "Protect main", "target": "branch", "enforcem
 DESIRED: dict[str, Any] = {
     "repository": "owner/repo",
     "general": {"visibility": "public", "allow_rebase_merge": True, "delete_branch_on_merge": True},
-    "security": {"secret_scanning": "enabled", "secret_scanning_push_protection": "enabled",
-                 "private_vulnerability_reporting": True, "vulnerability_alerts": True,
-                 "code_scanning_default_setup": "not-configured"},
+    "security": {"dependabot_security_updates": "disabled", "secret_scanning": "enabled",
+                 "secret_scanning_push_protection": "enabled", "private_vulnerability_reporting": True,
+                 "vulnerability_alerts": True, "code_scanning_default_setup": "not-configured"},
     "actions": {"enabled": True, "allowed_actions": "all", "sha_pinning_required": True,
                 "default_workflow_permissions": "read", "can_approve_pull_request_reviews": False},
     "rulesets": [RULESET],
@@ -34,7 +34,8 @@ class FakeGitHub:
     def __init__(self) -> None:
         self.repo: dict[str, Any] = {
             "visibility": "public", "allow_rebase_merge": True, "delete_branch_on_merge": True,
-            "security_and_analysis": {"secret_scanning": {"status": "enabled"},
+            "security_and_analysis": {"dependabot_security_updates": {"status": "disabled"},
+                                      "secret_scanning": {"status": "enabled"},
                                       "secret_scanning_push_protection": {"status": "enabled"}}}
         self.pvr = True
         self.alerts = True
@@ -53,10 +54,16 @@ class FakeGitHub:
         if path == "":
             if method == "PATCH":
                 analysis = body.pop("security_and_analysis", {})
+                if "dependabot_security_updates" in analysis:
+                    return 422, {"message": "dependabot_security_updates is not a PATCH parameter"}
                 self.repo.update(body)
                 for key, value in analysis.items():
                     self.repo["security_and_analysis"][key] = value
             return 200, copy.deepcopy(self.repo)
+        if path == "/automated-security-fixes" and method in ("PUT", "DELETE"):
+            status = "enabled" if method == "PUT" else "disabled"
+            self.repo["security_and_analysis"]["dependabot_security_updates"] = {"status": status}
+            return 204, None
         if path == "/private-vulnerability-reporting":
             if method != "GET":
                 self.pvr = method == "PUT"
@@ -157,6 +164,15 @@ class ApplyTests(unittest.TestCase):
         self.assertEqual(code, 0, output)
         self.assertEqual(github.writes, ["PATCH ", "PUT /vulnerability-alerts", "PATCH /code-scanning/default-setup",
                                          "PUT /actions/permissions/workflow", "PUT /rulesets/1"])
+        self.assertEqual(run(github, "--check")[0], 0)
+
+    def test_dependabot_security_updates_use_their_own_endpoint(self) -> None:
+        github = FakeGitHub()
+        github.repo["security_and_analysis"]["dependabot_security_updates"] = {"status": "enabled"}
+        self.assertEqual(run(github, "--check")[0], 1)
+        code, output = run(github, "--apply")
+        self.assertEqual(code, 0, output)
+        self.assertEqual(github.writes, ["DELETE /automated-security-fixes"])
         self.assertEqual(run(github, "--check")[0], 0)
 
     def test_missing_ruleset_is_created_extra_is_kept(self) -> None:
