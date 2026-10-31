@@ -56,11 +56,11 @@ Do not weaken organization macro or endpoint policy to run a workbook.
 | CodeQL | On PRs and pushes to main and release/**, and weekly. A gate job reads the visibility with contents:read; only the analysis job holds security-events:write, to upload results. See [code scanning](docs/CI.md#code-scanning). |
 | External links | Weekly and on dispatch; reads contents and requests the external URLs linked from the documentation. No write permission. |
 | Pull request milestones | On pull_request_target, pushes to main and daily. Holds pull-requests:write only, never checks out or runs pull-request code, and refuses to change an issue. See [pull request milestones](docs/CI.md#pull-request-milestones). |
+| Traffic history | Daily and on dispatch, from main only, in the `analytics` environment. A GitHub App installation token with Administration: read only, valid for an hour and revoked at the job's end, reaches only the curl fetch step; the job pushes the data branch with contents:write. See [TRAFFIC.md](docs/TRAFFIC.md#credential-setup-and-renewal). |
 | Dependabot version updates | Weekly GitHub Actions dependency-update PRs targeting release/0.1.0, assigned to the maintainer. No automatic approval or merge; maintainer final-head review is required. |
 
 The workflow files pin actions to full SHAs and disable persisted checkout
-credentials. No traffic token or traffic workflow is established by this issue.
-Traffic collection belongs to #14. Universal repository CI was delivered by #6
+credentials. Universal repository CI was delivered by #6
 through PR #30 and integrated into main by PR #32; required-check enforcement
 was configured under #12 for main and release/**. The controlled enforcement
 demonstration remains #13. A green metadata check is not a security scan.

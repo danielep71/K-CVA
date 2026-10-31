@@ -17,31 +17,42 @@ branch is skipped.
 
 ## Credential setup and renewal
 
-The traffic API needs a token with **Administration: read** on the
-repository. The workflow token cannot be given that permission, so a
-fine-grained personal access token is used.
+The traffic API needs **Administration: read** on the repository, which the
+workflow token cannot have. A GitHub App that you own, installed on this
+repository only and holding that single permission, provides it. Each run mints
+an installation token from the App's private key: limited to this repository
+and to Administration: read, valid for one hour, and revoked when the job ends.
+No long-lived token is stored.
 
 1. **Settings → Environments → New environment** `analytics`. Under
    *Deployment branches and tags*, select *Selected branches and tags* and
    allow `main` only. Do this before adding the secret: a run that names a
    missing environment creates it without that restriction.
-2. **Settings → Developer settings → Fine-grained tokens → Generate new
-   token**: resource owner `danielep71`, *Only select repositories*:
-   `K-CVA`, repository permission **Administration: Read-only**, nothing
-   else. Set an expiry of at most 90 days.
-3. In the `analytics` environment, add the secret **TRAFFIC_TOKEN** with that
-   token. Never put the token in a file, issue, comment or chat.
-4. Run the workflow manually on `main` and check that it passes and that
+2. **Settings → Developer settings → GitHub Apps → New GitHub App**:
+   - a name, for example `K-CVA traffic`, and the repository URL as homepage;
+   - **Webhook**: clear *Active*;
+   - **Repository permissions**: **Administration: Read-only**, nothing else
+     (*Metadata: Read-only* is added by GitHub);
+   - **Where can this GitHub App be installed?** *Only on this account*.
+3. On the App's page, note its **Client ID**, then **Generate a private key**;
+   a `.pem` file downloads.
+4. **Install App** → your account → *Only select repositories*: `K-CVA`.
+5. In the `analytics` environment, add the variable **TRAFFIC_APP_CLIENT_ID**
+   with the client ID, and the secret **TRAFFIC_APP_PRIVATE_KEY** with the whole
+   content of the `.pem` file. Then delete the `.pem` file. Never put the key
+   in a file in the repository, an issue, a comment or a chat.
+6. Run the workflow manually on `main` and check that it passes and that
    `traffic-history` gains a commit.
 
-**Renewal:** before the token expires, and at least every 90 days, generate a
-new token with the same settings, replace the secret, and repeat step 4.
-Revoke the token at once if it may have been exposed, or if the workflow is
-changed by anyone but the maintainer. Collections missed while the token is
-invalid are lost once they fall outside the 14-day window.
+**Key rotation:** the key does not expire. Generate a new key on the App's
+page, replace the secret, run step 6, then delete the old key there. Do this
+at once if the key may have been exposed, or if the workflow is changed by
+anyone but the maintainer. Collections missed while the App cannot be used are
+lost once they fall outside the 14-day window.
 
-Only the fetch step receives `TRAFFIC_TOKEN`, and it runs `curl` only. The
-merge script runs without it, and the push uses the workflow token with
+Only the token step receives the private key, and only the fetch step, which
+runs `curl` and no repository code, receives the installation token. The merge
+script runs without either, and the push uses the workflow token with
 `contents: write`.
 
 ## Stored data
@@ -137,9 +148,10 @@ invalid, and leaves the history unchanged. Read the failing step:
 
 | Step and message | Cause | Action |
 | --- | --- | --- |
-| *Fetch*: `TRAFFIC_TOKEN is not set` | Secret missing, or the run is not in the `analytics` environment. | Follow the credential setup. |
-| *Fetch*: HTTP 401 | Token expired or revoked. | Renew the token. |
-| *Fetch*: HTTP 403 or 404 | Token lacks *Administration: read* on this repository. | Regenerate it with the settings above. |
+| *Create the GitHub App token* fails | The variable or the secret is missing, the run is not in the `analytics` environment, the key was deleted on the App, or the App is not installed on this repository. | Follow the credential setup; rotate the key if it was deleted. |
+| *Create the GitHub App token*: permission error | The App does not hold *Administration: read*, or its new permission was not accepted on the installation. | Set the permission on the App and accept it on the installation. |
+| *Fetch*: `The GitHub App token is missing` | The token step produced no token. | Read the token step's log. |
+| *Fetch*: HTTP 401, 403 or 404 | The token lacks *Administration: read* on this repository. | Check the App's permission and installation. |
 | *Fetch*: HTTP 429 or 5xx after retries | Rate limit or GitHub outage. | Run it again later; the next run collects the same 14 days. |
 | *Merge*: `ERROR: ...; the history was not changed` | The API returned an unexpected shape, or a history file no longer has the expected layout. | Inspect the response or the named file; a file edited by hand must keep its header and columns. |
 | *Commit and push*: `Could not push the history` | `traffic-history` kept moving, or a rule rejected the push. | Check the branch's rules and recent commits, then run again. |

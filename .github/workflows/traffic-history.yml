@@ -9,12 +9,16 @@ run-name: "Traffic history — ${{ github.event_name }}"
 # tests. Operation, credentials and recovery: docs/TRAFFIC.md.
 #
 # Credentials
-#   TRAFFIC_TOKEN, a fine-grained personal access token limited to this
-#   repository with Administration: read (the traffic API needs it; the
-#   workflow token cannot read traffic), stored in the `analytics`
-#   environment, whose deployment branches are limited to the default branch.
-#   Only the fetch step receives it; that step runs curl and no repository
-#   code. The workflow token pushes the history, with contents: write.
+#   The traffic API needs Administration: read, which the workflow token
+#   cannot have. A GitHub App installed on this repository only, with that one
+#   permission, provides it: its client ID is the `analytics` environment
+#   variable TRAFFIC_APP_CLIENT_ID and its private key the environment secret
+#   TRAFFIC_APP_PRIVATE_KEY. The environment's deployment branches are limited
+#   to the default branch. Only the token step receives the key; it mints an
+#   installation token for this repository with Administration: read, valid
+#   for one hour and revoked when the job ends. Only the fetch step, which
+#   runs curl and no repository code, receives that token. The workflow token
+#   pushes the history, with contents: write.
 
 on:
   schedule:
@@ -68,15 +72,24 @@ jobs:
         with:
           python-version: "3.12.14"
 
+      - name: Create the GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        with:
+          # With no owner or repositories, the token is limited to this repository.
+          client-id: ${{ vars.TRAFFIC_APP_CLIENT_ID }}
+          private-key: ${{ secrets.TRAFFIC_APP_PRIVATE_KEY }}
+          permission-administration: read
+
       - name: Fetch traffic from the GitHub API
         id: fetch
         env:
-          TRAFFIC_TOKEN: ${{ secrets.TRAFFIC_TOKEN }}
+          APP_TOKEN: ${{ steps.app-token.outputs.token }}
           API: ${{ github.api_url }}/repos/${{ github.repository }}/traffic
         run: |
           set -euo pipefail
-          if [ -z "${TRAFFIC_TOKEN:-}" ]; then
-            echo "::error::TRAFFIC_TOKEN is not set in the analytics environment (docs/TRAFFIC.md)"
+          if [ -z "${APP_TOKEN:-}" ]; then
+            echo "::error::The GitHub App token is missing (docs/TRAFFIC.md, Credential setup)"
             exit 1
           fi
           echo "collected_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_OUTPUT"
@@ -88,7 +101,7 @@ jobs:
           for resource in views clones; do
             curl --silent --show-error --location --fail-with-body \
               --retry 5 --retry-max-time 300 --max-time 60 \
-              --header "Authorization: Bearer $TRAFFIC_TOKEN" \
+              --header "Authorization: Bearer $APP_TOKEN" \
               --header "Accept: application/vnd.github+json" \
               --header "X-GitHub-Api-Version: 2026-03-10" \
               --output "$RAW/$resource.json" \
