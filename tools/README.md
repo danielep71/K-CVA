@@ -18,6 +18,10 @@ fixtures in test_check_changelog.py; it never tags or publishes.
 check_excel_run.py checks the evidence folder of an Excel run against its
 commit (INSTALLATION.md, Recording an Excel run), with fixtures in
 test_check_excel_run.py; it is not a gate, since it needs a host run.
+check_workflows.py parses the workflows as YAML and checks their permissions,
+timeouts, pins, checkout credentials and the required check
+(docs/CI.md, Workflow rules), with fixtures in test_check_workflows.py.
+requirements.txt locks its parser, PyYAML, with the hash of every wheel.
 traffic_history.py merges traffic API responses into the traffic-history
 branch (docs/TRAFFIC.md), with fixtures in test_traffic_history.py. Build and
 evidence scripts may be added here with their own contracts. Regulatory

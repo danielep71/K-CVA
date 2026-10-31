@@ -108,13 +108,7 @@ def main():
                         if not (Path(path).parent / target.split('#')[0]).exists():
                             raise RuntimeError('Missing relative link: ' + path + ': ' + target)
         workflows = sorted(str(p) for p in Path('.github/workflows').glob('*.y*ml'))
-        for path in workflows:
-            text = Path(path).read_text()
-            for use in re.findall(r'uses:\s*(\S+)', text):
-                if not re.fullmatch(r'[\w.-]+/[\w./-]+@[0-9a-f]{40}', use):
-                    raise RuntimeError('Unpinned action: ' + use)
-            if 'actions/checkout@' in text and 'persist-credentials: false' not in text:
-                raise RuntimeError('Checkout credentials persist: ' + path)
+        run('workflow-rules', [sys.executable, 'tools/check_workflows.py'])
         validator = actionlint()
         run('actionlint-version', [validator, '-version'])
         run('workflow-validation', [validator, '-shellcheck=', '-pyflakes=', *workflows])
