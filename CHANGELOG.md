@@ -88,6 +88,10 @@ CVA calculation, public API or workbook.
   ([docs/CI.md](docs/CI.md); #6, #9, #118, #119, #120).
 - CodeQL code scanning in advanced setup for the Python tooling, the label
   scripts and the workflows ([docs/CI.md](docs/CI.md#code-scanning); #117).
+  Alert dispositions are recorded in
+  [SECURITY.md](SECURITY.md#code-scanning-alerts). The label scripts show
+  text from the GitHub API in their run summaries only as code spans that
+  the text cannot close.
 - A workflow that clears milestones set on pull requests, so that milestones
   stay on issues ([docs/CI.md](docs/CI.md#pull-request-milestones); #122).
 - Repository settings as code: the desired general, security and Actions
