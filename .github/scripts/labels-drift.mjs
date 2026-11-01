@@ -278,13 +278,22 @@ function buildReport({ repository, manifestPath, policyPath, manifest, selection
   };
 }
 
-function markdownEscape(value) {
-  return String(value).replaceAll("|", "\\|").replaceAll("\n", " ");
+// Text from the GitHub API (live labels, error responses) is shown only as a
+// code span. The fence is one backtick longer than any backtick run in the
+// text, so the text cannot close the span and add links or images to the
+// summary. Line breaks become spaces; in a table cell, "|" is escaped.
+function inlineCode(value, inTable = false) {
+  let text = String(value).replace(/\r\n|\r|\n/g, " ");
+  if (inTable) text = text.replaceAll("|", "\\|");
+  const longest = Math.max(0, ...Array.from(text.matchAll(/`+/g), match => match[0].length));
+  const fence = "`".repeat(longest + 1);
+  const pad = text === "" || text.startsWith("`") || text.endsWith("`") ? " " : "";
+  return `${fence}${pad}${text}${pad}${fence}`;
 }
 
 function compactLabel(label) {
   if (label === null) return "—";
-  return `\`${markdownEscape(label.name)}\` / \`${label.color}\` / ${markdownEscape(label.description)}`;
+  return `${inlineCode(label.name, true)} / ${inlineCode(label.color, true)} / ${inlineCode(label.description, true)}`;
 }
 
 function markdownReport(report) {
@@ -312,7 +321,7 @@ function markdownReport(report) {
     );
     for (const difference of report.differences) {
       lines.push(
-        `| ${difference.action} | \`${markdownEscape(difference.name)}\` | `
+        `| ${difference.action} | ${inlineCode(difference.name, true)} | `
         + `${difference.fields.length > 0 ? difference.fields.join(", ") : "—"} | `
         + `${compactLabel(difference.observed)} | ${compactLabel(difference.desired)} |`
       );
@@ -352,6 +361,15 @@ async function checkedReport(parameters) {
 }
 
 async function runSelfTest(manifestPath, policyPath) {
+  assert.equal(inlineCode("plain"), "`plain`");
+  assert.equal(inlineCode("a`b"), "``a`b``");
+  assert.equal(inlineCode("`x`"), "`` `x` ``");
+  assert.equal(inlineCode("x ``y`` z"), "```x ``y`` z```");
+  assert.equal(inlineCode("[a](https://example.com)` ![i](x)"), "``[a](https://example.com)` ![i](x)``");
+  assert.equal(inlineCode("one\r\ntwo\nthree"), "`one two three`");
+  assert.equal(inlineCode("a|b", true), "`a\\|b`");
+  assert.equal(inlineCode("a|b"), "`a|b`");
+  assert.equal(inlineCode(""), "`  `");
   for (const [header, attempt, expected] of [
     [null, 0, 1000], [null, 2, 4000], ["", 1, 2000],
     ["invalid", 1, 2000], ["-1", 1, 2000], ["0", 2, 0],
