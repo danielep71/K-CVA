@@ -85,6 +85,15 @@ Secret scanning covers the patterns GitHub supports, not every credential
 format; the data and credential rules above still apply. The 2026-10-24
 observations below describe the former private configuration.
 
+### Code scanning alerts
+
+Every CodeQL alert is either fixed or dismissed on GitHub with a reason, and
+its disposition is recorded here.
+
+| Alert | Finding | Disposition |
+| --- | --- | --- |
+| CodeQL alert 1 (medium, `js/http-to-file-access`) | *Network data written to file*: `.github/scripts/labels-sync.mjs` writes its run summary, which includes live label names and GitHub API error text, to `GITHUB_STEP_SUMMARY`. | **Won't fix**, maintainer decision of 2026-11-01. Writing that summary is the code's purpose. The data comes from this repository's own labels, which only people with triage access can create, and from authenticated `api.github.com` responses. GitHub sanitises job summaries, so the remaining risk was Markdown injection into a public run summary. Both label scripts now show API text only as code spans it cannot close. CodeQL still reports the flow, because it reports any network data written to a file. |
+
 ## Historical feature status and limitations
 
 Snapshot: **2026-10-24**, verified in this repository's signed-in

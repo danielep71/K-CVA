@@ -271,7 +271,9 @@ uploads fail.
   upload its results; the gate reads with `contents: read`.
 
 Alerts appear on the repository's Security tab. CodeQL is not a required
-check; triage its alerts like any other finding.
+check; triage its alerts like any other finding. Fix an alert, or dismiss it
+on GitHub with a reason, and record either disposition in
+[SECURITY.md](../SECURITY.md#code-scanning-alerts).
 
 ## Pull request milestones
 
