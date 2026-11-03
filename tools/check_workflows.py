@@ -4,6 +4,7 @@ Every workflow is parsed as YAML (PyYAML, hash-locked in tools/requirements.txt)
 not matched with regular expressions. Rules (docs/CI.md, Workflow rules):
 
 - the workflow sets top-level ``permissions`` as a mapping with no write scope;
+- every job sets its own ``permissions``, so none relies on inheritance;
 - every write scope of a job is listed in ``WRITE_ALLOWED`` for that job;
 - every job has a positive ``timeout-minutes`` of at most ``MAX_TIMEOUT``;
 - every ``uses:`` names an action or workflow at a full commit SHA;
@@ -110,8 +111,10 @@ def check(name: str, workflow: Mapping[Any, Any]) -> list[str]:
         if not isinstance(job, dict):
             found.append(f"{where}: not a mapping")
             continue
-        scopes = write_scopes(job["permissions"]) if "permissions" in job else set()
-        if scopes is None:
+        scopes = write_scopes(job["permissions"]) if "permissions" in job else None
+        if "permissions" not in job:
+            found.append(f"{where}: permissions must be set on the job")
+        elif scopes is None:
             found.append(f"{where}: permissions must be an explicit mapping")
         else:
             extra = scopes - WRITE_ALLOWED.get((name, str(job_id)), frozenset())

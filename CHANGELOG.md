@@ -81,8 +81,9 @@ CVA calculation, public API or workbook.
   and issue-form configuration, Ruff and strict mypy on the Python tooling,
   relative Markdown links and their anchors, the test-case format, the
   changelog, static
-  checks of the exported VBA source, the workflows (permissions, timeouts,
-  pins and the required check, parsed as YAML) and whitespace; and
+  checks of the exported VBA source, the workflows (explicit permissions on
+  every job, timeouts, pins and the required check, parsed as YAML) and
+  whitespace; and
   reviewed Dependabot updates of the pinned actions and the hash-locked
   Python packages, and a weekly report of broken external links
   ([docs/CI.md](docs/CI.md); #6, #9, #118, #119, #120).
