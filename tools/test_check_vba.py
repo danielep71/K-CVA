@@ -150,12 +150,15 @@ def repository(files: Mapping[str, str | bytes], *, attributes: bool = True) -> 
         subprocess.run(["git", "init", "-q", str(root)], check=True)
         if attributes:
             shutil.copyfile(ROOT / ".gitattributes", root / ".gitattributes")
-        for relative, data in files.items():
+        for relative, content in files.items():
             path = root / relative
             path.parent.mkdir(parents=True, exist_ok=True)
-            if isinstance(data, str):
-                data = data.replace("\n", "\r\n").encode("ascii", errors="surrogateescape") \
-                    if relative.endswith((".bas", ".cls", ".frm")) else data.encode("utf-8")
+            if isinstance(content, bytes):
+                data = content
+            elif relative.endswith((".bas", ".cls", ".frm")):
+                data = content.replace("\n", "\r\n").encode("ascii", errors="surrogateescape")
+            else:
+                data = content.encode("utf-8")
             path.write_bytes(data)
         subprocess.run(["git", "-C", str(root), "-c", "core.autocrlf=false", "-c",
                         "core.safecrlf=false", "add", "--all"], check=True)
@@ -792,7 +795,7 @@ class PublicApiTest(unittest.TestCase):
         facade = API_FACADE.replace("Private Sub Helper()", "Public Function CVA_Pad( _\n"
                                     '    Optional ByVal Text As String = "A  ( B )") _\n'
                                     "    As String\nEnd Function\n\nPrivate Sub Helper()")
-        exact = api_inventory(API_ROWS + [("Function", "CVA_Pad", 'Public Function CVA_Pad('
+        exact = api_inventory([*API_ROWS, ("Function", "CVA_Pad", 'Public Function CVA_Pad('
                                            'Optional ByVal Text As String = "A  ( B )") '
                                            "As String")])
         self.assertEqual(self.findings(api_files(facade, exact)), [])
@@ -804,7 +807,7 @@ class PublicApiTest(unittest.TestCase):
         facade = API_FACADE.replace("Private Sub Helper()", "Public Function CVA_Say("
                                     'Optional ByVal Text As String = " declare ") As String\n'
                                     "End Function\n\nPrivate Sub Helper()")
-        rows = api_inventory(API_ROWS + [("Function", "CVA_Say", "Public Function CVA_Say("
+        rows = api_inventory([*API_ROWS, ("Function", "CVA_Say", "Public Function CVA_Say("
                                           'Optional ByVal Text As String = " declare ") As String')])
         self.assertEqual(self.findings(api_files(facade, rows)), [])
 

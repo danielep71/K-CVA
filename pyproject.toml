@@ -1,0 +1,33 @@
+# Configuration of the Python quality gates run by tools/check_repository.py
+# (docs/CI.md). The tooling is not a package; nothing here builds or installs it.
+
+[tool.ruff]
+target-version = "py312"
+# The existing tooling is written to about 120 columns; wrapping it to a
+# narrower limit would be churn without a reader benefit.
+line-length = 120
+src = ["tools"]
+
+[tool.ruff.lint]
+# An explicit selection, so a new Ruff default cannot silently change the gate.
+select = ["E", "W", "F", "I", "B", "UP", "SIM", "RUF", "PLE", "PLW", "S"]
+ignore = [
+    # The tools run fixed argument lists (git, node, the Python interpreter),
+    # never a shell or a command built from input; resolving git and node
+    # through PATH is the documented setup (INSTALLATION.md).
+    "S603",
+    "S607",
+]
+
+[tool.ruff.lint.per-file-ignores]
+# unittest tests may assert inside helpers.
+"tools/test_*.py" = ["S101"]
+# The VBA fixtures reproduce real source lines; wrapping them would change the source.
+"tools/test_check_vba.py" = ["S101", "E501"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["tools"]
+mypy_path = "tools"
+warn_unreachable = true

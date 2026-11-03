@@ -12,6 +12,7 @@ from __future__ import annotations
 import re
 import unittest
 from pathlib import Path
+from typing import ClassVar
 
 ROOT = Path(__file__).resolve().parents[1]
 EXAMPLES = ROOT / "tests/modules/TEST_Examples.bas"
@@ -39,7 +40,7 @@ def procedures(text: str) -> dict[str, str]:
 class ExampleSuiteTest(unittest.TestCase):
     text = source(EXAMPLES)
     bodies = procedures(text)
-    cases = {name: body for name, body in bodies.items() if name.startswith("Case")}
+    cases: ClassVar[dict[str, str]] = {name: body for name, body in bodies.items() if name.startswith("Case")}
 
     def test_runner_calls_every_case_once_in_order(self) -> None:
         runner = self.bodies["RunSuite"]

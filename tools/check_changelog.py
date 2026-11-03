@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import argparse
 import datetime
+import itertools
 import re
 import sys
 from collections.abc import Sequence
@@ -79,7 +80,7 @@ def check_changelog(text: str) -> list[str]:
             findings.append(f"{CHANGELOG}: [{label}] date {dated.group(1)} is not a calendar date")
         releases.append((tuple(int(part) for part in label.split(".")), dated.group(1)))
         findings.extend(link_problems(text, label))
-    for newer, older in zip(releases, releases[1:], strict=False):
+    for newer, older in itertools.pairwise(releases):
         if newer[0] <= older[0] or newer[1] < older[1]:
             findings.append(f"{CHANGELOG}: releases must be listed newest first, by version "
                             "and date")

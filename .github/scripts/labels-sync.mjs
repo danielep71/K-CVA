@@ -372,6 +372,19 @@ function markdownEscape(value) {
   return String(value).replaceAll("|", "\\|").replaceAll("\n", " ");
 }
 
+// Text from the GitHub API (live labels, error responses) is shown only as a
+// code span. The fence is one backtick longer than any backtick run in the
+// text, so the text cannot close the span and add links or images to the
+// summary. Line breaks become spaces; in a table cell, "|" is escaped.
+function inlineCode(value, inTable = false) {
+  let text = String(value).replace(/\r\n|\r|\n/g, " ");
+  if (inTable) text = text.replaceAll("|", "\\|");
+  const longest = Math.max(0, ...Array.from(text.matchAll(/`+/g), match => match[0].length));
+  const fence = "`".repeat(longest + 1);
+  const pad = text === "" || text.startsWith("`") || text.endsWith("`") ? " " : "";
+  return `${fence}${pad}${text}${pad}${fence}`;
+}
+
 function renderLabelNames(labels) {
   if (labels.length === 0) return "none";
   return labels.map(label => markdownEscape(JSON.stringify(label.name))).join(", ");
@@ -423,14 +436,14 @@ function renderSummary({
     `- Complete resolved set (${resolvedLabels.length}): ${renderLabelNames(resolvedLabels)}`
   );
   if (error) {
-    lines.push("", "## Failure", "", `\`${markdownEscape(error)}\``);
+    lines.push("", "## Failure", "", inlineCode(error));
   } else if (changes.length === 0) {
     lines.push("", "No label changes are required.");
   } else {
     lines.push("", "| Action | Label | Detail |", "|---|---|---|");
     for (const change of changes) {
       const detail = change.action === "update" ? change.fields.join(", ") : change.action === "delete" ? "outside selected manifest" : "missing live label";
-      lines.push(`| ${change.action} | \`${markdownEscape(change.name)}\` | ${markdownEscape(detail)} |`);
+      lines.push(`| ${change.action} | ${inlineCode(change.name, true)} | ${markdownEscape(detail)} |`);
     }
   }
   return `${lines.join("\n")}\n`;
@@ -446,6 +459,15 @@ function expectFailure(operation, pattern) {
 }
 
 async function runSelfTest(manifestPath, policyPath) {
+  assert.equal(inlineCode("plain"), "`plain`");
+  assert.equal(inlineCode("a`b"), "``a`b``");
+  assert.equal(inlineCode("`x`"), "`` `x` ``");
+  assert.equal(inlineCode("x ``y`` z"), "```x ``y`` z```");
+  assert.equal(inlineCode("[a](https://example.com)` ![i](x)"), "``[a](https://example.com)` ![i](x)``");
+  assert.equal(inlineCode("one\r\ntwo\nthree"), "`one two three`");
+  assert.equal(inlineCode("a|b", true), "`a\\|b`");
+  assert.equal(inlineCode("a|b"), "`a|b`");
+  assert.equal(inlineCode(""), "`  `");
   for (const [header, attempt, expected] of [
     [null, 0, 1000], [null, 2, 4000], ["", 1, 2000],
     ["invalid", 1, 2000], ["-1", 1, 2000], ["0", 2, 0],

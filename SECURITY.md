@@ -53,11 +53,14 @@ Do not weaken organization macro or endpoint policy to run a workbook.
 | Label drift | PR fixtures read contents; live checks read contents/issues. No label mutation. |
 | Issue triage | Reads contents, issues and pull requests; reports metadata violations without editing issues. |
 | Repository integrity | Reads contents; runs unfiltered PR/push checks for main and release/**, plus manual dispatch. Uploads diagnostic evidence retained for 30 days. No source or issue mutation; see [CI coverage](docs/CI.md). |
+| CodeQL | On PRs and pushes to main and release/**, and weekly. A gate job reads the visibility with contents:read; only the analysis job holds security-events:write, to upload results. See [code scanning](docs/CI.md#code-scanning). |
+| External links | Weekly and on dispatch; reads contents and requests the external URLs linked from the documentation. No write permission. |
+| Pull request milestones | On pull_request_target, pushes to main and daily. Holds pull-requests:write only, never checks out or runs pull-request code, and refuses to change an issue. See [pull request milestones](docs/CI.md#pull-request-milestones). |
+| Traffic history | Daily and on dispatch, from main only, in the `analytics` environment. A GitHub App installation token with Administration: read only, valid for an hour and revoked at the job's end, reaches only the curl fetch step; the job pushes the data branch with contents:write. The App is installed only on repositories whose traffic it collects; this repository's private key is its own, but could mint the same read-only access to each of them. See [TRAFFIC.md](docs/TRAFFIC.md#credential-setup-and-renewal). |
 | Dependabot version updates | Weekly GitHub Actions dependency-update PRs targeting release/0.1.0, assigned to the maintainer. No automatic approval or merge; maintainer final-head review is required. |
 
 The workflow files pin actions to full SHAs and disable persisted checkout
-credentials. No traffic token or traffic workflow is established by this issue.
-Traffic collection belongs to #14. Universal repository CI was delivered by #6
+credentials. Universal repository CI was delivered by #6
 through PR #30 and integrated into main by PR #32; required-check enforcement
 was configured under #12 for main and release/**. The controlled enforcement
 demonstration remains #13. A green metadata check is not a security scan.
@@ -75,12 +78,21 @@ the repository API read the settings below back the same day:
 | Private vulnerability reporting | Enabled; the reporting route above, with the email route as the alternative. |
 | Secret scanning (Secret Protection) | Enabled, for GitHub's supported secret patterns. Non-provider patterns and validity checks are disabled. |
 | Push protection | Enabled: pushes containing a supported secret are blocked. |
-| Code scanning (CodeQL) | Not configured; no code scanning coverage is claimed. |
+| Code scanning (CodeQL) | Advanced setup since 2026-10-31 (#117): [`.github/workflows/codeql.yml`](.github/workflows/codeql.yml) analyses the Python tooling, the JavaScript label scripts and the workflows with the `security-extended` queries. The VBA source is not scanned: CodeQL has no VBA support. GitHub's **default setup must stay off**; it cannot run beside an advanced-setup workflow. |
 | Dependency graph, Dependabot alerts | Enabled; Dependabot security updates disabled, as in the snapshot below. |
 
 Secret scanning covers the patterns GitHub supports, not every credential
 format; the data and credential rules above still apply. The 2026-10-24
 observations below describe the former private configuration.
+
+### Code scanning alerts
+
+Every CodeQL alert is either fixed or dismissed on GitHub with a reason, and
+its disposition is recorded here.
+
+| Alert | Finding | Disposition |
+| --- | --- | --- |
+| CodeQL alert 1 (medium, `js/http-to-file-access`) | *Network data written to file*: `.github/scripts/labels-sync.mjs` writes its run summary, which includes live label names and GitHub API error text, to `GITHUB_STEP_SUMMARY`. | **Won't fix**, maintainer decision of 2026-11-01. Writing that summary is the code's purpose. The data comes from this repository's own labels, which only people with triage access can create, and from authenticated `api.github.com` responses. GitHub sanitises job summaries, so the remaining risk was Markdown injection into a public run summary. Both label scripts now show API text only as code spans it cannot close. CodeQL still reports the flow, because it reports any network data written to a file. |
 
 ## Historical feature status and limitations
 

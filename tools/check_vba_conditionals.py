@@ -125,7 +125,7 @@ class ExpressionParser:
 
     def parse_atom(self) -> bool:
         token = self.take()
-        if token == "(":
+        if token == "(":  # noqa: S105 - a VBA expression token, not a password
             value = self.parse_or()
             if self.take() != ")":
                 raise ExpressionError("missing closing parenthesis")

@@ -14,7 +14,7 @@ For branch roles, final-head review, integration and evidence-based closure, see
 - When a prerequisite closes, review dependent issues and remove `blocked` once all prerequisites are resolved.
 - Apply `blocked` exactly while a named prerequisite issue is open or an external condition remains unresolved. Pull requests are references, not prerequisite issues.
 - Use only catalogue labels. Close issues when acceptance criteria and validation evidence are complete.
-- Assign milestones to issues only; link pull requests to the issues they implement.
+- Assign milestones to issues only; link pull requests to the issues they implement. A milestone set on a pull request is cleared automatically ([CI](CI.md#pull-request-milestones)).
 
 ## Automation
 
