@@ -10,9 +10,10 @@ run-name: "Traffic history — ${{ github.event_name }}"
 #
 # Credentials
 #   The traffic API needs Administration: read, which the workflow token
-#   cannot have. A GitHub App installed on this repository only, with that one
-#   permission, provides it: its client ID is the `analytics` environment
-#   variable TRAFFIC_APP_CLIENT_ID and its private key the environment secret
+#   cannot have. A GitHub App with that one permission, installed only on the
+#   repositories whose traffic it collects, provides it: its client ID is the
+#   `analytics` environment variable TRAFFIC_APP_CLIENT_ID, and this
+#   repository's own private key on it the environment secret
 #   TRAFFIC_APP_PRIVATE_KEY. The environment's deployment branches are limited
 #   to the default branch. Only the token step receives the key; it mints an
 #   installation token for this repository with Administration: read, valid

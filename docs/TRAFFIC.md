@@ -18,25 +18,32 @@ branch is skipped.
 ## Credential setup and renewal
 
 The traffic API needs **Administration: read** on the repository, which the
-workflow token cannot have. A GitHub App that you own, installed on this
-repository only and holding that single permission, provides it. Each run mints
-an installation token from the App's private key: limited to this repository
+workflow token cannot have. A GitHub App that you own provides it. The App
+holds that single permission and is installed only on the repositories whose
+traffic it collects. This repository has a private key of its own on the App.
+Each run mints an installation token from that key: limited to this repository
 and to Administration: read, valid for one hour, and revoked when the job ends.
-No long-lived token is stored.
+No long-lived token is stored. The key itself could mint the same read-only
+access to every repository the App is installed on, so keep the App's
+installations to repositories that collect traffic, and revoke the key at once
+if it may have been exposed.
 
 1. **Settings → Environments → New environment** `analytics`. Under
    *Deployment branches and tags*, select *Selected branches and tags* and
    allow `main` only. Do this before adding the secret: a run that names a
    missing environment creates it without that restriction.
-2. **Settings → Developer settings → GitHub Apps → New GitHub App**:
+2. **Settings → Developer settings → GitHub Apps**: reuse an App you own whose
+   only repository permission is *Administration: Read-only*, or create one
+   with **New GitHub App**:
    - a name, for example `K-CVA traffic`, and the repository URL as homepage;
    - **Webhook**: clear *Active*;
    - **Repository permissions**: **Administration: Read-only**, nothing else
      (*Metadata: Read-only* is added by GitHub);
    - **Where can this GitHub App be installed?** *Only on this account*.
 3. On the App's page, note its **Client ID**, then **Generate a private key**;
-   a `.pem` file downloads.
-4. **Install App** → your account → *Only select repositories*: `K-CVA`.
+   a `.pem` file downloads. This key is for this repository alone: never copy
+   a key already stored in another repository.
+4. **Install App** → your account → *Only select repositories*: add `K-CVA`.
 5. In the `analytics` environment, add the variable **TRAFFIC_APP_CLIENT_ID**
    with the client ID, and the secret **TRAFFIC_APP_PRIVATE_KEY** with the whole
    content of the `.pem` file. Then delete the `.pem` file. Never put the key
@@ -45,7 +52,8 @@ No long-lived token is stored.
    `traffic-history` gains a commit.
 
 **Key rotation:** the key does not expire. Generate a new key on the App's
-page, replace the secret, run step 6, then delete the old key there. Do this
+page, replace the secret, run step 6, then delete the old key there. Other
+repositories' keys on the same App are unaffected. Do this
 at once if the key may have been exposed, or if the workflow is changed by
 anyone but the maintainer. Collections missed while the App cannot be used are
 lost once they fall outside the 14-day window.
