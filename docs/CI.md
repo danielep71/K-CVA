@@ -237,6 +237,7 @@ error, so a later key cannot silently replace an earlier one.
 | Rule | Why |
 | --- | --- |
 | Top-level `permissions` is an explicit mapping with no write scope (`{}` or `read-all` also pass) | No job gets the default token permissions by omission |
+| Every job sets its own `permissions` mapping (`{}` for none), even when the top level is read-only | Each job's access is stated where the job is defined, not inherited |
 | A job may hold a write scope only if `WRITE_ALLOWED` in the checker names that job and scope | Each write permission is reviewed where it is granted; adding one changes the checker |
 | Every job sets `timeout-minutes` from 1 to 60, except one that calls a reusable workflow, which cannot | A stuck job cannot run for GitHub's default six hours |
 | Every `uses:` names an action or reusable workflow at a full 40-character commit SHA | Tags and branches can move |
