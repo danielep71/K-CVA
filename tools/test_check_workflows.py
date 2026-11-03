@@ -20,11 +20,12 @@ def workflow(jobs: str, top: str = "permissions:\n  contents: read\n",
                 + textwrap.indent(textwrap.dedent(jobs), "  "))
 
 
+JOB_PERMISSIONS = "  permissions:\n    contents: read\n"
 GOOD_JOB = f"""\
 build:
   runs-on: ubuntu-24.04
   timeout-minutes: 5
-  steps:
+{JOB_PERMISSIONS}  steps:
     - uses: {CHECKOUT}
       with:
         persist-credentials: false
@@ -43,6 +44,8 @@ jobs:
     name: Repository integrity
     runs-on: ubuntu-24.04
     timeout-minutes: 15
+    permissions:
+      contents: read
     steps:
       - uses: {CHECKOUT}
         with:
@@ -66,7 +69,7 @@ class RuleTests(unittest.TestCase):
                 self.assertEqual(check("x.yml", workflow(GOOD_JOB, top=top)), [])
 
     def test_job_write_scope_needs_the_allowlist(self) -> None:
-        job = GOOD_JOB + "  permissions:\n    contents: read\n    issues: write\n"
+        job = GOOD_JOB.replace(JOB_PERMISSIONS, "  permissions:\n    contents: read\n    issues: write\n")
         found = check("x.yml", workflow(job))
         self.assertEqual(found, ["x.yml: job build: write scope not allowed: issues"])
         allowed = {("x.yml", "build"): frozenset({"issues"})}
@@ -78,8 +81,19 @@ class RuleTests(unittest.TestCase):
             self.assertTrue(check("x.yml", workflow(job.replace("build:", "other:", 1))))
         finally:
             check_workflows.WRITE_ALLOWED = original
-        found = check("x.yml", workflow(GOOD_JOB + "  permissions: write-all\n"))
+        found = check("x.yml", workflow(GOOD_JOB.replace(JOB_PERMISSIONS, "  permissions: write-all\n")))
         self.assertIn("x.yml: job build: permissions must be an explicit mapping", found)
+
+    def test_every_job_sets_its_own_permissions(self) -> None:
+        # Inheriting the top-level block is not explicit, even when it is read-only.
+        found = check("x.yml", workflow(GOOD_JOB.replace(JOB_PERMISSIONS, "")))
+        self.assertEqual(found, ["x.yml: job build: permissions must be set on the job"])
+        for block in ("  permissions: {}\n", "  permissions:\n    contents: read\n"):
+            with self.subTest(block=block):
+                self.assertEqual(check("x.yml", workflow(GOOD_JOB.replace(JOB_PERMISSIONS, block))), [])
+        reusable = f"call:\n  uses: owner/repo/.github/workflows/w.yml@{SHA}\n"
+        self.assertEqual(check("x.yml", workflow(reusable)),
+                         ["x.yml: job call: permissions must be set on the job"])
 
     def test_every_job_needs_a_bounded_timeout(self) -> None:
         for value in ("", "  timeout-minutes: 0\n", "  timeout-minutes: 61\n",
@@ -96,7 +110,7 @@ class RuleTests(unittest.TestCase):
                 job = GOOD_JOB.replace(CHECKOUT, use)
                 self.assertTrue(any("not pinned" in line
                                     for line in check("x.yml", workflow(job))))
-        reusable = f"call:\n  uses: owner/repo/.github/workflows/w.yml@{SHA}\n"
+        reusable = f"call:\n  uses: owner/repo/.github/workflows/w.yml@{SHA}\n  permissions: {{}}\n"
         self.assertEqual(check("x.yml", workflow(reusable)), [])
         self.assertTrue(check("x.yml", workflow(reusable.replace(SHA, "main"))))
 

@@ -19,7 +19,7 @@ Nothing in this document is complete until its row links the evidence.
 
 | Step | Issue | Needs | Produces |
 | ---: | --- | --- | --- |
-| 1 | The remaining setup issues: #11, #14 and #15 | Each issue's own prerequisites | Their deliverables, merged and integrated into `main` |
+| 1 | The remaining setup issues: #11 and #119 | Each issue's own prerequisites | Their deliverables, merged and integrated into `main` |
 | 2 | #18, file audit | Step 1 | The [file audit record](#file-audit-record), with relevance, provenance and owner references for every tracked file |
 | 3 | #19, comment audit | #18 | The comment columns of the same record |
 | 4 | #20, certification | #19 | The [candidate record](#candidate-record), this checklist and the [evidence index](#evidence-index) completed, the [scope statement](#scope-statement) |
@@ -86,8 +86,8 @@ commit.
 | #11 | Candidate-bound evidence and host smoke test | Open | ☐ |
 | #12 | Repository settings and protections | Resolution of #12 | ☐ |
 | #13 | Failing and passing checks and merge enforcement | Resolution of #13 | ☐ |
-| #14 | Traffic history | Open | ☐ |
-| #15 | Repository About metadata | Open | ☐ |
+| #14 | Traffic history | Resolution of #14; main integrations #103, #106, #111; syncs #104, #107, #112 | ☐ |
+| #15 | Repository About metadata | Resolution of #15; saved metadata read-back | ☐ |
 | #16 | Onboarding | Resolution of #16 | ☐ |
 | #17 | Versioning and closeout documents | Resolution of #17; main integration #83, sync #84 | ☐ |
 | #18 | File audit | Open | ☐ |
@@ -96,6 +96,15 @@ commit.
 | #35, #37, #41, #47 | Documentation and CI corrections | Their Resolutions | ☐ |
 | #56, #58, #60, #62, #64, #65 | Static-check defects | Their Resolutions | ☐ |
 | #85 | Repository/project rename to K-CVA | Resolution of #85; main integration #87, sync #88 | ☐ |
+| #108 | Public visibility, security reporting and source terms | Resolution of #108; main integrations #111, #113; syncs #112, #114 | ☐ |
+| #116 | Traffic collection with a GitHub App token | Resolution of #116; main integration #141, sync #142 | ☐ |
+| #117 | CodeQL code scanning and its first alert | Resolution of #117; main integrations #130, #138; syncs #131, #139 | ☐ |
+| #118 | Markdown anchor and external-link checks | Resolution of #118; main integration #130, sync #131 | ☐ |
+| #119 | Workflow rules and timeouts | Open: reopened 2026-11-01; first delivery #124, main integration #130, sync #131 | ☐ |
+| #120 | Ruff and strict mypy gates | Resolution of #120; main integrations #130, #138; syncs #131, #139 | ☐ |
+| #121 | Repository settings as code | Resolution of #121; main integration #130, sync #131 | ☐ |
+| #122 | Milestones kept off pull requests | Resolution of #122; main integration #130, sync #131 | ☐ |
+| #123 | Timeless governance and settings rules | Resolution of #123; main integration #130, sync #131 | ☐ |
 
 An issue added to the milestone later gets a row here.
 
