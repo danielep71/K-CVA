@@ -108,8 +108,9 @@ CVA calculation, public API or workbook.
   test-case file format with its tolerances and reference classes
   ([docs/methodology/](docs/methodology/README.md); #8).
 - A VBA regression harness with a neutral example suite in `tests/modules/`,
-  the reference cleanup pattern, and a procedure and checker for recording an
-  Excel run against its commit
+  the reference cleanup pattern, and a procedure, a one-command recording
+  script for a Windows host and a checker for recording an Excel run against
+  its commit
   ([tests/README.md](tests/README.md#vba-harness),
   [INSTALLATION.md](INSTALLATION.md#recording-an-excel-run); #10, #11).
 - Onboarding: README, developer setup and contributing guide

@@ -18,6 +18,9 @@ fixtures in test_check_changelog.py; it never tags or publishes.
 check_excel_run.py checks the evidence folder of an Excel run against its
 commit (INSTALLATION.md, Recording an Excel run), with fixtures in
 test_check_excel_run.py; it is not a gate, since it needs a host run.
+Record-KCVA-ExcelRun.ps1, started by Record-KCVA-ExcelRun.cmd, records that
+run on a Windows host with Excel and ends with the same check; it cannot run
+in CI.
 check_links.py checks relative Markdown links and their anchors by GitHub's
 slug rule; check_external_links.py, run weekly by the External links
 workflow, reports broken http(s) links; both have fixtures in
