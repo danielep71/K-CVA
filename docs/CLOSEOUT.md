@@ -19,7 +19,7 @@ Nothing in this document is complete until its row links the evidence.
 
 | Step | Issue | Needs | Produces |
 | ---: | --- | --- | --- |
-| 1 | The remaining setup issues: #11 and #119 | Each issue's own prerequisites | Their deliverables, merged and integrated into `main` |
+| 1 | The remaining setup issue: #11 | Each issue's own prerequisites | Their deliverables, merged and integrated into `main` |
 | 2 | #18, file audit | Step 1 | The [file audit record](#file-audit-record), with relevance, provenance and owner references for every tracked file |
 | 3 | #19, comment audit | #18 | The comment columns of the same record |
 | 4 | #20, certification | #19 | The [candidate record](#candidate-record), this checklist and the [evidence index](#evidence-index) completed, the [scope statement](#scope-statement) |
@@ -100,7 +100,7 @@ commit.
 | #116 | Traffic collection with a GitHub App token | Resolution of #116; main integration #141, sync #142 | ☐ |
 | #117 | CodeQL code scanning and its first alert | Resolution of #117; main integrations #130, #138; syncs #131, #139 | ☐ |
 | #118 | Markdown anchor and external-link checks | Resolution of #118; main integration #130, sync #131 | ☐ |
-| #119 | Workflow rules and timeouts | Open: reopened 2026-11-01; first delivery #124, main integration #130, sync #131 | ☐ |
+| #119 | Workflow rules and timeouts | Resolution of #119; main integrations #130, #144; syncs #131, #145 | ☐ |
 | #120 | Ruff and strict mypy gates | Resolution of #120; main integrations #130, #138; syncs #131, #139 | ☐ |
 | #121 | Repository settings as code | Resolution of #121; main integration #130, sync #131 | ☐ |
 | #122 | Milestones kept off pull requests | Resolution of #122; main integration #130, sync #131 | ☐ |
