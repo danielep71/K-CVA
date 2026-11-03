@@ -20,6 +20,10 @@ no additional reference is approved. Check Tools > References for MISSING
 entries before compilation. Any new reference needs a reviewed dependency
 decision. Python is tooling/reference testing only and is never called by the
 workbook. Follow organizational macro policy; do not weaken security settings.
+The [automatic recording](#automatic-recording) script is the one exception
+to leaving Excel's settings as they are: it turns on *Trust access to the VBA
+project object model* for the current user for its run only, then restores it,
+and never touches the macro-security level.
 
 <a id="tested-environments"></a>
 
@@ -184,8 +188,42 @@ more entry points show the failure paths and are expected to fail:
 The evidence that a commit's VBA was imported, compiled and run on a host,
 for [#11](https://github.com/danielep71/K-CVA/issues/11) and for every later
 issue or pull request that cites an Excel run. It needs no self-hosted
-runner, no change to the macro-security level and no *Trust access to the
-VBA project object model*.
+runner and no change to the macro-security level. There are two ways to
+record it: the script below does every step, and the manual procedure after
+it needs no *Trust access to the VBA project object model*. Both produce the
+same evidence folder and the same check.
+
+### Automatic recording
+
+On the Windows host, with desktop Excel, Git and Python 3.12 or later on
+`PATH`, in a clone with no local changes at the candidate commit
+(`git switch --detach <commit>`), close Excel and double-click
+`tools\Record-KCVA-ExcelRun.cmd`, or run:
+
+```text
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\Record-KCVA-ExcelRun.ps1
+```
+
+It performs steps 2 to 8 below without typing:
+- **Workbook:** builds `test-results\K-CVA-excel-run-<sha7>.xlsm`, imports
+  every VBA component the commit tracks, compiles with Debug → Compile
+  VBAProject and runs `TEST_Examples.SaveExampleEvidence`.
+- **Evidence:** exports the modules and writes `host.txt` from Windows and
+  the project's references.
+- **Check:** runs `check_excel_run.py` on `test-results\excel-run-<sha7>\`
+  and saves its report as `check.txt`. Copy that report as in step 9.
+
+Importing and exporting through Excel's object model needs *Trust access to
+the VBA project object model*. If it is off, the script turns it on for the
+current Windows user only, for the run, and restores the previous value when
+the run ends, whatever its outcome; `host.txt` records this in
+`vba_project_access`. It stops without changing anything if a policy
+controls the setting or Excel is already running. If the project does not
+compile, Excel shows the error in a message box: click OK and the run is
+recorded with `compile=FAIL`. The script does not import forms or document
+modules yet; a commit holding them needs the manual procedure.
+
+### Manual procedure
 
 1. **Fix the candidate.** In a clone with no local changes
    (`git status --short` prints nothing), type `git switch --detach <commit>`,
@@ -234,6 +272,8 @@ VBA project object model*.
 9. **Record.** Copy the report into the issue or pull request and add a row
    to [tested environments](#tested-environments). The folder stays outside
    Git: its exported modules would be second copies of the VBA components.
+
+### What the check verifies
 
 `check_excel_run.py` reads only the folder and the commit:
 
