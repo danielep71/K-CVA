@@ -11,6 +11,7 @@ on:
     branches: [main, 'release/**']
   pull_request:
     branches: [main, 'release/**']
+  workflow_dispatch:
   schedule:
     - cron: "23 3 * * 0"
 
@@ -52,7 +53,7 @@ jobs:
   analyze:
     name: Analyze (${{ matrix.language }})
     needs: gate
-    if: needs.gate.outputs.public == 'true'
+    if: needs.gate.outputs.public == 'true' && github.event_name != 'pull_request'
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     permissions:
@@ -76,3 +77,40 @@ jobs:
         uses: github/codeql-action/analyze@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
         with:
           category: "/language:${{ matrix.language }}"
+
+  analyze-pr:
+    name: Analyze pull request (${{ matrix.language }})
+    needs: gate
+    if: needs.gate.outputs.public == 'true' && github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [actions, javascript-typescript, python]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Initialise CodeQL
+        uses: github/codeql-action/init@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: none
+          queries: security-extended
+      - name: Analyse without uploading
+        uses: github/codeql-action/analyze@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
+        with:
+          category: "/language:${{ matrix.language }}"
+          upload: never
+          upload-database: false
+          output: codeql-results
+      - name: Keep SARIF results
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: codeql-pr-${{ matrix.language }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: codeql-results
+          if-no-files-found: error
+          retention-days: 30

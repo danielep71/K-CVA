@@ -37,6 +37,7 @@ class FakeGitHub:
             "security_and_analysis": {"dependabot_security_updates": {"status": "disabled"},
                                       "secret_scanning": {"status": "enabled"},
                                       "secret_scanning_push_protection": {"status": "enabled"}}}
+        self.paused = False
         self.pvr = True
         self.alerts = True
         self.default_setup = "not-configured"
@@ -46,7 +47,9 @@ class FakeGitHub:
         self.refused: set[str] = set()
         self.writes: list[str] = []
 
-    def request(self, method: str, path: str, body: Any = None) -> tuple[int, Any]:
+    # Declarative endpoint dispatch in this fake mirrors independent API routes;
+    # splitting it obscures the request/response fixture. Production code has no exemption.
+    def request(self, method: str, path: str, body: Any = None) -> tuple[int, Any]:  # noqa: C901
         if path.split("?")[0] in self.refused:
             return 403, {"message": "refused"}
         if method != "GET":
@@ -60,6 +63,13 @@ class FakeGitHub:
                 for key, value in analysis.items():
                     self.repo["security_and_analysis"][key] = value
             return 200, copy.deepcopy(self.repo)
+        if path == "/automated-security-fixes" and method == "GET":
+            status = self.repo["security_and_analysis"]["dependabot_security_updates"]["status"]
+            return 200, {"enabled": status == "enabled", "paused": self.paused}
+        if path == "/actions/permissions/fork-pr-contributor-approval":
+            return 200, {"approval_policy": "all_external_contributors"}
+        if path == "/actions/permissions/artifact-and-log-retention":
+            return 200, {"days": 90}
         if path == "/automated-security-fixes" and method in ("PUT", "DELETE"):
             status = "enabled" if method == "PUT" else "disabled"
             self.repo["security_and_analysis"]["dependabot_security_updates"] = {"status": status}
@@ -211,6 +221,58 @@ class ApplyTests(unittest.TestCase):
         self.assertIn("Refusing to apply", output)
 
 
+class AlignmentTests(unittest.TestCase):
+    def test_paused_updates_remain_drift_after_apply(self) -> None:
+        github = FakeGitHub()
+        github.paused = True
+        desired = copy.deepcopy(DESIRED)
+        desired["security"]["dependabot_security_updates"] = "enabled"
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "desired.json"
+            path.write_text(json.dumps(desired), encoding="utf-8")
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(rs.main(["--desired", str(path), "--apply"], github), 1)
+        drift, _ = rs.differences(desired, rs.read_live(github))
+        self.assertTrue(any("enabled(paused)" in line for line in drift))
+
+    def test_missing_admin_endpoints_are_unread(self) -> None:
+        github = FakeGitHub()
+        github.refused = {"/automated-security-fixes", "/actions/permissions/fork-pr-contributor-approval",
+                          "/actions/permissions/artifact-and-log-retention"}
+        live = rs.read_live(github)
+        self.assertEqual(live["security"]["dependabot_security_updates"], rs.UNREAD)
+        self.assertEqual(live["actions"]["fork_pr_approval_policy"], rs.UNREAD)
+        self.assertEqual(live["actions"]["retention_days"], rs.UNREAD)
+
+    def test_admin_values_are_read_only(self) -> None:
+        github = FakeGitHub()
+        desired = copy.deepcopy(DESIRED)
+        desired["actions"].update(fork_pr_approval_policy="first_time_contributors", retention_days=60)
+        live = rs.read_live(github)
+        self.assertEqual(live["actions"]["retention_days"], 90)
+        self.assertEqual(live["actions"]["fork_pr_approval_policy"], "all_external_contributors")
+        self.assertEqual(len(rs.differences(desired, live)[0]), 2)
+        self.assertEqual(rs.apply(github, desired, live), [])
+
+    def test_auto_delete_is_last_and_failure_prevents_it(self) -> None:
+        for fail in (False, True):
+            with self.subTest(fail=fail):
+                github = FakeGitHub()
+                github.repo["delete_branch_on_merge"] = False
+                github.repo["allow_rebase_merge"] = False
+                github.rulesets[1]["enforcement"] = "disabled"
+                live = rs.read_live(github)
+                if fail:
+                    github.refused.add("/rulesets/1")
+                    with self.assertRaises(RuntimeError):
+                        rs.apply(github, DESIRED, live)
+                    self.assertFalse(github.repo["delete_branch_on_merge"])
+                else:
+                    rs.apply(github, DESIRED, live)
+                    self.assertEqual(github.writes, ["PATCH ", "PUT /rulesets/1", "PATCH "])
+                    self.assertTrue(github.repo["delete_branch_on_merge"])
+
+
 class ReportTests(unittest.TestCase):
     def test_report_records_the_reading(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -220,6 +282,9 @@ class ReportTests(unittest.TestCase):
         self.assertEqual((data["repository"], data["result"], data["drift"], data["unread"]),
                          ("owner/repo", "match", [], []))
         self.assertTrue(data["read_at"].endswith("Z"))
+        self.assertEqual(data["mode"], "check")
+        self.assertEqual(data["desired"], DESIRED)
+        self.assertEqual(len(data["manifest_sha256"]), 64)
         self.assertEqual(data["live"]["rulesets"]["Protect main"]["enforcement"], "active")
 
 

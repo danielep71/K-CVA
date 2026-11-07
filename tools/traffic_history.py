@@ -34,7 +34,7 @@ DAILY = "daily.csv"
 SNAPSHOTS = "snapshots.csv"
 HEADERS: dict[str, tuple[str, ...]] = {
     DAILY: ("date", "views", "unique_views", "views_collected_at",
-            "clones", "unique_clones", "clones_collected_at"),
+            "clones", "unique_clones", "clones_collected_at", "views_observed_at", "clones_observed_at"),
     SNAPSHOTS: ("snapshot_date", "collected_at", "observed_at", "first_date", "last_date",
                 "views_14d", "unique_views_14d", "clones_14d", "unique_clones_14d"),
 }
@@ -45,7 +45,8 @@ ISO_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 STAMP = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
 NUMERIC = {"views", "unique_views", "clones", "unique_clones", "views_14d", "unique_views_14d",
            "clones_14d", "unique_clones_14d"}
-STAMPS = {"collected_at", "observed_at", "views_collected_at", "clones_collected_at"}
+STAMPS = {"collected_at", "observed_at", "views_collected_at", "clones_collected_at",
+          "views_observed_at", "clones_observed_at"}
 Row = dict[str, str]
 
 
@@ -152,7 +153,8 @@ def read_history(path: Path) -> list[Row]:
     except (OSError, ValueError) as error:
         raise TrafficError(f"{path.name}: unreadable ({error})") from error
     reader = csv.DictReader(io.StringIO(content))
-    if tuple(reader.fieldnames or ()) != header:
+    legacy = path.name == DAILY and tuple(reader.fieldnames or ()) == header[:-2]
+    if tuple(reader.fieldnames or ()) != header and not legacy:
         raise TrafficError(f"{path.name}: header is {reader.fieldnames}, expected {list(header)}")
     rows = []
     for number, row in enumerate(reader, start=2):
@@ -160,6 +162,9 @@ def read_history(path: Path) -> list[Row]:
             raise TrafficError(f"{path.name}:{number}: wrong number of fields")
         if not ISO_DATE.match(row[header[0]]):
             raise TrafficError(f"{path.name}:{number}: invalid date {row[header[0]]!r}")
+        if legacy:
+            for prefix in ("views", "clones"):
+                row[f"{prefix}_observed_at"] = row[f"{prefix}_collected_at"]
         check_fields(path.name, number, row)
         rows.append(dict(row))
     return rows
@@ -172,7 +177,7 @@ def check_fields(name: str, number: int, row: Mapping[str, str]) -> None:
     was never reported for the date.
     """
     def blank_metric(key: str) -> bool:
-        metric = key.removesuffix("_collected_at").removeprefix("unique_")
+        metric = key.removesuffix("_collected_at").removesuffix("_observed_at").removeprefix("unique_")
         return (name == DAILY and row[metric] == "" and row[f"unique_{metric}"] == ""
                 and row[f"{metric}_collected_at"] == "")
 
@@ -198,24 +203,26 @@ def render(name: str, rows: Sequence[Mapping[str, str]]) -> str:
 
 
 def merge_daily(rows: list[Row], collection: Collection) -> list[Row]:
-    """Newest collection wins per date and metric; unreported dates keep their values.
+    """Newest observation wins per date and metric; unreported dates keep their values.
 
-    Views and clones each carry the time of the collection that last changed
-    them. A metric stored by a later collection than this one is never
-    replaced, so replaying an older collection cannot undo newer counts, yet it
-    can still fill a metric that no newer collection reported.
+    Views and clones each carry two times: the collection that last changed
+    them and the newest collection that reported them. A metric reported by a
+    later collection than this one is never replaced, even when that later
+    collection left it unchanged, so replaying an older collection cannot undo
+    newer counts; it can still fill a metric that no newer collection reported.
     """
     by_date = {row["date"]: row for row in rows}
     for prefix, series in (("views", collection.views), ("clones", collection.clones)):
-        stamp_key = f"{prefix}_collected_at"
+        changed_key, observed_key = f"{prefix}_collected_at", f"{prefix}_observed_at"
         for day, (total, unique) in series.days.items():
             row = by_date.setdefault(day, {key: "" for key in HEADERS[DAILY]} | {"date": day})
-            if row[stamp_key] > collection.stamp:
+            if max(row[observed_key], row[changed_key]) > collection.stamp:
                 continue
             values = {prefix: str(total), f"unique_{prefix}": str(unique)}
             if any(row[key] != value for key, value in values.items()):
                 row.update(values)
-                row[stamp_key] = collection.stamp
+                row[changed_key] = collection.stamp
+            row[observed_key] = collection.stamp
     return [by_date[day] for day in sorted(by_date)]
 
 
