@@ -27,6 +27,19 @@ has admin rights on the repository, for example `GH_TOKEN=$(gh auth token)`:
 - **Changing a control:** edit the file in a reviewed pull request, run
   `--apply` once it is merged, and keep a `--check` report as evidence.
 
+The report records the exact manifest SHA256, desired values and execution
+mode alongside the live values, timestamp and differences. The automated
+security-fixes endpoint must report `enabled=true` and `paused=false`;
+`enabled(paused)` is drift and remains a failed apply if still paused after
+read-back. Apply is not transactional: merge options are changed before
+rulesets, and automatic branch deletion only after protection and security
+requests succeed. A failure can leave earlier operations applied; recheck
+and repair before retrying.
+
+On 2026-11-07 the GitHub UI confirmed security updates enabled and fork
+approval set to all external contributors; retention was 90 days. This is
+UI evidence, not proof of the API's paused flag or a complete `--check` pass.
+
 The script uses only the standard library; its tests (`tools/test_repository_settings.py`,
 in the repository checks) run against a fake API, without network access.
 
@@ -46,12 +59,15 @@ web-commit sign-off requirement.
 | Secret scanning (Secret Protection) and push protection | On |
 | Secret scanning: non-provider patterns, validity checks | Off |
 | Dependabot alerts | On |
-| Dependabot security updates | Off |
+| Dependabot security updates | On and not paused |
 | Code scanning default setup | Not configured; code scanning runs in advanced setup ([CI.md](CI.md#code-scanning)), which default setup would break |
 
 **Actions.** Actions enabled and all actions allowed, with full-length
 commit-SHA pinning required. The default workflow token is read-only, and
-workflows may not create or approve pull requests.
+workflows may not create or approve pull requests. Fork PR workflows require
+approval for all external contributors; artifact/log retention is 90 days.
+These two settings are read and compared, but never written by `--apply`.
+Unknown or missing values are unread, never a match.
 
 **Rulesets.** All five are active, with no bypass actors and no excluded refs.
 

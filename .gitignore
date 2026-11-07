@@ -56,6 +56,12 @@ coverage.xml
 *.pvk
 *.key
 *.pem
+*.jks
+*.keystore
+*.kdbx
+id_rsa*
+id_ed25519*
+!*.pub
 
 # Editors and installed tooling; keep source, manifests and lock files.
 .vscode/

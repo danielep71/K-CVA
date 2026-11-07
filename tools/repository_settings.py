@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import argparse
 import copy
+import hashlib
 import json
 import os
 import sys
@@ -129,6 +130,17 @@ def read_live(client: Client) -> dict[str, Any]:
             security[key] = reader(status, data)
         except Unreadable:
             security[key] = UNREAD
+    try:
+        _, fixes = get(client, "/automated-security-fixes")
+        if not isinstance(fixes, dict):
+            raise Unreadable("automated-security-fixes: expected object")
+        enabled, paused = fixes.get("enabled"), fixes.get("paused")
+        if not isinstance(enabled, bool) or not isinstance(paused, bool):
+            raise Unreadable("automated-security-fixes: missing boolean enabled/paused")
+        security["dependabot_security_updates"] = (
+            "enabled(paused)" if enabled and paused else "enabled" if enabled else "disabled")
+    except Unreadable:
+        security["dependabot_security_updates"] = UNREAD
     live["security"] = security
     actions: dict[str, Any] = {}
     for path, keys in (("/actions/permissions", ("enabled", "allowed_actions", "sha_pinning_required")),
@@ -139,6 +151,22 @@ def read_live(client: Client) -> dict[str, Any]:
             actions.update({key: data.get(key) for key in keys})
         except Unreadable:
             actions.update(dict.fromkeys(keys, UNREAD))
+    # Administrative read-back only: these settings require a separate decision
+    # in GitHub's UI, not an implicit write by --apply.
+    for key, path, field in (
+        ("fork_pr_approval_policy", "/actions/permissions/fork-pr-contributor-approval", "approval_policy"),
+        ("retention_days", "/actions/permissions/artifact-and-log-retention", "days"),
+    ):
+        try:
+            _, data = get(client, path)
+            value = data.get(field, UNREAD) if isinstance(data, dict) else UNREAD
+            valid = (isinstance(value, str) and value in {
+                         "first_time_contributors_new_to_github", "first_time_contributors",
+                               "all_external_contributors"} if key == "fork_pr_approval_policy"
+                     else isinstance(value, int) and not isinstance(value, bool) and value > 0)
+            actions[key] = value if valid else UNREAD
+        except Unreadable:
+            actions[key] = UNREAD
     live["actions"] = actions
     try:
         _, summaries = get(client, "/rulesets?includes_parents=false&per_page=100")
@@ -194,6 +222,7 @@ def apply(client: Client, desired: Mapping[str, Any], live: Mapping[str, Any]) -
 
     general = {key: want for key, want in desired["general"].items()
                if live["general"].get(key) != want and f"general.{key}" not in NEVER_APPLIED}
+    auto_delete = general.pop("delete_branch_on_merge", None)
     # The repository PATCH takes only the secret-scanning switches; Dependabot
     # security updates have their own endpoint, below.
     analysis = {key: {"status": want} for key, want in desired["security"].items()
@@ -223,13 +252,21 @@ def apply(client: Client, desired: Mapping[str, Any], live: Mapping[str, Any]) -
             send("POST", "/rulesets", want)
         elif any(have[key] != want[key] for key in RULESET_KEYS):
             send("PUT", f"/rulesets/{have['id']}", want)
+    # Only enable automatic deletion after every protection/security operation
+    # succeeds. A failed ruleset write exits before this final PATCH.
+    if auto_delete is not None:
+        send("PATCH", "", {"delete_branch_on_merge": auto_delete})
     return done
 
 
 def report(repository: str, desired_path: Path, live: Mapping[str, Any], drift: list[str],
-           unread: list[str]) -> dict[str, Any]:
+           unread: list[str], *, mode: str = "preview", manifest: bytes | None = None) -> dict[str, Any]:
+    manifest = desired_path.read_bytes() if manifest is None else manifest
     return {
         "repository": repository,
+        "mode": mode,
+        "manifest_sha256": hashlib.sha256(manifest).hexdigest(),
+        "desired": json.loads(manifest),
         "read_at": datetime.now(UTC).isoformat(timespec="seconds").replace("+00:00", "Z"),
         "desired_state": desired_path.relative_to(ROOT).as_posix() if desired_path.is_relative_to(ROOT)
         else str(desired_path),
@@ -248,7 +285,8 @@ def main(argv: list[str] | None = None, client: Client | None = None) -> int:
     parser.add_argument("--desired", type=Path, default=DESIRED)
     parser.add_argument("--report", type=Path, help="write a JSON evidence report here")
     args = parser.parse_args(argv)
-    desired = json.loads(args.desired.read_text(encoding="utf-8"))
+    manifest = args.desired.read_bytes()
+    desired = json.loads(manifest)
     repository = desired["repository"]
     client = client or GitHub(repository, os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN"))
     live = read_live(client)
@@ -267,8 +305,9 @@ def main(argv: list[str] | None = None, client: Client | None = None) -> int:
         print("unread: " + line)
     print(f"{repository}: {len(drift)} differences, {len(unread)} unread settings")
     if args.report:
-        args.report.write_text(json.dumps(report(repository, args.desired, live, drift, unread), indent=2) + "\n",
-                               encoding="utf-8")
+        evidence = report(repository, args.desired, live, drift, unread, manifest=manifest,
+                          mode="apply" if args.apply else "check" if args.check else "preview")
+        args.report.write_text(json.dumps(evidence, indent=2) + "\n", encoding="utf-8")
     if drift and (args.check or args.apply):
         return 1
     return 2 if unread and (args.check or args.apply) else 0

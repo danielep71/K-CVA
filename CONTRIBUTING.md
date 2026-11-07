@@ -1,5 +1,7 @@
 # Contributing to K-CVA
 
+Participation follows the [code of conduct](CODE_OF_CONDUCT.md).
+
 K-CVA has one maintainer, who decides scope, priorities and what is
 integrated ([docs/GOVERNANCE.md](docs/GOVERNANCE.md#ownership-and-scope)).
 The repository is public (verified on 2026-10-28). Every change starts from

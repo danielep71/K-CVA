@@ -59,6 +59,13 @@ Use only the categories an entry needs.
 Planned as 0.1.0, *Repo setup*: repository infrastructure only. It contains no
 CVA calculation, public API or workbook.
 
+### Changed
+
+- Harden repository tooling against out-of-order traffic replays, isolate
+  CodeQL PR analysis, preserve push CI evidence, and align security-settings
+  verification and contributor policies with MyTemplate (#162). Existing
+  traffic CSVs migrate automatically; no calculation engine is changed.
+
 ### Added
 
 - Issue forms and triage require target end dates before an open milestone's

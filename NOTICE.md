@@ -253,3 +253,14 @@ at `f1d0d17ecede525941cfedf07f0cf737bf1346ef` under MPL-2.0. K-CVA retains its
 runtime baseline, paths, governance, special-name evidence tests and scope.
 The earlier label-policy baseline table is historical: `.github/label-policy.json`
 was retired in favour of the schema-3 catalogue and `selected_overlays` (#158).
+
+## Remaining MyTemplate baseline alignment
+
+For #162, conduct and safe-harbor wording, CodeQL PR isolation, traffic App
+preflight and per-metric observation tracking, settings read-back/evidence and
+safe application ordering, ignore patterns and complexity/concurrency policy
+were adapted from MyTemplate at `f1d0d17ecede525941cfedf07f0cf737bf1346ef`
+(MPL-2.0, Daniele Penza and contributors). K-CVA retains its existing runtime
+pins, reporting schema, private security contact and scope. Traffic migration
+and the regression tests are local adaptations. See
+[the reconciliation record](docs/MYTEMPLATE_ALIGNMENT.md).
