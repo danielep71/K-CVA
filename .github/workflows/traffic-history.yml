@@ -73,6 +73,17 @@ jobs:
         with:
           python-version: "3.12.14"
 
+      - name: Check GitHub App configuration
+        env:
+          CLIENT_ID: ${{ vars.TRAFFIC_APP_CLIENT_ID }}
+          HAS_KEY: ${{ secrets.TRAFFIC_APP_PRIVATE_KEY != '' }}
+        run: |
+          set -euo pipefail
+          if [ -z "$CLIENT_ID" ] || [ "$HAS_KEY" != "true" ]; then
+            echo "::error::Configure the analytics App client ID and private key (docs/TRAFFIC.md)."
+            exit 1
+          fi
+
       - name: Create the GitHub App token
         id: app-token
         uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0

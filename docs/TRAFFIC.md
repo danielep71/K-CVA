@@ -74,7 +74,7 @@ branch, and its history is not rewritten. Its creation commit is recorded in
 
 | File | Key | Contents |
 | --- | --- | --- |
-| `daily.csv` | `date` | Views and unique views, clones and unique clones per UTC day. `views_collected_at` and `clones_collected_at` give the collection that last changed each pair. |
+| `daily.csv` | `date` | Views and unique views, clones and unique clones per UTC day. `views_collected_at` and `clones_collected_at` give the collection that last changed each pair; `views_observed_at` and `clones_observed_at` record the latest observation even when values are unchanged. |
 | `snapshots.csv` | `snapshot_date` | One row per collection day: the first and last day the API reported, the 14-day totals, `collected_at`, the collection that last changed that day's snapshot, and `observed_at`, the latest collection of that day, changed or not. |
 
 The first collections, from 2026-10-27, also stored `referrers.csv` and
@@ -172,3 +172,15 @@ If the branch must be repaired, change it with a new commit made with
 `python tools/traffic_history.py merge` or by hand, keeping every header.
 `python tools/traffic_history.py init --data data` recreates missing files
 with their headers and never overwrites an existing one.
+
+## Observation migration and preflight
+
+Before minting an App token, the workflow checks the client ID and a boolean
+indicating whether the key exists. The raw key is passed only to the token step.
+
+The merger accepts the former seven-column `daily.csv` and initializes each
+observation timestamp from its corresponding collection timestamp. Its next
+write adds the two observation columns; snapshots keep their existing schema.
+Older histories cannot reconstruct observations that were never saved. From
+migration onward, A at t1, identical A at t3, then replay B at t2 keeps A for
+each metric. An unreported metric can still be filled by an older collection.

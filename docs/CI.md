@@ -252,6 +252,12 @@ The current allowlist: `codeql.yml` job `analyze` may write `security-events`;
 write `contents`. Fixtures for every
 rule are in `tools/test_check_workflows.py`.
 
+Repository integrity cancels only superseded runs for the same PR. Push and
+manual runs use a unique run-ID group, preserving each run's evidence.
+Ruff includes C90 with maximum complexity 15 for Python tooling. The fake API
+request dispatcher in `test_repository_settings.py` has one documented C901
+exemption because it models independent routes; production code has none.
+
 ## Code scanning
 
 The *CodeQL* workflow (`.github/workflows/codeql.yml`) is GitHub code
@@ -260,7 +266,7 @@ cannot run together, and an enabled default setup makes this workflow's
 uploads fail.
 
 - **Triggers:** pushes and pull requests to `main` and `release/**`, and
-  every Sunday.
+  every Sunday, plus manual dispatch.
 - **Languages:** `python` (the tooling), `javascript-typescript` (the label
   scripts in `.github/scripts/`) and `actions` (the workflows), one matrix
   job each, without a build (`build-mode: none`). The VBA source is not
@@ -271,7 +277,10 @@ uploads fail.
   scheduled event may not carry the repository payload. The analysis runs only
   for a public repository, the case in which this plan can upload results.
 - **Permissions:** only the `analyze` job holds `security-events: write`, to
-  upload its results; the gate reads with `contents: read`.
+  upload its non-PR results; the gate reads with `contents: read`.
+  The separate `analyze-pr` job has only `contents: read`, disables both
+  result and database uploads, and retains SARIF as a 30-day artifact.
+  PR scans therefore do not create code-scanning annotations.
 
 Alerts appear on the repository's Security tab. CodeQL is not a required
 check; triage its alerts like any other finding. Fix an alert, or dismiss it
