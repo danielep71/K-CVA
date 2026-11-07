@@ -90,7 +90,7 @@ commit.
 | #15 | Repository About metadata | Resolution of #15; saved metadata read-back | ☐ |
 | #16 | Onboarding | Resolution of #16 | ☐ |
 | #17 | Versioning and closeout documents | Resolution of #17; main integration #83, sync #84 | ☐ |
-| #18 | File audit | Open | ☐ |
+| #18 | File audit | [Per-file record](evidence/v0.1.0-file-audit.md); acceptance tracked in #18 | ☐ |
 | #19 | Comment audit | Open | ☐ |
 | #20 | Certification | Open | ☐ |
 | #35, #37, #41, #47 | Documentation and CI corrections | Their Resolutions | ☐ |
@@ -105,6 +105,8 @@ commit.
 | #121 | Repository settings as code | Resolution of #121; main integration #130, sync #131 | ☐ |
 | #122 | Milestones kept off pull requests | Resolution of #122; main integration #130, sync #131 | ☐ |
 | #123 | Timeless governance and settings rules | Resolution of #123; main integration #130, sync #131 | ☐ |
+| #158 | Issue management and label safeguards | Resolution of #158; task #159, main #160, sync #161 | ☐ |
+| #162 | Remaining MyTemplate baseline alignment | Resolution of #162; task #163, main #164, sync #165 | ☐ |
 
 An issue added to the milestone later gets a row here.
 
@@ -112,7 +114,7 @@ An issue added to the milestone later gets a row here.
 
 ## File audit record
 
-#18 creates `docs/evidence/v0.1.0-file-audit.md` at the commit it reviews;
+#18 records the [per-file audit](evidence/v0.1.0-file-audit.md) at the commit it reviews;
 #19 adds its columns there. One row per tracked file, binary files included:
 
 | Column | Content |

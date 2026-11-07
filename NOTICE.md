@@ -264,3 +264,17 @@ were adapted from MyTemplate at `f1d0d17ecede525941cfedf07f0cf737bf1346ef`
 pins, reporting schema, private security contact and scope. Traffic migration
 and the regression tests are local adaptations. See
 [the reconciliation record](docs/MYTEMPLATE_ALIGNMENT.md).
+
+## Local assets and evidence tooling
+
+`docs/assets/K-CVA-social-preview.jpg` was generated specifically for K-CVA
+for [PR #92](https://github.com/danielep71/K-CVA/pull/92), introduced by
+`8957be3`. K-SFTs was visual inspiration; no source image was imported.
+It is an illustrative research-and-development banner, not calculation output.
+
+`tools/Record-KCVA-ExcelRun.cmd` and `tools/Record-KCVA-ExcelRun.ps1` were
+introduced locally by [PR #149](https://github.com/danielep71/K-CVA/pull/149),
+commit `bd78a6b`, to automate this repository's Excel evidence procedure.
+The underlying harness and validator retain the upstream notices above.
+The #11 host report and #18 audit record are local project evidence; they
+do not import an upstream execution or certification claim.
