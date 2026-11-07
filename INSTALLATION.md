@@ -218,8 +218,9 @@ Importing and exporting through Excel's object model needs *Trust access to
 the VBA project object model*. If it is off, the script turns it on for the
 current Windows user only, for the run, and restores the previous value when
 the run ends, whatever its outcome; `host.txt` records this in
-`vba_project_access`. It stops without changing anything if a policy
-controls the setting or Excel is already running. If the project does not
+`vba_project_access`. It stops before changing the access setting if the current-user policy
+disables VBA project access or Excel is already running. An explicitly enabled
+current-user policy is accepted; the script does not override policy. If the project does not
 compile, Excel shows the error in a message box: click OK and the run is
 recorded with `compile=FAIL`. The script does not import forms or document
 modules yet; a commit holding them needs the manual procedure.
