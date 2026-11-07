@@ -136,7 +136,7 @@ CVA calculation, public API or workbook.
 
 ### Validation
 
-- File audit (#18): record every tracked file and reviewed blob, preserve
+- File and prose audits (#18/#19): record every tracked file and reviewed blob, preserve
   historical attribution, document local artwork/recorder provenance, reconcile
   remaining scaffold-host status and add #158/#162 to the closeout index.
 

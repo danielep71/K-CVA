@@ -41,7 +41,7 @@ Pull requests opened by Dependabot or another bot carry the labels of the work a
 | `P2` | Material correctness, robustness, or maintainability defect. Default of the bug and private security contact forms. |
 | `P3` | Non-blocking quality, testing, documentation, setup, or technical-debt work. Default of the enhancement and documentation forms and of Dependabot pull requests. |
 
-A form sets the default priority; triage confirms or changes it. Raise a bug to `P1` only once the calculation defect is confirmed.
+A form sets the default priority; the maintainer confirms or changes it during triage. Raise a bug to `P1` only once the calculation defect is confirmed.
 
 Every open issue also needs a target end date: an ISO `YYYY-MM-DD` calendar date (Europe/Rome) earlier than the due date of its milestone. The bug, enhancement, and documentation forms ask for it in the *Target end date* field. On other issues, including private security contacts, add it during triage as a line in the issue body:
 

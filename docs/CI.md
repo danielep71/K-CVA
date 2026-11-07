@@ -80,7 +80,7 @@ run by the Python tooling tests.
 | `vba-conditionals` | Every `#If` block evaluates in each modeled host; a project `#Const`, an unknown symbol or an unbalanced block fails; a `Declare` reachable under VBA7 is `PtrSafe` (`check_vba_conditionals.py`). |
 | `vba-jumps` | Every `GoTo`, `GoSub` and `Resume` target is a label of the same procedure, labels are unique per procedure and every procedure is closed, in each modeled host; a member call such as `Application.Goto` is not a jump (`check_vba_jumps.py`). |
 | `vba-public-api` | Every procedure and module-level declaration states its visibility; a standard module declares no public variable and no public `Declare`; the public declarations of `src/modules/` and [PUBLIC_API.txt](PUBLIC_API.txt) match one to one with their signatures; no public name collides (`check_vba_public_api.py`). |
-| `vba-dependencies` | `src/core/` and `src/classes/` name no Excel or UI global or type, use no `[...]` evaluation, no VBA file, file-metadata, registry, environment, process, form-loading or system-clock statement or function, no native `Declare`, no external object model (`Scripting` other than `Dictionary`, `ADODB`, `MSXML2` and similar) or file-system type, declared or created with `New`, no `CallByName`, `Evaluate`, `ExecuteExcel4Macro` or `AddressOf`, no `CreateObject` other than `"Scripting.Dictionary"` and no `GetObject`, and name no facade, adapter, form, test or example component; `src/core/` standard modules hold no module-level or `Static` variable and no `Static` procedure; `examples/modules/` name only the facade, not core, model classes, adapters, forms or tests (`check_vba_dependencies.py`). |
+| `vba-dependencies` | `src/core/` and `src/classes/` name no Excel or UI global or type, use no `[...]` evaluation, no VBA file, file-metadata, registry, environment, process, form-loading statement or function, no system-clock assignment, no native `Declare`, no external object model (`Scripting` other than `Dictionary`, `ADODB`, `MSXML2` and similar) or file-system type, declared or created with `New`, no `CallByName`, `Evaluate`, `ExecuteExcel4Macro` or `AddressOf`, no `CreateObject` other than `"Scripting.Dictionary"` and no `GetObject`, and name no facade, adapter, form, test or example component; `src/core/` standard modules hold no module-level or `Static` variable and no `Static` procedure; `examples/modules/` name only the facade, not core, model classes, adapters, forms or tests (`check_vba_dependencies.py`). |
 
 **Three different checks.** A static PASS is neither a compilation nor a
 validation:
@@ -159,7 +159,7 @@ versions come from the hash-locked [tools/requirements.txt](../tools/requirement
   a new Ruff default cannot change the gate: pycodestyle (`E`, `W`), Pyflakes
   (`F`), import order (`I`), bugbear (`B`), pyupgrade (`UP`), simplify
   (`SIM`), Ruff's own rules (`RUF`), Pylint errors and warnings (`PLE`,
-  `PLW`) and the security rules (`S`). Lines may be 120 characters, the width
+  `PLW`), the security rules (`S`) and complexity (`C90`, maximum 15). Lines may be 120 characters, the width
   the tooling is written to.
 - **mypy** (`python -m mypy`) in strict mode for Python 3.12, with
   unreachable-code warnings, over every module in `tools/`.
@@ -171,7 +171,10 @@ Every exception, with its reason:
 | `S603`, `S607` | All tools | The tools run fixed argument lists (`git`, `node`, the interpreter), never a shell or a command built from input; finding `git` and `node` on `PATH` is the documented setup |
 | `S101` | `tools/test_*.py` | unittest helpers may assert |
 | `E501` | `tools/test_check_vba.py` | The VBA fixtures reproduce real source lines; wrapping them would change the fixture |
-| `S310` (3 lines) | `check_issues.py`, `check_repository.py` | The URLs opened are the HTTPS GitHub API and the HTTPS release URL from the actionlint lock |
+| `S310` (7 lines) | `check_issues.py`, `check_repository.py`, `repository_settings.py`, `check_external_links.py` | GitHub API requests use HTTPS; actionlint uses the HTTPS lock URL; the external-link checker intentionally requests documented http(s) links |
+| `S506` (1 line) | `check_workflows.py` | The explicit YAML loader subclasses SafeLoader and rejects duplicate keys |
+| `E402` (2 lines) | `test_check_issues.py` | Imports follow the test module search-path setup |
+| `C901` (1 line) | `test_repository_settings.py` | One fake API dispatcher keeps endpoint routes together; production functions retain the complexity limit |
 | `S106` (1 line) | `test_labels_sync.py` | Synthetic token used only against the local fake API |
 | `S102` (1 line) | `test_pr_milestones.py` | Executes the trusted repository workflow script under test with a fake API |
 | `S105` (1 line) | `check_vba_conditionals.py` | A VBA expression token compared with `"("`, not a password |

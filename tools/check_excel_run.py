@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Check the evidence of an Excel run of the VBA harness against one commit.
 
-The harness runs only in Excel, by hand (INSTALLATION.md, Recording an Excel
-run). This reads what that run left in an evidence folder and checks it
+The harness runs in Excel, manually or through the Windows recorder
+(INSTALLATION.md, Recording an Excel run). This reads its evidence folder and checks it
 against the candidate commit, without Excel:
 
 - source identity: the modules exported back from the workbook equal, line

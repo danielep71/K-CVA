@@ -91,7 +91,7 @@ commit.
 | #16 | Onboarding | Resolution of #16 | ☐ |
 | #17 | Versioning and closeout documents | Resolution of #17; main integration #83, sync #84 | ☐ |
 | #18 | File audit | [Per-file record](evidence/v0.1.0-file-audit.md); acceptance tracked in #18 | ☐ |
-| #19 | Comment audit | Open | ☐ |
+| #19 | Comment audit | [Per-file prose review](evidence/v0.1.0-file-audit.md#prose-and-comment-review-19); acceptance tracked in #19 | ☐ |
 | #20 | Certification | Open | ☐ |
 | #35, #37, #41, #47 | Documentation and CI corrections | Their Resolutions | ☐ |
 | #56, #58, #60, #62, #64, #65 | Static-check defects | Their Resolutions | ☐ |

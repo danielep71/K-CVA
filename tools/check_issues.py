@@ -25,9 +25,9 @@ PRIORITIES = ("P1", "P2", "P3")
 BLOCKED = "blocked"
 FORM_PRIORITIES = {"bug.yml": "P2", "enhancement.yml": "P3", "documentation.yml": "P3",
                    "security-contact.yml": "P2"}
-# Forms whose reporter proposes the target end date; triage adds it to the others.
+# Forms whose reporter proposes the target end date; the maintainer adds it to the others during triage.
 TARGET_DATE_FORMS = ("bug.yml", "enhancement.yml", "documentation.yml")
-# The planning line triage writes, or the field an issue form renders. Each
+# The planning line the maintainer writes, or the field an issue form renders. Each
 # captures its whole value, so an invalid line never falls back to the form.
 PLANNED_TARGET = re.compile(r"^[ \t]*[-*][ \t]*Target end date:[ \t]*(.*?)[ \t]*$", re.I | re.M)
 FORM_TARGET = re.compile(

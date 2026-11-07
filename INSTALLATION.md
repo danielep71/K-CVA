@@ -83,7 +83,8 @@ Where evidence goes:
 | Repository checks: one log per check and a JSON report with the checkout commit, tracked-file hashes and tool versions | `test-results/integrity/` (ignored, not committed); CI uploads it as an artifact kept 30 days |
 | Harness log | The Immediate window, or `TEST_Harness.SaveLog` to `test-results/` or a folder outside the checkout ([running the harness](#running-the-harness)) |
 | Excel run: the three logs, the exported modules and `host.txt` | An evidence folder such as `test-results/excel-run/` (ignored, not committed); the `check_excel_run.py` report is copied into the issue or pull request ([recording an Excel run](#recording-an-excel-run)) |
-| Other retained, reviewed evidence tied to a commit | `tests/evidence/` |
+| Retained, reviewed test evidence tied to a commit | `tests/evidence/` |
+| Setup audits and retained operator-report summaries | `docs/evidence/` |
 
 ## Importing VBA into Excel
 
@@ -217,9 +218,10 @@ It performs steps 2 to 8 below without typing:
 Importing and exporting through Excel's object model needs *Trust access to
 the VBA project object model*. If it is off, the script turns it on for the
 current Windows user only, for the run, and restores the previous value when
-the run ends, whatever its outcome; `host.txt` records this in
-`vba_project_access`. It stops without changing anything if a policy
-controls the setting or Excel is already running. If the project does not
+the run ends. `host.txt` records the restoration path taken in
+`vba_project_access`; it is not an independent registry read-back. It stops before changing the access setting if the current-user policy
+disables VBA project access or Excel is already running. An explicitly enabled
+current-user policy is accepted; the script does not override policy. If the project does not
 compile, Excel shows the error in a message box: click OK and the run is
 recorded with `compile=FAIL`. The script does not import forms or document
 modules yet; a commit holding them needs the manual procedure.
@@ -303,7 +305,8 @@ git add --renormalize --dry-run .
 
 The example component paths are probes, not installed components. Inspect any
 normalization before applying it. Stage only intended changes, then run
-git diff --cached --check. Retained reviewed evidence goes in tests/evidence;
+git diff --cached --check. Retained reviewed test evidence goes in tests/evidence; setup audit reports
+and operator-report summaries go in docs/evidence;
 disposable output goes in test-results. Ignore rules do not remove already
 tracked files and are not a secret scanner.
 
