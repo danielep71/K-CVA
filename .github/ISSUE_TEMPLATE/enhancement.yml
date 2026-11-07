@@ -48,6 +48,14 @@ body:
       required: true
 
   - type: textarea
+    id: alternatives
+    attributes:
+      label: "🔀 Alternatives considered"
+      description: Optional. Other ways to meet the need, doing nothing included, and why you prefer the requested behavior.
+    validations:
+      required: false
+
+  - type: textarea
     id: scope
     attributes:
       label: "📐 Scope and non-goals"
@@ -80,11 +88,20 @@ body:
     validations:
       required: true
 
+  - type: input
+    id: target_end_date
+    attributes:
+      label: "🗓️ Target end date (Europe/Rome)"
+      description: ISO calendar date YYYY-MM-DD, earlier than the due date of the milestone. Triage checks it against the milestone it assigns.
+      placeholder: "YYYY-MM-DD"
+    validations:
+      required: true
+
   - type: textarea
     id: dependencies
     attributes:
       label: "🔗 Dependencies and blocking status"
-      description: Name each prerequisite as an issue link (#12) or on a line starting "External condition:". Write "None" if nothing blocks this work. Triage adds `blocked` only while a named prerequisite is unresolved.
+      description: Name each prerequisite as an issue link (#12) or on a line starting "External condition:". Write "None" if nothing blocks this work. Triage adds `blocked` only while a named prerequisite is unresolved. When an external condition is resolved, delete its "External condition:" line, or replace the section with "None" if nothing else is named, in the same edit that removes `blocked`.
       placeholder: None
     validations:
       required: true

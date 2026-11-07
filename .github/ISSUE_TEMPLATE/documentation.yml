@@ -17,8 +17,8 @@ body:
     id: location
     attributes:
       label: "📍 Document and section"
-      description: File and heading, or a link to the exact line on the default branch.
-      placeholder: docs/ISSUE_LABELS.md → Integration
+      description: File and heading, or a link to the exact line on the branch you read.
+      placeholder: README.md → License
     validations:
       required: true
 
@@ -73,7 +73,16 @@ body:
     id: validation
     attributes:
       label: "🧪 Validation evidence required"
-      description: How the correction will be checked, for example `the relevant automated checks`, a rendered review or a link check.
+      description: How the correction will be checked, for example `python -m unittest discover -s tools`, a rendered review or a link check.
+    validations:
+      required: true
+
+  - type: input
+    id: target_end_date
+    attributes:
+      label: "🗓️ Target end date (Europe/Rome)"
+      description: ISO calendar date YYYY-MM-DD, earlier than the due date of the milestone. Triage checks it against the milestone it assigns.
+      placeholder: "YYYY-MM-DD"
     validations:
       required: true
 
@@ -81,7 +90,7 @@ body:
     id: dependencies
     attributes:
       label: "🔗 Dependencies and blocking status"
-      description: Name each prerequisite as an issue link (#12) or on a line starting "External condition:". Write "None" if nothing blocks this work. Triage adds `blocked` only while a named prerequisite is unresolved.
+      description: Name each prerequisite as an issue link (#12) or on a line starting "External condition:". Write "None" if nothing blocks this work. Triage adds `blocked` only while a named prerequisite is unresolved. When an external condition is resolved, delete its "External condition:" line, or replace the section with "None" if nothing else is named, in the same edit that removes `blocked`.
       placeholder: None
     validations:
       required: true
@@ -91,7 +100,7 @@ body:
     attributes:
       label: "☑️ Submission checks"
       options:
-        - label: I checked the current documentation on the default branch.
+        - label: I checked the current documentation on the default branch or the active release branch.
           required: true
         - label: This request contains no secrets, private links or real portfolio data.
           required: true

@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
 """Check issue metadata and dependency status that issue forms cannot enforce.
 
-Read-only: the check never changes an issue. It reports findings for the
-maintainer to resolve by hand (docs/ISSUE_LABELS.md, Issues).
+Read-only: the check never changes an issue. It reports findings for me to
+resolve by hand (docs/ISSUE_LABELS.md).
 """
 
 from __future__ import annotations
 
 import argparse
+import datetime as dt
 import json
 import os
 import re
+import subprocess
 import sys
 import urllib.error
 import urllib.request
@@ -19,10 +21,18 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-OWNER = "danielep71"
 PRIORITIES = ("P1", "P2", "P3")
 BLOCKED = "blocked"
-FORM_PRIORITIES = {"bug.yml": "P2", "enhancement.yml": "P3", "documentation.yml": "P3"}
+FORM_PRIORITIES = {"bug.yml": "P2", "enhancement.yml": "P3", "documentation.yml": "P3",
+                   "security-contact.yml": "P2"}
+# Forms whose reporter proposes the target end date; triage adds it to the others.
+TARGET_DATE_FORMS = ("bug.yml", "enhancement.yml", "documentation.yml")
+# The planning line triage writes, or the field an issue form renders. Each
+# captures its whole value, so an invalid line never falls back to the form.
+PLANNED_TARGET = re.compile(r"^[ \t]*[-*][ \t]*Target end date:[ \t]*(.*?)[ \t]*$", re.I | re.M)
+FORM_TARGET = re.compile(
+    r"^###\s+(?:🗓️\s*)?Target end date(?:\s*\(Europe/Rome\))?\s*$\n\s*(.*?)[ \t]*$", re.I | re.M)
+ROME_SUFFIX = re.compile(r"\s*\(Europe/Rome\)$", re.I)
 DEPENDENCY_STATUS_WORDS = re.compile(r"block|ready|waiting|depend|on[ -]hold|prerequisite", re.I)
 HEADING = re.compile(r"^#{2,3}\s+(.*)$")
 EXTERNAL = re.compile(r"^\s*(?:[-*]\s*)?external condition:\s*\S", re.I)
@@ -37,6 +47,9 @@ class Issue:
     assignees: tuple[str, ...]
     milestone: str | None
     body: str
+    # Calendar date (YYYY-MM-DD) of the milestone's due_on, as GitHub stores it.
+    milestone_due: str | None = None
+    milestone_state: str = "open"
 
 
 @dataclass(frozen=True)
@@ -44,6 +57,11 @@ class Finding:
     number: int
     rule: str
     message: str
+
+
+def normalized(body: str) -> str:
+    """Use LF line endings: issues edited in a browser are saved with CRLF."""
+    return body.replace("\r\n", "\n").replace("\r", "\n")
 
 
 def issue_from_api(item: Mapping[str, Any]) -> Issue:
@@ -54,7 +72,9 @@ def issue_from_api(item: Mapping[str, Any]) -> Issue:
         labels=tuple(str(label["name"]) for label in item.get("labels", [])),
         assignees=tuple(str(user["login"]) for user in item.get("assignees", [])),
         milestone=str(milestone["title"]) if milestone else None,
-        body=str(item.get("body") or ""),
+        body=normalized(str(item.get("body") or "")),
+        milestone_due=str(milestone["due_on"])[:10] if milestone and milestone.get("due_on") else None,
+        milestone_state=str(milestone.get("state") or "open").lower() if milestone else "open",
     )
 
 
@@ -83,10 +103,45 @@ def references(lines: Iterable[str], repository: str, own: int) -> set[int]:
     return found
 
 
-def metadata_findings(issue: Issue) -> list[Finding]:
+def target_end_date(body: str) -> str | None:
+    """Read the planning line or the issue-form field without guessing a date."""
+    body = normalized(body)
+    match = PLANNED_TARGET.search(body) or FORM_TARGET.search(body)
+    return ROME_SUFFIX.sub("", match.group(1)) if match else None
+
+
+def iso_date(text: str | None) -> dt.date | None:
+    if text is None or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", text):
+        return None
+    try:
+        return dt.date.fromisoformat(text)
+    except ValueError:
+        return None
+
+
+def target_date_findings(issue: Issue) -> list[Finding]:
+    """The target end date must be a real ISO date before the milestone's due date."""
+    target = iso_date(target_end_date(issue.body))
+    if target is None:
+        return [Finding(issue.number, "target-date",
+                        "needs a valid ISO YYYY-MM-DD target end date (Europe/Rome)")]
+    if not issue.milestone:
+        return []  # already reported by the milestone rule
+    due = iso_date(issue.milestone_due)
+    if due is None:
+        return [Finding(issue.number, "milestone-due",
+                        f"milestone {issue.milestone!r} has no due date, so the target end "
+                        "date cannot be checked against it")]
+    if target >= due:
+        return [Finding(issue.number, "milestone-due",
+                        f"target end date {target} must be before the milestone due date {due}")]
+    return []
+
+
+def metadata_findings(issue: Issue, assignee: str) -> list[Finding]:
     findings = []
-    if OWNER not in issue.assignees:
-        findings.append(Finding(issue.number, "assignee", f"is not assigned to {OWNER}"))
+    if assignee not in issue.assignees:
+        findings.append(Finding(issue.number, "assignee", f"is not assigned to {assignee}"))
     priorities = [label for label in issue.labels if label in PRIORITIES]
     if len(priorities) != 1:
         found = ", ".join(priorities) or "none"
@@ -97,6 +152,10 @@ def metadata_findings(issue: Issue) -> list[Finding]:
                                 "has P1 without bug: P1 is reserved for confirmed calculation bugs"))
     if not issue.milestone:
         findings.append(Finding(issue.number, "milestone", "has no milestone"))
+    elif issue.milestone_state != "open":
+        findings.append(Finding(issue.number, "milestone",
+                                f"is in the closed milestone {issue.milestone!r}: "
+                                "move it to an open milestone"))
     return findings
 
 
@@ -128,14 +187,16 @@ def dependency_findings(issue: Issue, states: Mapping[int, str], repository: str
 
 
 def audit(issues: Sequence[Issue], states: Mapping[int, str], repository: str,
-          catalogue: set[str] | None = None, pulls: Collection[int] = ()) -> list[Finding]:
+          catalogue: set[str] | None = None, pulls: Collection[int] = (),
+          *, assignee: str) -> list[Finding]:
     """Audit every open issue; ``states`` maps every known issue number to its state
     and ``pulls`` holds the numbers of the repository's pull requests."""
     findings = []
     for issue in sorted(issues, key=lambda item: item.number):
         if issue.state != "open":
             continue
-        findings += metadata_findings(issue)
+        findings += metadata_findings(issue, assignee)
+        findings += target_date_findings(issue)
         findings += dependency_findings(issue, states, repository, pulls)
         if catalogue is not None:
             findings += [Finding(issue.number, "catalogue", f"has label {label!r}, "
@@ -145,14 +206,35 @@ def audit(issues: Sequence[Issue], states: Mapping[int, str], repository: str,
 
 
 def catalogue_labels(root: Path) -> set[str]:
+    """The resolved catalogue: the core labels plus those of every selected overlay."""
+    # Use the same schema validator as synchronization, so that an unknown or
+    # duplicated overlay selection is refused here too, never silently ignored.
+    result = subprocess.run(
+        ["node", str(root / ".github/scripts/labels-sync.mjs"), "--mode", "validate",
+         "--manifest", str(root / ".github/labels.json")],
+        capture_output=True, text=True, encoding="utf-8", errors="replace", check=False,
+    )
+    if result.returncode:
+        raise ValueError(result.stderr.strip() or result.stdout.strip())
     data = json.loads((root / ".github" / "labels.json").read_text(encoding="utf-8"))
-    return {str(label["name"]) for label in data["core"]}
+    sections = [data["core"], *(data["overlays"][name] for name in data["selected_overlays"])]
+    return {str(label["name"]) for section in sections for label in section}
+
+
+def configured_assignee(root: Path) -> str:
+    """Read the required person from the issue form, not the repository owner."""
+    text = (root / ".github/ISSUE_TEMPLATE/bug.yml").read_text(encoding="utf-8")
+    assignees = flow_list(text, "assignees")
+    if len(assignees) != 1:
+        raise ValueError("bug.yml must configure exactly one assignee")
+    return assignees[0]
 
 
 def config_findings(root: Path) -> list[str]:
     """Check the label catalogue and the issue forms against the issue rules."""
     problems = []
     labels = catalogue_labels(root)
+    assignee = configured_assignee(root)
     status_labels = sorted(n for n in labels if DEPENDENCY_STATUS_WORDS.search(n))
     if status_labels != [BLOCKED]:
         problems.append(f"the dependency status labels must be exactly ['blocked'], "
@@ -169,10 +251,13 @@ def config_findings(root: Path) -> list[str]:
             problems.append(f"{name} must set exactly the priority {priority}")
         problems += [f"{name} sets unknown label {label!r}"
                      for label in form_labels if label not in labels]
-        if flow_list(text, "assignees") != [OWNER]:
-            problems.append(f"{name} must assign {OWNER}")
+        if flow_list(text, "assignees") != [assignee]:
+            problems.append(f"{name} must assign {assignee}")
         if not re.search(r"^\s*id:\s*dependencies\s*$", text, re.M):
             problems.append(f"{name} has no dependencies field")
+        if name in TARGET_DATE_FORMS and not re.search(r"^\s*id:\s*target_end_date\s*$",
+                                                       text, re.M):
+            problems.append(f"{name} has no target end date field")
     config = forms / "config.yml"
     if not config.is_file() or not re.search(r"^blank_issues_enabled:\s*false\s*$",
                                              config.read_text(encoding="utf-8"), re.M):
@@ -188,12 +273,12 @@ def flow_list(text: str, key: str) -> list[str]:
 
 
 def fetch(url: str, token: str) -> Any:
-    request = urllib.request.Request(url, headers={  # noqa: S310 - https API URLs only
+    request = urllib.request.Request(url, headers={  # noqa: S310 - HTTPS GitHub API only
         "Accept": "application/vnd.github+json",
         "Authorization": f"Bearer {token}",
         "X-GitHub-Api-Version": "2022-11-28",
     })
-    with urllib.request.urlopen(request, timeout=30) as response:  # noqa: S310 - https API URLs only
+    with urllib.request.urlopen(request, timeout=30) as response:  # noqa: S310 - HTTPS GitHub API only
         return json.load(response)
 
 
@@ -222,7 +307,7 @@ def load_live(repository: str, token: str) -> Loaded:
         if len(batch) < 100:
             break
     else:
-        raise RuntimeError("more than 10000 issues; refusing to audit a partial list")
+        raise RuntimeError("10000 or more issues; refusing to audit a possibly partial list")
     return split(items)
 
 
@@ -237,7 +322,7 @@ def render(findings: Sequence[Finding], audited: int) -> str:
         lines += ["| Issue | Rule | Finding |", "| --- | --- | --- |"]
         lines += [f"| #{f.number} | `{f.rule}` | {f.message} |" for f in findings]
         lines += ["", "Resolve each finding by hand; this check never changes an issue. "
-                  "See docs/ISSUE_LABELS.md, Issues."]
+                  "See docs/ISSUE_LABELS.md."]
     else:
         lines.append("Every open issue meets the triage rules.")
     return "\n".join(lines) + "\n"
@@ -251,11 +336,17 @@ def parse_args(argv: Sequence[str] | None) -> argparse.Namespace:
     source.add_argument("--input", type=Path, help="issues exported as GitHub REST JSON")
     source.add_argument("--check-config", action="store_true",
                         help="check the issue forms and label catalogue only (offline)")
-    parser.add_argument("--repo-name", default="danielep71/K-CVA",
+    parser.add_argument("--repo-name",
                         help="repository used to resolve issue URLs with --input")
     parser.add_argument("--output", type=Path, help="write the findings as JSON")
     parser.add_argument("--summary", type=Path, help="append the Markdown report to this file")
-    return parser.parse_args(argv)
+    args = parser.parse_args(argv)
+    if args.input and not args.repo_name:
+        parser.error("--input requires --repo-name owner/name")
+    repository = args.repository or args.repo_name
+    if repository and not re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", repository):
+        parser.error("repository must have the form owner/name")
+    return args
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -277,7 +368,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         else:
             issues, states, pulls = load_file(args.input)
             repository = args.repo_name
-        findings = audit(issues, states, repository, catalogue_labels(root), pulls)
+        findings = audit(issues, states, repository, catalogue_labels(root), pulls,
+                         assignee=configured_assignee(root))
     except (OSError, RuntimeError, ValueError, KeyError, urllib.error.URLError) as error:
         print(f"ERROR: {error}", file=sys.stderr)
         return 2

@@ -242,3 +242,14 @@ conditional-compilation and public-API checks from EXCEL-VBA-PROJECT-TEMPLATE
 at `b903fe44ef6a032c4689870b83745afa1c22490d`; preserve that attribution.
 `tools/check_vba_dependencies.py` and its fixtures were written locally. No
 SFT formula, module name, fixture value or regulatory decision is imported.
+
+## Issue-management alignment
+
+The issue forms, issue checker/tests, label catalogue and synchronization/drift
+scripts, issue/label/PR-milestone workflows, safe-pruning and milestone tests,
+and issue-label guide were adapted from
+[danielep71/MyTemplate](https://github.com/danielep71/MyTemplate/tree/f1d0d17ecede525941cfedf07f0cf737bf1346ef)
+at `f1d0d17ecede525941cfedf07f0cf737bf1346ef` under MPL-2.0. K-CVA retains its
+runtime baseline, paths, governance, special-name evidence tests and scope.
+The earlier label-policy baseline table is historical: `.github/label-policy.json`
+was retired in favour of the schema-3 catalogue and `selected_overlays` (#158).

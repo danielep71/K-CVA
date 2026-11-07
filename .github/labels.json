@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 3,
   "prune": true,
   "core": [
     {
@@ -20,12 +20,12 @@
     {
       "name": "ci",
       "color": "24292F",
-      "description": "Automated quality checks, workflow maintenance, or release certification"
+      "description": "Automated quality checks, workflow maintenance, or dependency updates"
     },
     {
       "name": "documentation",
       "color": "0075CA",
-      "description": "User-facing or maintainer-facing documentation"
+      "description": "Documentation for users or for my repository maintenance"
     },
     {
       "name": "duplicate",
@@ -45,7 +45,7 @@
     {
       "name": "help wanted",
       "color": "008672",
-      "description": "Maintainer welcomes external investigation, implementation, validation, or review"
+      "description": "I welcome external investigation, implementation, validation, or review"
     },
     {
       "name": "invalid",
@@ -65,12 +65,12 @@
     {
       "name": "P3",
       "color": "FBCA04",
-      "description": "Non-blocking quality, testing, documentation, or technical-debt improvement"
+      "description": "Non-blocking quality, testing, documentation, setup or technical-debt work"
     },
     {
       "name": "question",
       "color": "D876E3",
-      "description": "Further information or a maintainer decision is required"
+      "description": "I need further information or need to make a decision"
     },
     {
       "name": "refactor",
@@ -100,15 +100,9 @@
     {
       "name": "wontfix",
       "color": "6E7781",
-      "description": "Maintainers have decided not to implement or continue this work"
+      "description": "I have decided not to implement or continue this work"
     }
   ],
-  "overlays": {
-    "profile": {
-      "application": [],
-      "library": [],
-      "ui-component": []
-    },
-    "domain": {}
-  }
+  "overlays": {},
+  "selected_overlays": []
 }
