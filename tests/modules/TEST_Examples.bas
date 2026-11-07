@@ -21,8 +21,8 @@ Attribute VB_Name = "TEST_Examples"
 '
 ' STATE OWNERSHIP
 '   Owns the mode of the running suite. RunExampleOperation changes
-'   Application.Calculation and Application.ScreenUpdating and restores them
-'   before it returns, on the success and the error path.
+'   Application.Calculation and Application.ScreenUpdating and attempts to
+'   restore them on both paths; cleanup failures are reported separately.
 '
 ' ERROR POLICY
 '   As TEST_Harness.EndRun: a run that does not pass raises ERR_TEST_FAILED,
@@ -37,7 +37,7 @@ Attribute VB_Name = "TEST_Examples"
 '   (INSTALLATION.md, Recording an Excel run).
 '
 ' UPDATED
-'   2026-10-24
+'   2026-11-07
 '
 ' AUTHOR
 '   Daniele Penza
@@ -811,7 +811,8 @@ Private Sub RunExampleOperation( _
 '
 ' STATE OWNERSHIP
 '   Changes Application.ScreenUpdating to False and Application.Calculation
-'   to manual, and restores each one it registered to the value it captured.
+'   to manual, and attempts to restore each registered setting to its captured
+'   value; a failed restoration is recorded in CleanupDetails.
 '
 ' ERROR POLICY
 '   Re-raises the primary error after cleanup; when only the cleanup failed,

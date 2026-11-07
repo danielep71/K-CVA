@@ -11,7 +11,7 @@ body:
 
         **Outcome first · Cited rule · Checkable acceptance · Explicit boundaries**
 
-        Describe the result you need and how it will be proved before any implementation. A calculation change cites its regulatory source and states units and valid input domains. Triage sets the milestone and confirms the priority (`P3` by default).
+        Describe the result you need and how it will be proved before any implementation. A calculation change cites its regulatory source and states units and valid input domains. The maintainer sets the milestone and confirms the priority during triage (`P3` by default).
 
         > [!NOTE]
         > Synthetic data only: no real trades, counterparties, collateral, credentials or private links.
@@ -92,7 +92,7 @@ body:
     id: target_end_date
     attributes:
       label: "🗓️ Target end date (Europe/Rome)"
-      description: ISO calendar date YYYY-MM-DD, earlier than the due date of the milestone. Triage checks it against the milestone it assigns.
+      description: ISO calendar date YYYY-MM-DD, earlier than the due date of the milestone. The read-only triage check compares it with the milestone assigned by the maintainer.
       placeholder: "YYYY-MM-DD"
     validations:
       required: true
@@ -101,7 +101,7 @@ body:
     id: dependencies
     attributes:
       label: "🔗 Dependencies and blocking status"
-      description: Name each prerequisite as an issue link (#12) or on a line starting "External condition:". Write "None" if nothing blocks this work. Triage adds `blocked` only while a named prerequisite is unresolved. When an external condition is resolved, delete its "External condition:" line, or replace the section with "None" if nothing else is named, in the same edit that removes `blocked`.
+      description: Name each prerequisite as an issue link (#12) or on a line starting "External condition:". Write "None" if nothing blocks this work. The maintainer adds `blocked` only while a named prerequisite is unresolved. When an external condition is resolved, delete its "External condition:" line, or replace the section with "None" if nothing else is named, in the same edit that removes `blocked`.
       placeholder: None
     validations:
       required: true

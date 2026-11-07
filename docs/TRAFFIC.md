@@ -106,9 +106,10 @@ hold them, since the branch's history is never rewritten.
   is rebuilt on a newer branch tip, never replaces what the newer one stored;
   it can only fill a date or metric that nothing newer reported. For the
   snapshot, a collection older than the day's `observed_at` is ignored, even
-  if its totals differ. For the daily counts, the stored time is that of the
-  collection that last *changed* them; a day's counts only grow until the day
-  ends, so an older collection replayed later cannot hold different values.
+  if its totals differ. Daily counts use separate `views_observed_at` and
+  `clones_observed_at` guards. Each advances on a newer observation even when
+  values are unchanged, preventing an older divergent replay from replacing
+  them. The corresponding `*_collected_at` records only the last value change.
 
 ### Zero or unavailable
 

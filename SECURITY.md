@@ -60,7 +60,7 @@ Do not weaken organization macro or endpoint policy to run a workbook.
 
 | Automation | Permissions and behavior |
 | --- | --- |
-| Label synchronization | PR validation reads contents. Reconciliation on relevant main pushes or manual dispatch has contents:read and issues:write. Review the selected ref before dispatching a write-capable run. |
+| Label synchronization | PR validation reads contents. Reconciliation on relevant main pushes or manual dispatch has contents:read, issues:write and pull-requests:read (to check labels on PRs before pruning). Review the selected ref before dispatching a write-capable run. |
 | Label drift | PR fixtures read contents; live checks read contents/issues. No label mutation. |
 | Issue triage | Reads contents, issues and pull requests; reports metadata violations without editing issues. |
 | Repository integrity | Reads contents; runs unfiltered PR/push checks for main and release/**, plus manual dispatch. Uploads diagnostic evidence retained for 30 days. No source or issue mutation; see [CI coverage](docs/CI.md). |
@@ -68,13 +68,13 @@ Do not weaken organization macro or endpoint policy to run a workbook.
 | External links | Weekly and on dispatch; reads contents and requests the external URLs linked from the documentation. No write permission. |
 | Pull request milestones | On PR events, daily/manual scans and workflow-file changes on the default branch. Holds issues:read and pull-requests:write, never runs PR code, refuses to change an issue and verifies removal by read-back. See [pull request milestones](docs/CI.md#pull-request-milestones). |
 | Traffic history | Daily and on dispatch, from main only, in the `analytics` environment. A GitHub App installation token with Administration: read only, valid for an hour and revoked at the job's end, reaches only the curl fetch step; the job pushes the data branch with contents:write. The App is installed only on repositories whose traffic it collects; this repository's private key is its own, but could mint the same read-only access to each of them. See [TRAFFIC.md](docs/TRAFFIC.md#credential-setup-and-renewal). |
-| Dependabot version updates | Weekly GitHub Actions dependency-update PRs targeting release/0.1.0, assigned to the maintainer. No automatic approval or merge; maintainer final-head review is required. |
+| Dependabot version updates | Weekly GitHub Actions and `tools/` Python dependency-update PRs targeting release/0.1.0, assigned to the maintainer. No automatic approval or merge; maintainer final-head review is required. |
 
 The workflow files pin actions to full SHAs and disable persisted checkout
 credentials. Universal repository CI was delivered by #6
 through PR #30 and integrated into main by PR #32; required-check enforcement
 was configured under #12 for main and release/**. The controlled enforcement
-demonstration remains #13. A green metadata check is not a security scan.
+demonstration was completed under #13; see the [governance evidence](docs/GOVERNANCE.md). A green metadata check is not a security scan.
 
 <a id="current-visibility"></a>
 

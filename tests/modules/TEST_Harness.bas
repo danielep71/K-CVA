@@ -17,7 +17,7 @@ Attribute VB_Name = "TEST_Harness"
 '   Module keeps all of them out of the workbook's external surface.
 '
 ' DEPENDENCIES
-'   The VBA and Excel object models only: no reference, workbook fixture,
+'   The VBA and Excel object models only: no additional reference, workbook fixture,
 '   worksheet or external framework.
 '
 ' STATE OWNERSHIP
@@ -47,7 +47,7 @@ Attribute VB_Name = "TEST_Harness"
 '   the Immediate window. It has no suite of its own.
 '
 ' UPDATED
-'   2026-10-24
+'   2026-11-07
 '
 ' AUTHOR
 '   Daniele Penza
@@ -1023,7 +1023,7 @@ Private Function EnvironmentSummary() _
 '   Describe the Excel host and the compiled VBA environment.
 '
 ' RETURNS
-'   host, version, os, office (bitness) and runtime (VBA generation); the
+'   host, version, build, os, office (bitness) and runtime (VBA generation); the
 '   last two come from conditional compilation, not from Windows.
 '
 ' UPDATED

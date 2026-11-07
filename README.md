@@ -92,7 +92,10 @@ numerical test-case **format**, exported VBA static rules and workflows.
 They read files only: they neither compile VBA nor test a CVA calculation.
 
 The regression harness exercises a neutral example suite, with no CVA formula.
-Its Excel execution remains unverified. The methodology documents retain the
+A [maintainer-supplied Excel run](docs/evidence/excel-run-194e9cd.md) records
+compile and scaffold-run PASS for its exact candidate and host; the raw bundle
+remains with the maintainer and no CVA calculation is validated.
+The methodology documents retain the
 regulatory source and describe the inputs and evidence expected for future work.
 
 See [CI coverage](docs/CI.md), [tooling](tools/README.md) and

@@ -11,8 +11,8 @@ A 2xx or 3xx answer passes. 401, 403 and 429 are reported as *unverified*:
 the site refuses automated clients or rate-limits, which says nothing about
 the link. Pages that only a signed-in maintainer can open, listed in
 ``SIGN_IN_REQUIRED``, are not requested and are reported as unverified too:
-GitHub answers an anonymous request for them with 404. Anything else, after
-one retry, is *broken* and fails the run.
+GitHub answers an anonymous request for them with 404. Other errors are
+*broken* and fail the run; server and network errors receive one retry.
 """
 
 from __future__ import annotations
