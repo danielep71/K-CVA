@@ -30,9 +30,11 @@
     Importing, compiling and exporting through COM needs "Trust access to the
     VBA project object model". If it is off, the script turns it on for the
     current user only, for this run, and restores the previous value when the
-    run ends, whatever its outcome; host.txt records that it did. It stops,
-    changing nothing, if a policy controls the setting or if Excel is
-    already running. The macro security level is never changed.
+    run ends; host.txt records the restoration path taken, not an independent
+    read-back. Before changing the setting, it stops if the current-user
+    policy disables access or Excel is already running. An explicitly
+    enabled current-user policy is accepted and is not overridden.
+    The macro security level is never changed.
 
 .EXAMPLE
     powershell -NoProfile -ExecutionPolicy Bypass -File tools\Record-KCVA-ExcelRun.ps1

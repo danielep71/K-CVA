@@ -6,7 +6,8 @@ not matched with regular expressions. Rules (docs/CI.md, Workflow rules):
 - the workflow sets top-level ``permissions`` as a mapping with no write scope;
 - every job sets its own ``permissions``, so none relies on inheritance;
 - every write scope of a job is listed in ``WRITE_ALLOWED`` for that job;
-- every job has a positive ``timeout-minutes`` of at most ``MAX_TIMEOUT``;
+- every non-reusable job has a positive ``timeout-minutes`` of at most
+  ``MAX_TIMEOUT``; reusable-workflow calls cannot set their own timeout;
 - every ``uses:`` names an action or workflow at a full commit SHA;
 - every ``actions/checkout`` step sets ``persist-credentials: false``;
 - the required check runs on ``pull_request`` and ``push`` without path filters,

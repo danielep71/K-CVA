@@ -31,7 +31,7 @@ version and changelog rules are in
 | Version | Semantic Versioning, `MAJOR.MINOR.PATCH`; `0.y.z` while in initial development ([rules](CHANGELOG.md#date-and-version-rules)) |
 | Release branch | `release/X.Y.Z`, without `v`, opened only by maintainer decision |
 | Milestone | `vX.Y.Z - <title>`, on issues only |
-| `VERSION` | One `X.Y.Z` line at the root. Created in the release-preparation pull request, never before; afterwards it always names the newest released version |
+| `VERSION` | One `X.Y.Z` line at the root. Created in the release-preparation pull request, never before; afterwards it names the newest dated changelog version, including a prepared version not yet published |
 | Changelog | Work stays under `## [Unreleased]`; preparation moves it to `## [X.Y.Z] - YYYY-MM-DD` |
 | Tag | Annotated `vX.Y.Z` on the candidate commit on `main`; the `v*` tag ruleset blocks its deletion, force pushes and updates ([settings](docs/REPOSITORY_SETTINGS.md)) |
 | GitHub Release | Created from the tag. For 0.1.0: release notes only, with no asset, since no workbook or other artifact exists |
