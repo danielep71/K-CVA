@@ -136,6 +136,10 @@ CVA calculation, public API or workbook.
 
 ### Validation
 
+- File audit (#18): record every tracked file and reviewed blob, preserve
+  historical attribution, document local artwork/recorder provenance, reconcile
+  remaining scaffold-host status and add #158/#162 to the closeout index.
+
 - Scaffold imported, compiled and executed in Excel 16.0 build 20430, Windows
   64-bit, at main `194e9cd`: [maintainer-supplied validator PASS](docs/evidence/excel-run-194e9cd.md)
   for normal, injected-failure and skipped-case evidence (#11).
