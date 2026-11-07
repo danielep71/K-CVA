@@ -1,9 +1,10 @@
 # Verification
 
-No numerical CVA test suite or host certification exists yet. This directory
+No numerical CVA test suite or product certification exists yet. This directory
 holds the deterministic regression scaffold (#10): the VBA harness, its
-neutral example suite and the test-case files. Evidence and host smoke
-validation are #11. The repository tooling has its own tests in
+neutral example suite and the test-case files. The
+[maintainer-supplied host report](../docs/evidence/excel-run-194e9cd.md) records
+a successful scaffold smoke test for #11. The repository tooling has its own tests in
 [tools/](../tools/README.md).
 
 | Location | Holds |
@@ -94,8 +95,8 @@ of the table:
 fixed in the suite's source, so two logs of the same commit can be compared
 line by line, apart from `started` and `ENVIRONMENT`.
 
-The harness runs only in Excel and has not been run yet: compiling and
-running it on the intended host is #11, recorded as in
+The harness runs only in Excel. Its candidate-bound smoke test is retained
+in the [host report](../docs/evidence/excel-run-194e9cd.md) for #11, recorded as in
 [recording an Excel run](../INSTALLATION.md#recording-an-excel-run) and
 checked against its commit by `tools/check_excel_run.py`. Without Excel,
 `tools/test_vba_harness.py` checks what the source can show: the example

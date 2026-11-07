@@ -2,15 +2,16 @@
 
 **Setup only:** no production VBA component, template or workbook exists yet;
 tests/modules holds the test harness and its neutral example suite (#10). The
-procedures below define the convention for components; they have not been
-executed in Excel. The first real host run belongs to #11.
+procedures below define the convention for components. The scaffold was imported,
+compiled and run on the [recorded Excel host](#tested-environments) for #11.
 Contribution rules are in [CONTRIBUTING.md](CONTRIBUTING.md); portable CI is documented in
 [docs/CI.md](docs/CI.md).
 
 ## Host policy
 
 The intended initial target is Microsoft 365 Excel desktop on Windows, 64-bit.
-No Excel build is currently tested or certified. Windows 32-bit, older perpetual
+The scaffold has been tested on the build recorded below; this is not production
+calculation certification. Windows 32-bit, older perpetual
 Excel versions, Mac and web are not supported targets for this baseline.
 Adding support requires a recorded decision and evidence.
 
@@ -29,7 +30,7 @@ and never touches the macro-security level.
 
 | Tested environment | Commit | Evidence |
 | --- | --- | --- |
-| None yet | Not applicable | Pending the first [recorded Excel run](#recording-an-excel-run) (#11) |
+| Windows 11 Enterprise 25H2, OS build 26200.9711; Excel 16.0 build 20430, 64-bit, VBA7 | `194e9cd322b5a86a58bf54e025d931b17cc13276` | [Maintainer-supplied compile and scaffold-run PASS](docs/evidence/excel-run-194e9cd.md) (#11); no CVA calculation validation |
 
 ## Obtain an exact source revision
 
@@ -58,7 +59,7 @@ conversion, even though archives retain configuration. Do not mix revisions.
 | Git | Any current release | Checkout with the repository's line-ending rules |
 | Python | 3.12.14 (the CI baseline) | `tools/check_repository.py` and its checks; the hash-locked packages in [tools/requirements.txt](tools/requirements.txt) |
 | Node.js | 24.22.1 (the CI baseline) | Label scripts and their self-tests; built-in modules only |
-| Microsoft 365 Excel, Windows, 64-bit | Not yet tested (#11) | Importing, compiling and running VBA ([host policy](#host-policy)) |
+| Microsoft 365 Excel, Windows, 64-bit | Tested scaffold: Excel 16.0 build 20430 (#11) | Importing, compiling and running VBA ([host policy](#host-policy)) |
 
 Install the locked Python packages once, preferably in a virtual
 environment; no npm package is installed. The first run downloads actionlint
@@ -144,8 +145,8 @@ configured under #12 and were demonstrated under #13
 
 ## Running the harness
 
-Not yet run: the first host run, with its evidence, is #11; to record a run
-as evidence, follow [recording an Excel run](#recording-an-excel-run). In a
+The [recorded host run](docs/evidence/excel-run-194e9cd.md) passed for the
+scaffold at its stated candidate. To record a new run as evidence, follow [recording an Excel run](#recording-an-excel-run). In a
 **development** workbook built as above, open the Immediate window
 (**Ctrl+G**) and type:
 

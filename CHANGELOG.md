@@ -136,6 +136,10 @@ CVA calculation, public API or workbook.
 
 ### Validation
 
+- Scaffold imported, compiled and executed in Excel 16.0 build 20430, Windows
+  64-bit, at main `194e9cd`: [maintainer-supplied validator PASS](docs/evidence/excel-run-194e9cd.md)
+  for normal, injected-failure and skipped-case evidence (#11).
+
 - Enforcement of the required check was exercised on `release/**`: a failing
   check and an out-of-date base blocked the merge, and a rebase merge was
   refused ([demonstrated enforcement](docs/GOVERNANCE.md#demonstrated-enforcement);
@@ -143,8 +147,8 @@ CVA calculation, public API or workbook.
 
 ### Known limitations
 
-- No VBA has been imported, compiled or run in Excel; no host is tested
-  (#11).
+- The scaffold host evidence covers only the exact candidate and environment
+  recorded under #11; it is not CVA numerical or product certification.
 - There is no calculation, public API, workbook or numerical test case other
   than an illustrative format example. Methodology decisions M4 and M6 are
   open, and M5 and M7 in part ([docs/DECISIONS.md](docs/DECISIONS.md)).
