@@ -49,7 +49,7 @@ See the [decision register](docs/DECISIONS.md) and
 | --- | --- | --- |
 | Repository infrastructure | CI, issue policy, static checks and development conventions | Ongoing maintenance and milestone closeout |
 | Methodology | Regulatory basis, source copy, BA-CVA input definitions and test-case format | Calculation implementation and numerical validation |
-| VBA regression harness | Neutral example suite and evidence tooling | Compilation and execution in Excel under [#11](https://github.com/danielep71/K-CVA/issues/11) |
+| VBA regression harness | Neutral example suite, evidence tooling and [recorded Excel smoke-test PASS](docs/evidence/excel-run-194e9cd.md) | Candidate closeout and validation of future changes |
 | Calculation product | No engine, public API or workbook | Future implementation, testing and release |
 
 **No version, tag or workbook has been released.** The current milestone is

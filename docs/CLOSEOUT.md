@@ -83,7 +83,7 @@ commit.
 | #8 | Methodology provenance and test-case contract | Resolution of #8 | ☐ |
 | #9 | Static checks and regression fixtures | Resolution of #9 | ☐ |
 | #10 | Regression scaffold | Resolution of #10 | ☐ |
-| #11 | Candidate-bound evidence and host smoke test | Open | ☐ |
+| #11 | Candidate-bound evidence and host smoke test | [Maintainer-supplied main-candidate PASS](evidence/excel-run-194e9cd.md); documentation acceptance tracked in #11 | ☐ |
 | #12 | Repository settings and protections | Resolution of #12 | ☐ |
 | #13 | Failing and passing checks and merge enforcement | Resolution of #13 | ☐ |
 | #14 | Traffic history | Resolution of #14; main integrations #103, #106, #111; syncs #104, #107, #112 | ☐ |
