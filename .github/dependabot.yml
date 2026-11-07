@@ -5,6 +5,9 @@ updates:
     target-branch: release/0.1.0
     schedule:
       interval: weekly
+    groups:
+      codeql:
+        patterns: ['github/codeql-action/*']
     open-pull-requests-limit: 5
     assignees: [danielep71]
     labels: [ci, P3]
