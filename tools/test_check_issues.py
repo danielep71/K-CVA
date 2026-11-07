@@ -5,23 +5,31 @@ from __future__ import annotations
 import contextlib
 import io
 import json
+import shutil
+import sys
 import tempfile
 import unittest
 import unittest.mock
 from pathlib import Path
 
-import check_issues
-from check_issues import Issue
-
 ROOT = Path(__file__).resolve().parents[1]
-REPOSITORY = "danielep71/K-CVA"
+sys.path.insert(0, str(ROOT / "tools"))
+
+import check_issues  # noqa: E402
+from check_issues import Issue  # noqa: E402
+
+REPOSITORY = "example-org/sample-project"
 BLOCKED_LABEL = check_issues.BLOCKED
 READY = "## Dependencies and blocking status\n\n**Ready to start**: none.\n"
+PLANNING = "## Planning\n- Target end date: {} (Europe/Rome)\n\n"
 
 
 def issue(number: int, *labels: str, state: str = "open", body: str = READY,
-          assignees: tuple[str, ...] = ("danielep71",), milestone: str | None = "v0.1.0") -> Issue:
-    return Issue(number, state, labels or ("P3",), assignees, milestone, body)
+          assignees: tuple[str, ...] = ("triage-person",), milestone: str | None = "v0.1.0",
+          target: str | None = "2026-11-04", milestone_due: str | None = "2026-11-30") -> Issue:
+    """An issue whose body starts with a planning line for ``target`` unless it is None."""
+    planned = (PLANNING.format(target) if target is not None else "") + body
+    return Issue(number, state, labels or ("P3",), assignees, milestone, planned, milestone_due)
 
 
 def blocked_by(*numbers: int, heading: str = "## Dependencies and blocking status") -> str:
@@ -33,7 +41,7 @@ def rules(issues: list[Issue], states: dict[int, str] | None = None,
           pulls: frozenset[int] = frozenset()) -> list[tuple[int, str]]:
     known = states if states is not None else {i.number: i.state for i in issues}
     return [(f.number, f.rule)
-            for f in check_issues.audit(issues, known, REPOSITORY, pulls=pulls)]
+            for f in check_issues.audit(issues, known, REPOSITORY, pulls=pulls, assignee="triage-person")]
 
 
 class MetadataTests(unittest.TestCase):
@@ -55,8 +63,66 @@ class MetadataTests(unittest.TestCase):
 
     def test_unknown_labels_are_reported_against_the_catalogue(self) -> None:
         findings = check_issues.audit([issue(1, "P3", "ready")], {1: "open"}, REPOSITORY,
-                                      catalogue={"P3"})
+                                      catalogue={"P3"}, assignee="triage-person")
         self.assertEqual([(f.number, f.rule) for f in findings], [(1, "catalogue")])
+
+
+class TargetDateTests(unittest.TestCase):
+    def test_target_end_date_must_be_a_real_iso_date(self) -> None:
+        for date in ("2026-02-30", "04/11/2026", "2026-11-4", "soon"):
+            with self.subTest(date=date):
+                self.assertEqual(rules([issue(1, target=date)]), [(1, "target-date")])
+        self.assertEqual(rules([issue(1, target=None)]), [(1, "target-date")])
+
+    def test_crlf_bodies_are_read(self) -> None:
+        planned = PLANNING.format("2026-11-04").replace("\n", "\r\n") + READY.replace("\n", "\r\n")
+        self.assertEqual(check_issues.target_end_date(planned), "2026-11-04")
+        form = "### 🗓️ Target end date (Europe/Rome)\r\n\r\n2026-11-04\r\n\r\n" + READY.replace("\n", "\r\n")
+        self.assertEqual(check_issues.target_end_date(form), "2026-11-04")
+        item = {"number": 1, "state": "open", "labels": [{"name": "P3"}],
+                "assignees": [{"login": "triage-person"}], "body": planned,
+                "milestone": {"title": "v0.1.0", "due_on": "2026-11-30T08:00:00Z", "state": "open"}}
+        self.assertEqual(rules([check_issues.issue_from_api(item)]), [])
+
+    def test_issue_form_field_is_read(self) -> None:
+        body = "### 🗓️ Target end date (Europe/Rome)\n\n2026-11-04\n\n" + READY
+        self.assertEqual(check_issues.target_end_date(body), "2026-11-04")
+        self.assertEqual(rules([issue(1, body=body, target=None)]), [])
+        self.assertEqual(rules([issue(1, body="### 🗓️ Target end date (Europe/Rome)\n\n_No response_\n\n"
+                                       + READY, target=None)]), [(1, "target-date")])
+
+    def test_planning_line_takes_precedence_even_when_invalid(self) -> None:
+        form = "### 🗓️ Target end date (Europe/Rome)\n\n2026-11-04\n\n" + READY
+        self.assertEqual(rules([issue(1, body=form, target="2026-11-10")]), [])
+        self.assertEqual(check_issues.target_end_date(PLANNING.format("2026-11-10") + form),
+                         "2026-11-10")
+        for value in ("to be decided", "", "2026-11-10 or later"):
+            with self.subTest(value=value):
+                body = f"- Target end date: {value}\n\n" + form
+                self.assertEqual(rules([issue(1, body=body, target=None)]), [(1, "target-date")])
+
+    def test_target_date_must_be_before_the_milestone_due_date(self) -> None:
+        self.assertEqual(rules([issue(1, milestone_due="2026-11-05")]), [])
+        self.assertEqual(rules([issue(1, milestone_due="2026-11-04")]), [(1, "milestone-due")])
+        self.assertEqual(rules([issue(1, milestone_due=None)]), [(1, "milestone-due")])
+
+    def test_missing_milestone_is_reported_once(self) -> None:
+        self.assertEqual(rules([issue(1, milestone=None, milestone_due=None)]), [(1, "milestone")])
+
+    def test_open_issue_in_a_closed_milestone_is_reported(self) -> None:
+        closed = Issue(1, "open", ("P3",), ("triage-person",), "v0.1.0",
+                       PLANNING.format("2026-11-04") + READY, "2026-11-30", "closed")
+        self.assertEqual(rules([closed]), [(1, "milestone")])
+
+    def test_due_date_comes_from_the_api_milestone(self) -> None:
+        item = {"number": 1, "state": "open", "labels": [], "assignees": [], "body": "",
+                "milestone": {"title": "v0.1.0", "due_on": "2026-11-30T08:00:00Z"}}
+        self.assertEqual(check_issues.issue_from_api(item).milestone_due, "2026-11-30")
+        self.assertEqual(check_issues.issue_from_api(item).milestone_state, "open")
+        item["milestone"] = {"title": "v0.1.0", "due_on": None, "state": "closed"}
+        self.assertEqual(check_issues.issue_from_api(item).milestone_state, "closed")
+        item["milestone"] = {"title": "v0.1.0", "due_on": None}
+        self.assertIsNone(check_issues.issue_from_api(item).milestone_due)
 
 
 class DependencyTests(unittest.TestCase):
@@ -104,15 +170,99 @@ class DependencyTests(unittest.TestCase):
                          [(2, "dependencies"), (2, "blocked")])
 
 
+class GuideExampleTests(unittest.TestCase):
+    """The dependency-section example of the label guide reads as the guide says."""
+
+    def example(self) -> str:
+        guide = (ROOT / "docs/ISSUE_LABELS.md").read_text(encoding="utf-8")
+        section = guide.split("### Dependency section", 1)[1]
+        return section.split("```markdown\n", 1)[1].split("```", 1)[0]
+
+    def findings(self, body: str, *labels: str) -> list[str]:
+        # #12 is an open issue and #34 a pull request, as the example says.
+        found = rules([issue(1, "P3", *labels, body=body)], {12: "open"}, pulls=frozenset({34}))
+        return [rule for _, rule in found if rule in {"blocked", "dependencies"}]
+
+    def test_the_example_is_a_correctly_blocked_issue(self) -> None:
+        self.assertEqual(self.findings(self.example(), BLOCKED_LABEL), [])
+
+    def test_each_blocker_of_the_example_requires_blocked(self) -> None:
+        self.assertEqual(self.findings(self.example()), ["blocked", "blocked"])
+
+    def test_the_pull_request_alone_does_not_block(self) -> None:
+        only_pull = "\n".join(line for line in self.example().splitlines()
+                              if "#12" not in line and "External condition" not in line)
+        self.assertIn("#34", only_pull)
+        self.assertEqual(self.findings(only_pull, BLOCKED_LABEL), ["blocked"])
+
 
 class ConfigTests(unittest.TestCase):
     def test_repository_configuration_passes(self) -> None:
         self.assertEqual(check_issues.config_findings(ROOT), [])
 
+    def test_forms_must_ask_for_the_target_end_date(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            shutil.copytree(ROOT / ".github", root / ".github")
+            form = root / ".github/ISSUE_TEMPLATE/enhancement.yml"
+            form.write_text(form.read_text(encoding="utf-8").replace(
+                "id: target_end_date", "id: planned_date"), encoding="utf-8")
+            self.assertEqual(check_issues.config_findings(root),
+                             ["enhancement.yml has no target end date field"])
+
+    @staticmethod
+    def catalogue_with_overlay(root: Path, selected: list[str]) -> set[str]:
+        """The resolved catalogue of a copy of the manifest with one overlay, ``regime``."""
+        shutil.copytree(ROOT / ".github/scripts", root / ".github/scripts")
+        manifest = json.loads((ROOT / ".github/labels.json").read_text(encoding="utf-8"))
+        manifest["overlays"] = {"regime": [
+            {"name": "zz-regime", "color": "ABCDEF", "description": "overlay label"}]}
+        manifest["selected_overlays"] = selected
+        (root / ".github/labels.json").write_text(json.dumps(manifest), encoding="utf-8")
+        return check_issues.catalogue_labels(root)
+
+    def test_catalogue_is_the_core_plus_the_selected_overlays(self) -> None:
+        core = {label["name"] for label in
+                json.loads((ROOT / ".github/labels.json").read_text(encoding="utf-8"))["core"]}
+        with tempfile.TemporaryDirectory() as directory:
+            self.assertEqual(self.catalogue_with_overlay(Path(directory), ["regime"]),
+                             core | {"zz-regime"})
+        with tempfile.TemporaryDirectory() as directory:
+            self.assertEqual(self.catalogue_with_overlay(Path(directory), []), core)
+
+    def test_an_unknown_or_duplicated_overlay_selection_is_rejected(self) -> None:
+        for selected, message in ((["missing"], 'selects unknown overlay "missing"'),
+                                  (["regime", "regime"], 'selects overlay "regime" again')):
+            with (self.subTest(selected=selected), tempfile.TemporaryDirectory() as directory,
+                  self.assertRaisesRegex(ValueError, message)):
+                self.catalogue_with_overlay(Path(directory), selected)
+
+    def test_the_previous_manifest_schema_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            shutil.copytree(ROOT / ".github/scripts", root / ".github/scripts")
+            manifest = json.loads((ROOT / ".github/labels.json").read_text(encoding="utf-8"))
+            previous = {"schema_version": 2, "prune": manifest["prune"], "labels": manifest["core"]}
+            (root / ".github/labels.json").write_text(json.dumps(previous), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "schema_version 2 with a labels list is no "
+                                                    "longer supported"):
+                check_issues.catalogue_labels(root)
+
+    def test_assignee_comes_from_configuration_not_repository_identity(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            forms = root / ".github/ISSUE_TEMPLATE"
+            forms.mkdir(parents=True)
+            (forms / "bug.yml").write_text('assignees: [triage-person]\n')
+            self.assertEqual(check_issues.configured_assignee(root), "triage-person")
+            (forms / "bug.yml").write_text('assignees: []\n')
+            with self.assertRaises(ValueError):
+                check_issues.configured_assignee(root)
+
     def test_flow_list(self) -> None:
-        text = 'name: x\nlabels: ["bug", "P2"]\nassignees: [danielep71]\n'
+        text = 'name: x\nlabels: ["bug", "P2"]\nassignees: [triage-person]\n'
         self.assertEqual(check_issues.flow_list(text, "labels"), ["bug", "P2"])
-        self.assertEqual(check_issues.flow_list(text, "assignees"), ["danielep71"])
+        self.assertEqual(check_issues.flow_list(text, "assignees"), ["triage-person"])
         self.assertEqual(check_issues.flow_list(text, "title"), [])
 
 
@@ -120,8 +270,8 @@ class MainTests(unittest.TestCase):
     def test_input_mode_reports_and_exits_nonzero_on_findings(self) -> None:
         items = [
             {"number": 1, "state": "open", "labels": [{"name": "P3"}],
-             "assignees": [{"login": "danielep71"}], "milestone": None,
-             "body": READY + "Delivered in #2, a pull request.\n"},
+             "assignees": [{"login": "triage-person"}], "milestone": None,
+             "body": PLANNING.format("2026-11-04") + READY + "Delivered in #2, a pull request.\n"},
             {"number": 2, "state": "open", "labels": [], "assignees": [],
              "milestone": None, "body": READY, "pull_request": {}},
         ]
@@ -129,14 +279,39 @@ class MainTests(unittest.TestCase):
             source = Path(directory) / "issues.json"
             source.write_text(json.dumps(items), encoding="utf-8")
             output = Path(directory) / "report.json"
-            with contextlib.redirect_stdout(io.StringIO()) as stdout:
+            with contextlib.redirect_stdout(io.StringIO()) as stdout, \
+                    unittest.mock.patch.object(check_issues, "configured_assignee",
+                                               return_value="triage-person"):
                 code = check_issues.main(["--root", str(ROOT), "--input", str(source),
-                                          "--output", str(output)])
+                                          "--output", str(output), "--repo-name", REPOSITORY])
             self.assertEqual(code, 1)
             report = json.loads(output.read_text(encoding="utf-8"))
             self.assertEqual(report["status"], "fail")
             self.assertEqual([f["rule"] for f in report["findings"]], ["milestone"])
             self.assertIn("open issues audited: 1", stdout.getvalue())
+
+    def test_live_mode_reads_every_page_and_refuses_partial_lists(self) -> None:
+        def item(number: int) -> dict[str, object]:
+            return {"number": number, "state": "open", "labels": [], "assignees": [],
+                    "milestone": None, "body": ""}
+
+        pages = {1: [item(n) for n in range(1, 101)], 2: [item(101)]}
+        with unittest.mock.patch.object(
+                check_issues, "fetch",
+                side_effect=lambda url, token: pages[int(url.rsplit("page=", 1)[1])]) as fetch:
+            issues, _states, _pulls = check_issues.load_live("o/r", "token")
+        self.assertEqual(len(issues), 101)
+        self.assertEqual(fetch.call_count, 2)
+        with unittest.mock.patch.object(check_issues, "fetch",
+                                        return_value=[item(1)] * 100) as fetch, \
+                self.assertRaisesRegex(RuntimeError, "10000 or more issues"):
+            check_issues.load_live("o/r", "token")
+        self.assertEqual(fetch.call_count, 100)
+
+    def test_offline_mode_requires_explicit_repository(self) -> None:
+        with contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit) as error:
+            check_issues.parse_args(["--input", "issues.json"])
+        self.assertEqual(error.exception.code, 2)
 
     def test_live_mode_requires_a_token(self) -> None:
         with contextlib.redirect_stderr(io.StringIO()), \

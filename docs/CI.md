@@ -172,6 +172,8 @@ Every exception, with its reason:
 | `S101` | `tools/test_*.py` | unittest helpers may assert |
 | `E501` | `tools/test_check_vba.py` | The VBA fixtures reproduce real source lines; wrapping them would change the fixture |
 | `S310` (3 lines) | `check_issues.py`, `check_repository.py` | The URLs opened are the HTTPS GitHub API and the HTTPS release URL from the actionlint lock |
+| `S106` (1 line) | `test_labels_sync.py` | Synthetic token used only against the local fake API |
+| `S102` (1 line) | `test_pr_milestones.py` | Executes the trusted repository workflow script under test with a fake API |
 | `S105` (1 line) | `check_vba_conditionals.py` | A VBA expression token compared with `"("`, not a password |
 
 Git's SHA-1 blob id in `check_excel_run.py` is computed with
@@ -281,17 +283,34 @@ on GitHub with a reason, and record either disposition in
 Milestones belong to issues only. The *Pull request milestones* workflow
 (`.github/workflows/pr-milestones.yml`) enforces it:
 
-- **Triggers:** `pull_request_target` when a pull request is opened,
-  reopened, edited or given a milestone; a push to `main`; and a daily sweep
-  of every pull request, open or closed.
-- **Action:** it clears the milestone of any pull request that has one and
-  lists what it cleared in the run summary.
-- **Safety:** it never checks out or runs code from a pull request. It only
-  calls the GitHub API, with a token that holds `pull-requests: write` and
-  nothing else (top-level permissions are empty). Before changing anything it
-  reads the number through the pulls API, which answers 404 for an issue, and
-  it refuses, with an error, anything that is not a pull request; an issue's
-  milestone is never changed.
+- **Triggers:** PR opened/reopened/edited/milestoned events, a daily scan,
+  manual dispatch, and a workflow-file change on the default branch.
+- **Action:** remove milestones only from verified pull requests, then read
+  them again to verify the removal persisted. The summary lists each removal.
+- **Safety:** trusted inline code only; no PR checkout or code execution.
+  Permissions are `issues: read` and `pull-requests: write`. A read-only token
+  on a PR event produces a warning, leaving cleanup to the daily/manual scan;
+  a scan failure still fails the workflow.
+- **Tests:** `tools/test_pr_milestones.py` exercises pagination, refusal to
+  change issues, an unpersisted write, summary output and read-only tokens.
+
+## Issue planning and triage
+
+Forms require an ISO target end date. `tools/check_issues.py` validates that
+open issues have the configured assignee, exactly one priority, an open
+milestone with a due date, a target end date strictly before that date, valid
+catalogue labels and consistent dependencies/blocked status. It normalizes
+browser CRLF bodies and accepts both form fields and planning lines; the latter
+take precedence. Issue and milestone events and manual dispatch trigger the
+read-only audit. Start dates, overdue status, dependency timing and closed
+issues are not checked automatically. See [ISSUE_LABELS.md](ISSUE_LABELS.md).
+
+Label reconciliation refuses to delete labels still used by any issue or PR,
+open or closed. Dry-run previews without writes. The resolved catalogue uses
+schema 3 with `selected_overlays`, shared by triage, synchronization and drift
+checks. Drift evidence is cross-checked against the reconciler CLI on the same
+snapshot. `tools/test_labels_sync.py` exercises safe-pruning order via a local
+fake API; special-name drift evidence stays covered by the Node tests.
 
 ## Dependency updates
 

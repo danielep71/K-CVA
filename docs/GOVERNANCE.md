@@ -134,7 +134,9 @@ artifacts expire, so the decisive lines are copied here and into #13.
 [ISSUE_LABELS.md](ISSUE_LABELS.md) defines the canonical catalogue, priority
 criteria, dependency syntax and audit commands. These rules apply to every issue:
 
-- Assign to `danielep71`, choose a milestone and exactly one priority.
+- Assign to `danielep71`, choose a milestone and exactly one priority. Open
+  issues need an open milestone with a due date and an ISO target end date
+  strictly before it; record a start date at triage as described in ISSUE_LABELS.md.
 - Reserve P1 for confirmed calculation defects producing wrong results for
   valid inputs, together with `bug`. Setup work is P3.
 - Use `blocked` only for named unresolved prerequisites. Ready issues have no
