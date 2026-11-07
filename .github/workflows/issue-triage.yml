@@ -2,10 +2,12 @@ name: Issue triage
 run-name: "Issue triage — ${{ github.event_name }} by ${{ github.actor }}"
 
 # Audits every open issue against the rules issue forms cannot enforce:
-# assignee, exactly one priority, P1 only on bugs, a milestone, catalogue
-# labels, and `blocked` exactly while a named prerequisite is unresolved.
+# assignee, exactly one priority, P1 only on bugs, an open milestone, a
+# target end date before that milestone's due date, a dependency section,
+# catalogue labels, and `blocked` exactly while a named prerequisite is
+# unresolved.
 # Read-only: it never changes an issue. A failed run is the triage signal;
-# the maintainer resolves each finding by hand (docs/ISSUE_LABELS.md, Issues).
+# I resolve each finding by hand (docs/ISSUE_LABELS.md).
 # Issue events run the workflow from the default branch only.
 
 on:
@@ -21,6 +23,13 @@ on:
       - unassigned
       - milestoned
       - demilestoned
+  # Triage compares each issue with its milestone's state and due date.
+  milestone:
+    types:
+      - edited
+      - closed
+      - opened
+      - deleted
   workflow_dispatch:
 
 permissions:
@@ -50,7 +59,7 @@ jobs:
       PYTHONDONTWRITEBYTECODE: "1"
 
     steps:
-      - name: Check out the default branch
+      - name: Check out the triggering ref (the default branch on issue and milestone events)
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
@@ -59,6 +68,12 @@ jobs:
         uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: "3.12.14"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24.22.1"
+          package-manager-cache: false
 
       - name: Audit open issues
         env:

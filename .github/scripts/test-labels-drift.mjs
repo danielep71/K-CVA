@@ -10,9 +10,8 @@ for (const name of ['extra|label', 'extra`label', 'extra|`label']) {
     const dir = await mkdtemp(join(tmpdir(), 'drift-evidence-'));
     try {
       const manifest = JSON.parse(await readFile('.github/labels.json', 'utf8'));
-      const policy = JSON.parse(await readFile('.github/label-policy.json', 'utf8'));
-      const live = [...manifest.core, ...manifest.overlays.profile[policy.profile],
-        ...policy.label_domains.flatMap(domain => manifest.overlays.domain[domain]),
+      const live = [...manifest.core,
+        ...manifest.selected_overlays.flatMap(name => manifest.overlays[name]),
         { name, color: 'ABCDEF', description: 'synthetic extra label' }];
       const source = join(dir, 'live.json');
       const output = join(dir, 'report.json');
@@ -27,7 +26,7 @@ for (const name of ['extra|label', 'extra`label', 'extra|`label']) {
       assert.equal(report.counts.differences, 1);
       assert.equal(report.differences[0].name, name);
       assert.equal(report.differences[0].action, 'delete');
-      assert.match(await readFile(summary, 'utf8'), /Canonical reconciliation plan cross-check: \*\*PASS\*\*/);
+      assert.match(await readFile(summary, 'utf8'), /Cross-check against the reconciler's plan on the same snapshot: \*\*agree\*\*/);
     } finally { await rm(dir, { recursive: true, force: true }); }
   });
 }

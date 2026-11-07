@@ -61,6 +61,12 @@ CVA calculation, public API or workbook.
 
 ### Added
 
+- Issue forms and triage require target end dates before an open milestone's
+  due date and recheck milestone events. Label synchronization preserves labels
+  still in use; PR milestone cleanup verifies persisted changes and supports
+  manual scans. The catalogue uses selected overlays shared by all checks
+  (#158).
+
 - Governance: the branch model, task, integration and sync pull requests,
   review of the final head, rulesets on `main`, `release/**` and `v*` tags
   with the required `Repository integrity` check, and the issue rules

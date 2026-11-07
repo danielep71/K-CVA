@@ -20,9 +20,10 @@ Open an issue with one of the forms; blank issues are disabled.
 
 | Form | Use it for |
 | --- | --- |
-| **Bug report** | Something that behaves differently from its documentation. Give the full commit SHA, the environment (for Excel: build, bitness, Windows version), the steps, and the expected and observed behaviour. |
+| **Bug report** | A source or tooling defect. Give the full commit SHA, the environment (for Excel: build, bitness, Windows version), the steps, and the expected and observed behaviour. |
 | **Enhancement** | New or changed behaviour. Define the observable contract, the non-goals and how it will be validated; a calculation change cites the CRR provision it implements ([methodology](docs/methodology/README.md)). |
 | **Documentation** | A wrong, stale or missing statement. Name the document that is authoritative for it. |
+| **Private security contact** | Only if private vulnerability reporting is unavailable: request a private channel, without vulnerability details. |
 
 **Synthetic data only.** Never attach or paste real counterparties,
 portfolios, exposures, ratings, market data or client data, and never
@@ -33,7 +34,9 @@ exported source instead. If confidential data has been posted, tell the
 maintainer at once rather than editing it out quietly; the
 [data rules](SECURITY.md#data-and-credentials) apply.
 
-Each issue gets the assignee, exactly one priority and a milestone at triage
+Each issue gets the assignee, exactly one priority, a start date and a target
+end date at triage. Open issues need an open milestone with a due date; the
+target end date must be strictly earlier
 ([docs/GOVERNANCE.md](docs/GOVERNANCE.md#issues-dependencies-and-closure),
 [docs/ISSUE_LABELS.md](docs/ISSUE_LABELS.md)).
 

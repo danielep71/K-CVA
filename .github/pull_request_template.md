@@ -9,7 +9,7 @@ in scope for regulatory CVA capital and what remains unsupported.
 
 Refs #<!-- issue number -->
 
-- [ ] Linked issues are assigned to @danielep71, have exactly one priority and an issue milestone.
+- [ ] Linked issues are assigned to @danielep71, have exactly one priority, a dependency section, a start date and a target end date before their open milestone’s due date.
 - [ ] P1 is used only for confirmed calculation defects, with the bug label.
 - [ ] Named unresolved prerequisites are listed in each issue's dependency section; blocked matches their current state.
 - [ ] This PR has **no milestone**. Milestones belong to issues only.
