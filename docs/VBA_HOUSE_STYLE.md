@@ -114,7 +114,7 @@ Failure-path tests must cover partial capture, mutation failure, primary failure
 each restoration failure and simultaneous primary/cleanup failure (#10/#11).
 `TEST_Examples.RunExampleOperation` is the reference implementation, with a
 case for each of these paths ([tests/README.md](../tests/README.md#vba-harness));
-it has not been run in Excel yet (#11).
+its candidate-bound Excel run is recorded in the [#11 host report](evidence/excel-run-194e9cd.md).
 
 ## Source representation
 

@@ -28,7 +28,7 @@ not evidence of implemented or validated functionality.
 | `src/modules/` | Public facade and supported entry points | Reserved. |
 | `src/classes/` | Host-independent record/model classes if required | Reserved. |
 | `src/workbook/`, `src/forms/` | Excel adapters, document modules and optional forms | Reserved. |
-| `tests/` | Verification guide, harness, synthetic fixtures and expected values | Guide, VBA harness and neutral example suite in `tests/modules/` (#10); not yet run in Excel (#11). |
+| `tests/` | Verification guide, harness, synthetic fixtures and expected values | Guide, VBA harness and neutral example suite in `tests/modules/` (#10); [recorded Excel scaffold run](evidence/excel-run-194e9cd.md) passed (#11); no numerical CVA validation. |
 | `tests/fixtures/`, `tests/expected/` | Inputs and independently justified expected results | One illustrative format example ([TEST_CASES.md](methodology/TEST_CASES.md)); no regulatory case. |
 | `tests/derivations/` | Independent Python reference calculations | Reserved. |
 | `tests/evidence/` | Deliberately retained, reviewed evidence tied to a source commit | Reserved. An Excel run is recorded as in [INSTALLATION.md](../INSTALLATION.md#recording-an-excel-run): its folder stays outside Git, its report goes into the issue (#11). |
@@ -63,7 +63,7 @@ classes. Classes must not call the facade or host, avoiding dependency cycles.
 The `vba-dependencies` check enforces these boundaries by name and review
 covers what it cannot resolve ([VBA static checks](CI.md#vba-static-checks)).
 Host policy and conventions are in [INSTALLATION.md](../INSTALLATION.md) and
-[VBA_HOUSE_STYLE.md](VBA_HOUSE_STYLE.md); host validation remains pending #11.
+[VBA_HOUSE_STYLE.md](VBA_HOUSE_STYLE.md); the [#11 report](evidence/excel-run-194e9cd.md) records the tested scaffold host and its limits.
 
 ## Public API inventory
 
