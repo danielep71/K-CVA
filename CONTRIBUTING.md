@@ -101,8 +101,8 @@ were not checked in a commit message.
   read files; they do not compile VBA or run Excel
   ([three different checks](docs/CI.md#vba-static-checks)). A pull request
   that changes VBA states whether it was compiled and run in Excel, on which
-  host and at which commit, and never implies it was when it was not. No VBA
-  has been compiled or run yet (#11).
+  host and at which commit, and never implies it was when it was not. The
+  [scaffold host report](docs/evidence/excel-run-194e9cd.md) records the run for #11.
 - **A skipped or incomplete run is not a pass**, whether a check fails to run
   or the harness reports `completeness=INCOMPLETE`
   ([tests/README.md](tests/README.md#vba-harness)).
