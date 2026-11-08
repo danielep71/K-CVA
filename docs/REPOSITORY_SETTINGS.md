@@ -15,7 +15,7 @@ has admin rights on the repository, for example `GH_TOKEN=$(gh auth token)`:
 | --- | --- | --- |
 | `python tools/repository_settings.py` | Reads the live settings and prints every difference (preview) | 0 |
 | `python tools/repository_settings.py --check` | The same, as a check | 0 if all match, 1 on any difference, 2 if a setting could not be read |
-| `python tools/repository_settings.py --apply` | Changes the live settings to the desired state, then reads them again and verifies | as `--check`, after the change |
+| `python tools/repository_settings.py --apply --approve-plan SHA256 --journal PATH` | Executes the approved plan with a new journal, then reads settings again and verifies | as `--check`, after the change |
 | add `--report docs/evidence/repository-settings-YYYY-MM-DD.json` | Also writes a dated JSON report of everything read | unchanged |
 
 - **Unread settings:** a setting the token may not read is reported as
@@ -25,7 +25,52 @@ has admin rights on the repository, for example `GH_TOKEN=$(gh auth token)`:
 - **Never applied:** the visibility is checked but never applied, and a
   ruleset present live but absent from the file is reported, never deleted.
 - **Changing a control:** edit the file in a reviewed pull request, run
-  `--apply` once it is merged, and keep a `--check` report as evidence.
+  preview once it is merged, review its plan, then apply that digest with a new
+  journal path and keep a `--check` report as evidence.
+
+### Approved plans and journals (#176)
+
+Preview prints the exact ordered requests and `PLAN SHA-256`. The digest binds
+repository identity, manifest bytes, observed settings and request payloads;
+it excludes timestamps. The manifest hash alone is not approval of a plan.
+Use the digest printed by the preview, for example:
+
+```sh
+python tools/repository_settings.py
+python tools/repository_settings.py --apply --approve-plan <SHA256> --journal test-results/settings-apply.json
+python tools/repository_settings.py --check --report test-results/settings-check.json
+```
+
+Create the output directory first. The journal must be a new path, distinct
+from the report; existing files and symlinks are refused. Apply re-reads the
+live state before the first write and refuses stale approval or unread values.
+This cannot lock GitHub against concurrent administrative edits during apply.
+
+The journal is atomically replaced before the first mutation, before each
+request, after every outcome and after read-back. It contains the destination,
+approved digest, exact requests and their status. A failed request is recorded
+as `failed_or_unknown`: a network failure may occur after GitHub applied it.
+A journal error stops further writes; the last persisted status may therefore
+remain `in_progress`. Inspect live state before retrying, preview again and
+use a new journal. There is no automatic rollback. Journal records contain
+settings and payloads, never authentication headers or tokens.
+
+### Equivalent protection
+
+Active rulesets with explicit empty bypass lists, no excluded refs and matching
+target/scope may cover the desired rules under another name, including combined
+coverage. Ref matching recognizes exact patterns, the default-branch alias and
+`~ALL`; it does not infer arbitrary glob containment. Unknown conditions or
+unread bypass actors cannot establish equivalence.
+
+More approvals, fewer allowed merge methods, extra required checks (including
+their integration IDs), stricter review/check flags and enforcement on creation
+can satisfy the configured minimum. Unknown parameters require equality.
+Named replacements retain additional rules and individually stronger known
+parameters. Missing rulesets are assessed against the projected state after
+named replacements, so removed coverage cannot justify omitting protection.
+Unrelated unmanaged rulesets remain reported and are never deleted. Equivalent
+extra rulesets contributing to complete desired coverage are not reported as drift.
 
 The report records the exact manifest SHA256, desired values and execution
 mode alongside the live values, timestamp and differences. The automated

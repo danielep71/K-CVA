@@ -278,3 +278,13 @@ commit `bd78a6b`, to automate this repository's Excel evidence procedure.
 The underlying harness and validator retain the upstream notices above.
 The #11 host report and #18 audit record are local project evidence; they
 do not import an upstream execution or certification claim.
+
+
+## Settings safety mechanisms (#176)
+
+The plan approval, atomic journal and conservative protection-equivalence
+requirements were compared with MyTemplate `tools/setup_repository.py`
+(S27–S29). The K-CVA implementation and tests are local adaptations of its
+existing `repository_settings.py`, under this repository's MPL-2.0 terms;
+no MyTemplate source was copied. Local desired settings and write exclusions
+remain authoritative.

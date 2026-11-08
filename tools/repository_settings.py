@@ -7,7 +7,7 @@ settings, the security features, the Actions permissions and the rulesets
 - preview (default): read the live settings and print every difference;
 - ``--check``: the same, exiting 1 on any difference and 2 if a setting could
   not be read (an unread setting is never taken as matching);
-- ``--apply``: change the live settings to the desired state, then read them
+- ``--apply --approve-plan SHA256 --journal PATH``: apply an approved plan, then read settings
   again and verify; needs a token with admin rights on the repository;
 - ``--report PATH``: also write a dated JSON evidence report of what was read.
 
@@ -24,6 +24,7 @@ import hashlib
 import json
 import os
 import sys
+import tempfile
 import urllib.error
 import urllib.request
 from collections.abc import Mapping
@@ -180,6 +181,114 @@ def read_live(client: Client) -> dict[str, Any]:
     return live
 
 
+
+def stronger_rule(want: Mapping[str, Any], have: Mapping[str, Any]) -> bool:
+    """Conservative partial order; unknown parameters require exact equality."""
+    if want["type"] != have["type"]:
+        return False
+    w, h = want.get("parameters") or {}, have.get("parameters") or {}
+    for key in set(w) | set(h):
+        a, b = w.get(key), h.get(key)
+        if key == "required_approving_review_count" and want["type"] == "pull_request":
+            if not isinstance(b, int) or b < (a or 0):
+                return False
+        elif key == "allowed_merge_methods" and want["type"] == "pull_request":
+            if not b or not set(b) <= set(a or ["merge", "squash", "rebase"]):
+                return False
+        elif key == "required_status_checks" and want["type"] == "required_status_checks":
+            required = {(x.get("context"), x.get("integration_id")) for x in a or []}
+            actual = {(x.get("context"), x.get("integration_id")) for x in b or []}
+            if not required <= actual:
+                return False
+        elif key == "do_not_enforce_on_create" and want["type"] == "required_status_checks":
+            if b not in (False, a):
+                return False
+        elif isinstance(a, bool) and key in {
+                "dismiss_stale_reviews_on_push", "require_code_owner_review",
+                "require_last_push_approval", "required_review_thread_resolution",
+                "strict_required_status_checks_policy"}:
+            if b not in (True, a):
+                return False
+        elif a != b:
+            return False
+    return True
+
+
+def covers(want: Mapping[str, Any], candidates: list[dict[str, Any]], default: str) -> bool:
+    """Only active, fully visible rulesets without bypass/exclusions count.
+
+    Ref matching is deliberately conservative: exact patterns, the default
+    branch alias and ~ALL; arbitrary glob containment is not inferred.
+    """
+    if want.get("enforcement") != "active" or want.get("bypass_actors") != []:
+        return False
+    eligible = []
+    for have in candidates:
+        if (have.get("enforcement") != "active" or have.get("target") != want["target"]
+                or have.get("bypass_actors") != []):
+            continue
+        conditions = have.get("conditions") or {}
+        refs = conditions.get("ref_name") or {}
+        if set(conditions) != {"ref_name"} or refs.get("exclude"):
+            continue
+        required = (want.get("conditions") or {}).get("ref_name") or {}
+        if set(want.get("conditions") or {}) != {"ref_name"} or required.get("exclude"):
+            continue
+        def expand(values: list[str]) -> set[str]:
+            return {f"refs/heads/{default}" if v == "~DEFAULT_BRANCH" and default else v for v in values}
+        actual = expand(refs.get("include") or [])
+        if "~ALL" in actual or expand(required.get("include") or []) <= actual:
+            eligible.append(have)
+    return all(any(stronger_rule(rule, other) for have in eligible for other in have.get("rules", []))
+               for rule in want["rules"]) and bool(eligible)
+
+
+
+def replacement(want: dict[str, Any], have: Mapping[str, Any]) -> dict[str, Any]:
+    """Preserve additional rules and individually stronger known parameters."""
+    result = copy.deepcopy(want)
+    rules = {rule["type"]: copy.deepcopy(rule) for rule in have.get("rules", [])}
+    for rule in want["rules"]:
+        previous = rules.get(rule["type"], {})
+        combined = copy.deepcopy(rule)
+        parameters = combined.setdefault("parameters", {})
+        for key, value in (previous.get("parameters") or {}).items():
+            old = {"type": rule["type"], "parameters": {key: value}}
+            new = {"type": rule["type"], "parameters": {key: parameters.get(key)}}
+            if stronger_rule(new, old):
+                parameters[key] = value
+        if not parameters:
+            combined.pop("parameters")
+        rules[rule["type"]] = combined
+    result["rules"] = sorted(rules.values(), key=lambda r: str(r["type"]))
+    return result
+
+
+def ruleset_plan(desired: Mapping[str, Any], live: Mapping[str, Any]) -> list[tuple[str, str, Any]]:
+    """Replace differing named rulesets first in the projected coverage state."""
+    if live["rulesets"] == UNREAD:
+        return []
+    projected = copy.deepcopy(live["rulesets"])
+    # General settings are written first, so aliases must use the projected default.
+    default = str(desired["general"].get("default_branch")
+                  or live.get("general", {}).get("default_branch") or "")
+    steps = []
+    missing = []
+    for rule in desired["rulesets"]:
+        want = normalize_ruleset(rule)
+        have = projected.get(want["name"])
+        if have is None:
+            missing.append(want)
+        elif not covers(want, [have], default) and any(have[k] != want[k] for k in RULESET_KEYS):
+            updated = replacement(want, have)
+            steps.append(("PUT", f"/rulesets/{have['id']}", updated))
+            projected[want["name"]] = updated
+    for want in missing:
+        if not covers(want, list(projected.values()), default):
+            steps.append(("POST", "/rulesets", want))
+            projected[want["name"]] = want
+    return steps
+
 def differences(desired: Mapping[str, Any], live: Mapping[str, Any]) -> tuple[list[str], list[str]]:
     """Return (drift, unread): one line per differing or unreadable setting."""
     drift: list[str] = []
@@ -198,27 +307,33 @@ def differences(desired: Mapping[str, Any], live: Mapping[str, Any]) -> tuple[li
     for name, want in wanted.items():
         have = live["rulesets"].get(name)
         if have is None:
+            if covers(want, list(live["rulesets"].values()), str(live["general"].get("default_branch") or "")):
+                continue
             drift.append(f"rulesets.{name}: missing")
+            continue
+        if covers(want, [have], str(live["general"].get("default_branch") or "")):
             continue
         for key in RULESET_KEYS:
             if have[key] == UNREAD:
                 unread.append(f"rulesets.{name}.{key}")
             elif have[key] != want[key]:
                 drift.append(f"rulesets.{name}.{key}: live {json.dumps(have[key])}, desired {json.dumps(want[key])}")
+    default = str(live["general"].get("default_branch") or "")
     drift += [f"rulesets.{name}: not in the desired state (not deleted by --apply)"
-              for name in sorted(set(live["rulesets"]) - set(wanted))]
+              for name in sorted(set(live["rulesets"]) - set(wanted))
+              if not any(covers(want, list(live["rulesets"].values()), default)
+                         and any(covers(dict(want, rules=[rule]), [live["rulesets"][name]], default)
+                                 for rule in want["rules"])
+                         for want in wanted.values())]
     return drift, unread
 
 
-def apply(client: Client, desired: Mapping[str, Any], live: Mapping[str, Any]) -> list[str]:
-    """Change what differs; return one line per request made."""
-    done: list[str] = []
+def build_plan(desired: Mapping[str, Any], live: Mapping[str, Any]) -> list[tuple[str, str, Any]]:
+    """Compute exact requests without mutation; retain local write policy and order."""
+    done: list[tuple[str, str, Any]] = []
 
     def send(method: str, path: str, body: Any = None) -> None:
-        status, data = client.request(method, path, body)
-        if not 200 <= status < 300:
-            raise RuntimeError(f"{method} {path}: HTTP {status} {data}")
-        done.append(f"{method} {path}")
+        done.append((method, path, copy.deepcopy(body)))
 
     general = {key: want for key, want in desired["general"].items()
                if live["general"].get(key) != want and f"general.{key}" not in NEVER_APPLIED}
@@ -245,18 +360,84 @@ def apply(client: Client, desired: Mapping[str, Any], live: Mapping[str, Any]) -
                         ("default_workflow_permissions", "can_approve_pull_request_reviews"))):
         if any(live["actions"].get(key) != actions[key] for key in keys):
             send("PUT", path, {key: actions[key] for key in keys})
-    for ruleset in desired["rulesets"]:
-        want = normalize_ruleset(ruleset)
-        have = live["rulesets"].get(want["name"])
-        if have is None:
-            send("POST", "/rulesets", want)
-        elif any(have[key] != want[key] for key in RULESET_KEYS):
-            send("PUT", f"/rulesets/{have['id']}", want)
+    done.extend(ruleset_plan(desired, live))
     # Only enable automatic deletion after every protection/security operation
     # succeeds. A failed ruleset write exits before this final PATCH.
     if auto_delete is not None:
         send("PATCH", "", {"delete_branch_on_merge": auto_delete})
     return done
+
+
+
+def plan_digest(desired: Mapping[str, Any], live: Mapping[str, Any], manifest: bytes) -> str:
+    """Bind approval to destination, manifest, observed state and exact writes."""
+    record = {"repository": desired["repository"], "manifest_sha256": hashlib.sha256(manifest).hexdigest(),
+              "live": live, "writes": build_plan(desired, live)}
+    return hashlib.sha256(json.dumps(record, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+
+
+def write_journal(path: Path, record: Mapping[str, Any]) -> None:
+    """Atomically replace the record; a write failure stops further mutations."""
+    fd, temporary = tempfile.mkstemp(dir=path.parent, prefix=path.name + ".", suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as handle:
+            json.dump(record, handle, indent=2)
+            handle.write("\n")
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary, path)
+    finally:
+        if os.path.exists(temporary):
+            os.unlink(temporary)
+
+
+def apply(client: Client, desired: Mapping[str, Any], live: Mapping[str, Any], *,
+          manifest: bytes, approved: str, journal: Path) -> dict[str, Any]:
+    """Execute the approved snapshot, stopping on any error; never roll back.
+
+    Re-read immediately before planning. This is not a GitHub transaction:
+    concurrent external edits during the sequence still require read-back.
+    """
+    current = read_live(client)
+    digest = plan_digest(desired, current, manifest)
+    if digest != approved or digest != plan_digest(desired, live, manifest):
+        raise ValueError("Refusing to apply: plan changed; review a new preview")
+    if differences(desired, current)[1]:
+        raise ValueError("Refusing to apply: unread settings")
+    steps = build_plan(desired, current)
+    record: dict[str, Any] = {"repository": desired["repository"], "plan_sha256": digest,
+        "started_at": datetime.now(UTC).isoformat(), "writes": [
+            {"method": m, "path": p, "payload": body, "status": "pending"} for m, p, body in steps],
+        "readback": None}
+    # Exclusive reservation refuses existing paths and symlinks, including races.
+    with journal.open("x", encoding="utf-8"):
+        pass
+    write_journal(journal, record)
+    for entry, (method, path, body) in zip(record["writes"], steps, strict=True):
+        entry["status"] = "in_progress"
+        write_journal(journal, record)
+        try:
+            status, _ = client.request(method, path, copy.deepcopy(body))
+            entry["http_status"] = status
+            if not 200 <= status < 300:
+                raise RuntimeError(f"{method} {path}: HTTP {status}")
+        except Exception:
+            entry["status"] = "failed_or_unknown"
+            write_journal(journal, record)
+            raise
+        entry["status"] = "done"
+        write_journal(journal, record)
+        print(f"applied: {method} {path}")
+    try:
+        after = read_live(client)
+        drift, unread = differences(desired, after)
+        record["readback"] = {"live": after, "drift": drift, "unread": unread}
+    except Exception:
+        record["readback"] = {"error": "read-back failed; inspect live state before retrying"}
+        write_journal(journal, record)
+        raise
+    write_journal(journal, record)
+    return after
 
 
 def report(repository: str, desired_path: Path, live: Mapping[str, Any], drift: list[str],
@@ -284,20 +465,33 @@ def main(argv: list[str] | None = None, client: Client | None = None) -> int:
     mode.add_argument("--apply", action="store_true", help="change the live settings to the desired state")
     parser.add_argument("--desired", type=Path, default=DESIRED)
     parser.add_argument("--report", type=Path, help="write a JSON evidence report here")
+    parser.add_argument("--approve-plan", help="SHA256 printed by preview")
+    parser.add_argument("--journal", type=Path, help="new JSON journal path in an existing directory")
     args = parser.parse_args(argv)
+    if args.apply and (not args.approve_plan or args.journal is None):
+        print("Refusing to apply: --approve-plan and --journal are required", file=sys.stderr)
+        return 2
+    if not args.apply and (args.approve_plan or args.journal):
+        parser.error("--approve-plan and --journal require --apply")
+    if args.journal and args.report and args.journal.resolve() == args.report.resolve():
+        print("Journal and report must use different paths", file=sys.stderr)
+        return 2
     manifest = args.desired.read_bytes()
     desired = json.loads(manifest)
     repository = desired["repository"]
     client = client or GitHub(repository, os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN"))
     live = read_live(client)
     drift, unread = differences(desired, live)
-    if args.apply and drift:
-        if unread:
-            print("Refusing to apply: unread settings: " + ", ".join(unread), file=sys.stderr)
+    digest = plan_digest(desired, live, manifest)
+    print(f"PLAN SHA-256: {digest}")
+    for method, path, body in build_plan(desired, live):
+        print(f"plan: {method} {path} {json.dumps(body, sort_keys=True)}")
+    if args.apply:
+        try:
+            live = apply(client, desired, live, manifest=manifest, approved=args.approve_plan, journal=args.journal)
+        except (OSError, ValueError, RuntimeError) as error:
+            print(str(error), file=sys.stderr)
             return 2
-        for line in apply(client, desired, live):
-            print("applied: " + line)
-        live = read_live(client)
         drift, unread = differences(desired, live)
     for line in drift:
         print("drift: " + line)
@@ -307,6 +501,7 @@ def main(argv: list[str] | None = None, client: Client | None = None) -> int:
     if args.report:
         evidence = report(repository, args.desired, live, drift, unread, manifest=manifest,
                           mode="apply" if args.apply else "check" if args.check else "preview")
+        evidence["plan_sha256"] = digest
         args.report.write_text(json.dumps(evidence, indent=2) + "\n", encoding="utf-8")
     if drift and (args.check or args.apply):
         return 1
