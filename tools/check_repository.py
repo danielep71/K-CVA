@@ -1,5 +1,6 @@
 """Portable, read-only repository checks; evidence describes the tested tree."""
 import hashlib
+import http.client
 import io
 import json
 import os
@@ -7,6 +8,9 @@ import platform
 import subprocess
 import sys
 import tarfile
+import tempfile
+import time
+import urllib.error
 import urllib.request
 import zipfile
 from pathlib import Path
@@ -14,6 +18,49 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / 'test-results' / 'integrity'
+
+
+def download_archive(url: str) -> bytes:
+    """Retry transient transport failures at most four times, never integrity errors."""
+    for attempt in range(4):
+        try:
+            with urllib.request.urlopen(url, timeout=60) as response:  # noqa: S310 - https URL from the lock
+                return bytes(response.read())
+        except (urllib.error.URLError, TimeoutError, ConnectionError, http.client.IncompleteRead) as error:
+            if isinstance(error, urllib.error.HTTPError):
+                if error.code not in {408, 429, 500, 502, 503, 504}:
+                    raise
+            elif isinstance(error, urllib.error.URLError) and not isinstance(
+                error.reason, (TimeoutError, ConnectionError)
+            ):
+                raise
+            if attempt == 3:
+                raise RuntimeError(f'actionlint download failed after 4 attempts: {error}') from error
+            delay = 2 ** (attempt + 1)
+            print(f'actionlint download attempt {attempt + 1} failed: {error}; retrying in {delay}s', flush=True)
+            time.sleep(delay)
+    raise AssertionError('unreachable')
+
+
+def verified_archive(archive: Path, url: str, digest: str) -> bytes:
+    """Verify both cache hits and downloads; publish only complete verified bytes."""
+    cached = archive.exists()
+    data = archive.read_bytes() if cached else download_archive(url)
+    if hashlib.sha256(data).hexdigest() != digest:
+        source = 'cache' if cached else 'download'
+        raise RuntimeError(f'actionlint {source} checksum mismatch')
+    if not cached:
+        archive.parent.mkdir(parents=True, exist_ok=True)
+        temporary: Path | None = None
+        try:
+            with tempfile.NamedTemporaryFile(dir=archive.parent, delete=False) as output:
+                temporary = Path(output.name)
+                output.write(data)
+            temporary.replace(archive)
+        finally:
+            if temporary is not None:
+                temporary.unlink(missing_ok=True)
+    return data
 
 
 def actionlint() -> str:
@@ -25,16 +72,7 @@ def actionlint() -> str:
         raise RuntimeError('Unsupported actionlint platform: ' + key)
     asset = lock['assets'][key]
     archive = ROOT / '.cache' / ('actionlint-' + asset['sha256'])
-    archive.parent.mkdir(exist_ok=True)
-    if not archive.exists():
-        with urllib.request.urlopen(asset['url'], timeout=60) as response:  # noqa: S310 - https URL from the lock
-            data = response.read()
-        if hashlib.sha256(data).hexdigest() != asset['sha256']:
-            raise RuntimeError('actionlint download checksum mismatch')
-        archive.write_bytes(data)
-    data = archive.read_bytes()
-    if hashlib.sha256(data).hexdigest() != asset['sha256']:
-        raise RuntimeError('actionlint cache checksum mismatch')
+    data = verified_archive(archive, asset['url'], asset['sha256'])
     name = 'actionlint.exe' if os.name == 'nt' else 'actionlint'
     if os.name == 'nt':
         with zipfile.ZipFile(io.BytesIO(data)) as package:
