@@ -88,7 +88,8 @@ and described in [REPOSITORY_SETTINGS.md](REPOSITORY_SETTINGS.md), which also
 says how to check them.
 
 - Change a control by changing that file in a reviewed PR, then apply it with
-  `python tools/repository_settings.py --apply` and confirm with `--check`.
+  preview and review the plan, apply with `--approve-plan SHA256 --journal PATH`
+  as [documented](REPOSITORY_SETTINGS.md), and confirm with `--check`.
 - Run `--check` before closing a milestone. Never describe a desired control
   as configured until `--check` has read it back.
 - Record applicable checks and explicit gaps in each PR. Absence of a check is
