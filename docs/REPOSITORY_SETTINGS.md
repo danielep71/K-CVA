@@ -126,6 +126,21 @@ Unknown or missing values are unread, never a match.
 
 ## Evidence
 
+- [repository-settings-2026-11-08.json](evidence/repository-settings-2026-11-08.json)
+  is the maintainer-supplied authenticated check at 10:09:13 UTC: zero
+  differences and zero unread settings. Its manifest SHA256
+  `f87de47b180d9726c36f98181313fd29ccfe9b71ff83d9d2aab9226044611020`
+  and desired values match main candidate
+  `3d75855e5cbe6cda2f7fd519b6c363710ba9b935`. Replaying the candidate's
+  comparison against the supplied live snapshot also returns no differences
+  or unread settings. This supersedes the earlier incomplete read-back for
+  these settings; it is operator-supplied evidence, not a new authenticated
+  request made by the reviewer. No settings were applied. The report does not
+  identify the operator's tool commit; candidate comparison was independently
+  replayed. The received CRLF file's SHA256 is
+  `50d196cb44c4276d85ec83442dcbfaba8424842b2b81203e805d6d91794c586d`;
+  the retained JSON is normalized to LF without changing values.
+
 - [repository-settings-2026-10-31.json](evidence/repository-settings-2026-10-31.json)
   is the first `--check` report. Every setting it could read matched. It
   could not read the Dependabot-alert switch or the Actions permissions,
