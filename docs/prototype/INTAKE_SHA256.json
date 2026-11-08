@@ -1,0 +1,19 @@
+{
+  "Build-CVA.cmd": "fc2be35ad923f964feafed26ce85b5b3db9901d09e0ab7e93d4b391ecf371ca2",
+  "Build-CVA.ps1": "e0f2abb91ea43867a9c9228125fb39bd371d090ccd48c09436a1b179aa5c6c7a",
+  "CVA_Template.xlsx": "5610428b459857b734e84a00782c495634beb8e5127dfe2e5c9b099a49eb7984",
+  "LICENSE": "3f3d9e0024b1921b067d6f7f88deb4a60cbe7a78e76c64e3f1d7fc3b779b9d04",
+  "NOTICE.md": "826217aa874af294fd4342a09178c0ab6c00554ab6c26fc76f887e715e634741",
+  "START-HERE.txt": "fd80de598495bd8656e0d830719cad429af002194b73c2042abca2377ac72f56",
+  "docs/CONTRACT.md": "f536ff0ce6083a9706c4e22b45fb01c088a3f98938cb8d7d227b44ccb65e5c15",
+  "docs/METHODOLOGY.md": "70e773d19b03611fc8e024acd649ad1449c8de34b990edb14229d18b93ac131d",
+  "docs/VALIDATION.md": "aa1e2248a144d82bf9de6b6ac8a8d2fc49de37a7c64535d7cf99da5d185e033d",
+  "src/core/CORE_BACVA.bas": "41f3669061bb4f37bd31b2fc1951e4a7c86fbc93f9f0b9ae7fbd74cea95b8eba",
+  "src/modules/CVA_Functions.bas": "0277b99d8f3a5295b8573c6fff5e2b6542edbdc9cdfdfa0ab4cd98331921ce9c",
+  "src/workbook/M_Main.bas": "136ace4d88aea99f7de49fb11310245a1a96ccff13e34419e7c2d30ca01702c0",
+  "src/workbook/ThisWorkbook.cls": "b21eb258f616a6d41e713caeab6d39d1ba2eb05cb2b65a976fed288da3c911e1",
+  "tests/cases.json": "b71e12832d73c2cc056459de4934f76ba6cdacb9e6a39b25fe843f627d24a08e",
+  "tests/expected.json": "2a4daecdeb839ef2242ae0af0d8e140c12d24cd2f6b68e3f16dc771746dcda15",
+  "tests/modules/TEST_Prototype.bas": "9a5f1bd8cae40224d35fa1afc56bc9966062f2b6063171250d8f8ee6ff1e0ab1",
+  "tests/reference.py": "429a474d42e01a229e623bed355a9afd4a3e6f563f7c9b3b19c2a116ea0d5df2"
+}

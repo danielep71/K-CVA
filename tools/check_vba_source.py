@@ -7,7 +7,7 @@ only in their homes, each with its role's name prefix and a VB_Name equal to
 its file name; ASCII only; Option Explicit, and Option Private Module where
 required; no Option Base, tab or trailing white space; string literals
 closed; forms beside their .frx; LF storage with CRLF checkout; no workbook
-committed. Adapted from CCR-K-SFTs, which adapted it from K-SACCR; see
+outside the exact approved template path. Adapted from CCR-K-SFTs, which adapted it from K-SACCR; see
 NOTICE.md.
 """
 
@@ -44,11 +44,11 @@ HOMES = tuple(sorted({home for home, _ in NAMING}))
 PRIVATE_MODULE_HOMES = ("src/core/", "tests/modules/")
 MAX_NAME = 31  # the VBE rejects a longer component name
 # Workbooks are build outputs. One may be committed only at an exact path
-# approved under the Git hygiene policy and re-included in .gitignore; none is
-# approved yet (docs/REPOSITORY_STRUCTURE.md, Locations).
+# reviewed under the Git hygiene policy and re-included in .gitignore (#180;
+# docs/REPOSITORY_STRUCTURE.md, Locations).
 WORKBOOK_SUFFIXES = frozenset({".xls", ".xlsx", ".xlsm", ".xlsb", ".xlt", ".xltx", ".xltm",
                                ".xlam", ".xla", ".xlw"})
-APPROVED_WORKBOOKS: frozenset[str] = frozenset()
+APPROVED_WORKBOOKS: frozenset[str] = frozenset({"src/workbook/CVA_Template.xlsx"})
 
 VB_NAME = re.compile(r'^Attribute VB_Name = "([^"]*)"[ \t]*$', re.M)
 OPTION_EXPLICIT = re.compile(r"^[ \t]*Option[ \t]+Explicit[ \t]*(?:'.*)?$", re.M | re.I)
@@ -221,7 +221,7 @@ def check(root: Path) -> tuple[list[Finding], int]:
             findings.extend(placement(path))
         if suffix in WORKBOOK_SUFFIXES and path not in APPROVED_WORKBOOKS:
             findings.append(Finding(path, None, "workbook committed; workbooks are built from "
-                                                "source and no committed path is approved"))
+                                                "source; this path is not an approved template"))
     names: dict[str, str] = {}
     for path in components:
         findings.extend(content(root, path, tracked_set, names))

@@ -1,5 +1,9 @@
 # Production source
 
+> Prototype port (#180): sources, template and tooling are now present. Earlier
+> setup-only absence statements below describe the v0.1.0 baseline. This port
+> provides no numerical or Excel acceptance. See the [porting record](../docs/prototype/PORTING.md).
+
 No production calculation source exists yet. Follow
 [architecture](../docs/REPOSITORY_STRUCTURE.md) and
 [decisions](../docs/DECISIONS.md) before adding components.

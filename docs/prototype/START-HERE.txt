@@ -1,0 +1,35 @@
+K-CVA - Excel/VBA prototype - 8 November 2026
+
+1. Use the complete repository checkout on Windows; paths below are relative to its root.
+2. In desktop Excel: File > Options > Trust Center > Trust Center Settings >
+   Macro Settings > Trust access to the VBA project object model.
+   This is needed only to import the supplied source. The build script does
+   not change Excel security settings. Follow your organisation's policy.
+3. Close the template if open. Run tools\Build-CVA.cmd.
+   The script creates build/K-CVA_Prototype.xlsm, runs 22 VBA regression cases and
+   the sample portfolio, then saves it only if these checks pass.
+4. Open build/K-CVA_Prototype.xlsm and use the buttons on README.
+   Enable macros only after reviewing this package. You can turn off VBA
+   project access after the build; ordinary calculation does not require it.
+
+If your policy blocks PowerShell or automatic source import:
+- Open src/workbook/CVA_Template.xlsx and Save As build/K-CVA_Prototype.xlsm.
+- Alt+F11 > File > Import File: import all .bas files under src, plus
+  tests/modules/TEST_Prototype.bas.
+- Open ThisWorkbook in the VBA project. Paste the source beginning at
+  Option Explicit from src/workbook/ThisWorkbook.cls into that module.
+  Do not import it as a separate class.
+- Debug > Compile VBAProject. Run M_Main.InstallButtons, then Run tests
+  on README. All 22 cases should PASS. Run CVA for the sample portfolio.
+
+The included .xlsx is a macro-free template, not a standalone VBA workbook.
+Excel for iPhone, the web or Mac is not the build target; Windows desktop
+Excel is required. The package does not require Python to calculate.
+
+Sample: two counterparties, two netting sets, a related-name hedge and a
+mixed-constituent index hedge. Expected BA-CVA: EUR 553,046.965386535.
+
+This is a prototype based on the registered CRR text and caller-supplied
+scope, classification, exposure, maturity and eligible hedge inputs.
+Native Excel has not been run in the preparation environment. See
+ docs/prototype/VALIDATION.md for checks performed and the remaining Excel checks.

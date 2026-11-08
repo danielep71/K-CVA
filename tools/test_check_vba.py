@@ -295,6 +295,13 @@ class SourceTest(unittest.TestCase):
     def test_workbooks_are_not_committed(self) -> None:
         self.assertFinding({"src/workbook/K-CVA.xlsm": b"PK\x03\x04"}, "workbook committed")
 
+    def test_only_exact_prototype_template_path_is_allowed(self) -> None:
+        self.assertEqual(self.findings({"src/workbook/CVA_Template.xlsx": b"PK\x03\x04"}), [])
+        for path in ("src/workbook/Other.xlsx", "build/CVA_Template.xlsx",
+                     "src/workbook/CVA_Template.xlsm", "src/workbook/cva_template.xlsx"):
+            with self.subTest(path=path):
+                self.assertFinding({path: b"PK\x03\x04"}, "workbook committed")
+
     def test_main_exit_codes(self) -> None:
         for files, expected in ((VALID, 0), ({"src/Stray.bas": CORE}, 1)):
             with self.subTest(expected=expected), repository(files) as root, \
@@ -681,9 +688,12 @@ class PublicApiTest(unittest.TestCase):
         self.assertEqual(self.findings(VALID), [])
         self.assertEqual(self.findings(api_files()), [])
 
-    def test_repository_inventory_matches_empty_source(self) -> None:
+    def test_repository_inventory_matches_facade_source(self) -> None:
         inventory = (ROOT / "docs/PUBLIC_API.txt").read_text(encoding="utf-8")
-        self.assertEqual(self.findings({"docs/PUBLIC_API.txt": inventory}), [])
+        files = {"docs/PUBLIC_API.txt": inventory}
+        files.update({path.relative_to(ROOT).as_posix(): path.read_text(encoding="ascii")
+                      for path in (ROOT / "src/modules").glob("*.bas")})
+        self.assertEqual(self.findings(files), [])
 
     def test_implicit_visibility_is_rejected_everywhere(self) -> None:
         self.assertFinding(api_files(API_FACADE.replace("Public Function CVA_Echo",

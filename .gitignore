@@ -16,7 +16,7 @@ Thumbs.db
 desktop.ini
 .DS_Store
 
-# Workbooks are generated; no template path exception is approved.
+# Workbooks are generated; the reviewed prototype source template is the sole exception (#180).
 *.xls
 *.xlsx
 *.xlsm
@@ -28,6 +28,7 @@ desktop.ini
 *.xlam
 *.xll
 *.xlw
+!/src/workbook/CVA_Template.xlsx
 
 # Root-scoped build/run output; retained tests/evidence stays trackable.
 /build/
