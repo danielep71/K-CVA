@@ -1,11 +1,18 @@
-"""Regressions for whitespace validation in clean and local Git checkouts."""
+"""Regressions for committed whitespace and verified actionlint archive retrieval."""
+import hashlib
+import http.client
+import io
 import os
+import socket
 import subprocess
 import tempfile
 import unittest
+import urllib.error
+from email.message import Message
 from pathlib import Path
+from unittest.mock import patch
 
-from check_repository import whitespace_commands
+from check_repository import verified_archive, whitespace_commands
 
 
 class WhitespaceTests(unittest.TestCase):
@@ -54,6 +61,92 @@ class WhitespaceTests(unittest.TestCase):
         self.assertNotEqual(self.outcomes()['whitespace-local'], 0)
         self.git('add', 'fixture.txt')
         self.assertNotEqual(self.outcomes()['whitespace-local'], 0)
+
+
+class ArchiveTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.archive = Path(self.temp.name) / 'cache' / 'actionlint-digest'
+        self.payload = b'locked fixture archive'
+        self.digest = hashlib.sha256(self.payload).hexdigest()
+        self.url = 'https://example.invalid/archive'
+
+    def load(self) -> bytes:
+        return verified_archive(self.archive, self.url, self.digest)
+
+    def test_valid_cache_never_uses_network(self) -> None:
+        self.archive.parent.mkdir()
+        self.archive.write_bytes(self.payload)
+        with patch('check_repository.urllib.request.urlopen') as request:
+            self.assertEqual(self.load(), self.payload)
+            request.assert_not_called()
+
+    def test_corrupt_cache_rejected_without_download(self) -> None:
+        self.archive.parent.mkdir()
+        self.archive.write_bytes(b'corrupt')
+        with patch('check_repository.urllib.request.urlopen') as request:
+            with self.assertRaisesRegex(RuntimeError, 'cache checksum mismatch'):
+                self.load()
+            request.assert_not_called()
+
+    def test_transient_failures_then_success(self) -> None:
+        failures = [urllib.error.HTTPError(self.url, 504, 'gateway', Message(), None),
+                    TimeoutError('read'), http.client.IncompleteRead(b'part')]
+        with patch('check_repository.urllib.request.urlopen',
+                   side_effect=[*failures, io.BytesIO(self.payload)]) as request, \
+                patch('check_repository.time.sleep') as sleep:
+            self.assertEqual(self.load(), self.payload)
+            self.assertEqual(request.call_count, 4)
+            self.assertEqual([c.args[0] for c in sleep.call_args_list], [2, 4, 8])
+        self.assertEqual(self.archive.read_bytes(), self.payload)
+        self.assertEqual(list(self.archive.parent.iterdir()), [self.archive])
+
+    def test_exhaustion_leaves_no_cache(self) -> None:
+        with patch('check_repository.urllib.request.urlopen',
+                   side_effect=urllib.error.URLError(TimeoutError('read'))) as request, \
+                patch('check_repository.time.sleep'):
+            with self.assertRaisesRegex(RuntimeError, 'after 4 attempts'):
+                self.load()
+            self.assertEqual(request.call_count, 4)
+        self.assertFalse(self.archive.exists())
+
+    def test_permanent_http_and_url_errors_not_retried(self) -> None:
+        for error in [urllib.error.HTTPError(self.url, 404, 'missing', Message(), None),
+                      urllib.error.URLError('invalid certificate'),
+                      urllib.error.URLError(socket.gaierror(socket.EAI_NONAME, 'unknown host'))]:
+            with self.subTest(error=error), \
+                    patch('check_repository.urllib.request.urlopen', side_effect=error) as request, \
+                    patch('check_repository.time.sleep') as sleep:
+                with self.assertRaises(type(error)):
+                    self.load()
+                self.assertEqual(request.call_count, 1)
+                sleep.assert_not_called()
+                self.assertFalse(self.archive.exists())
+
+    def test_temporary_dns_failure_is_retried(self) -> None:
+        error = urllib.error.URLError(socket.gaierror(socket.EAI_AGAIN, 'temporary DNS failure'))
+        with patch('check_repository.urllib.request.urlopen',
+                   side_effect=[error, io.BytesIO(self.payload)]) as request, \
+                patch('check_repository.time.sleep') as sleep:
+            self.assertEqual(self.load(), self.payload)
+            self.assertEqual(request.call_count, 2)
+            sleep.assert_called_once_with(2)
+
+    def test_wrong_download_hash_not_cached_or_retried(self) -> None:
+        with patch('check_repository.urllib.request.urlopen', return_value=io.BytesIO(b'wrong')) as request, \
+                patch('check_repository.time.sleep') as sleep:
+            with self.assertRaisesRegex(RuntimeError, 'download checksum mismatch'):
+                self.load()
+            self.assertEqual(request.call_count, 1)
+            sleep.assert_not_called()
+        self.assertFalse(self.archive.exists())
+
+    def test_failed_atomic_publish_removes_temporary_file(self) -> None:
+        with patch('check_repository.urllib.request.urlopen', return_value=io.BytesIO(self.payload)), \
+                patch.object(Path, 'replace', side_effect=OSError('disk error')), self.assertRaises(OSError):
+            self.load()
+        self.assertEqual(list(self.archive.parent.iterdir()), [])
 
 
 if __name__ == '__main__':

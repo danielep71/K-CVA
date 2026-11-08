@@ -66,6 +66,9 @@ CVA calculation, public API or workbook.
 
 ### Changed
 
+- Retry transient actionlint download failures and cache its locked archive in
+  CI; checksum verification remains mandatory on every use (#186).
+
 - Settings apply requires an approved plan digest and a new atomic journal;
   equivalent and stronger protections are retained (#176). Preview again
   before applying; the old bare `--apply` command is refused.

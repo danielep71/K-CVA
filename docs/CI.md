@@ -18,7 +18,15 @@ version; all label fixture, detection and reconciliation jobs explicitly set up
 the same pinned Node version. The first run downloads actionlint 1.7.12
 from its official release and verifies the platform archive against
 [the checksum lock](../tools/actionlint-lock.json). Later runs reverify the cached
-archive and extract only the named executable. Supported tooling platforms are
+archive and extract only the named executable. Downloads use at most four
+60-second attempts, with 2/4/8-second delays for HTTP 408/429/500/502/503/504,
+timeouts, connection failures, temporary DNS resolution errors (`EAI_AGAIN`)
+and truncated responses. Permanent HTTP errors
+and checksum mismatches fail immediately. Only complete verified downloads
+are published atomically to the local cache. CI caches the archive using the
+runner OS/architecture and lock-file hash, with no fallback keys; every cache
+hit is reverified before extraction. An empty cache still requires a successful
+official download; exhausted retries fail the required check. Supported tooling platforms are
 Linux, Windows and macOS on x64/ARM64. This is not Excel host certification.
 
 The command checks issue configuration, all Python tooling tests, the

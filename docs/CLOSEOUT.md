@@ -51,7 +51,7 @@ The criteria of #20. Each row is ticked only with a link to its evidence.
 
 ## Candidate record
 
-Reviewed main candidate: `3d75855e5cbe6cda2f7fd519b6c363710ba9b935`
+Original reviewed main candidate: `3d75855e5cbe6cda2f7fd519b6c363710ba9b935`
 (integration #178; identical-tree sync #179).
 
 The [verification record](evidence/certification-2026-11-08.md#candidate-and-reproducibility)
@@ -59,15 +59,15 @@ records the clean checkout, exact tools, all 24 static gates, hosted candidate
 checks, cached actionlint limitation and operator-supplied Excel evidence.
 The [static report](evidence/integrity-3d75855.json) retains candidate/file hashes
 and `dirty: false`. Final certification is pending the closeout PR's checks,
-final-head review and merge; this is not a publication decision.
+final-head review, merge and final main integration/SHA record; this is not a publication decision.
 
 <a id="evidence-index"></a>
 
 ## Evidence index
 
-The [42-row issue reconciliation](evidence/certification-2026-11-08.md#acceptance-reconciliation)
-links every setup-milestone issue and its local evidence. All 41 prerequisites
-are closed. Qualifications for #116 and #120, later VBA comment changes, live
+The [43-row issue reconciliation](evidence/certification-2026-11-08.md#acceptance-reconciliation)
+links every setup-milestone issue and its local evidence. The original 41 prerequisites
+are closed; #186 is the subsequent reviewed download-resilience follow-up. Qualifications for #116 and #120, later VBA comment changes, live
 settings provenance and unsupported claims remain explicit in that record.
 Issue #20 and milestone closure remain pending the final PR gates.
 
@@ -97,7 +97,8 @@ with their re-audit.
 ## Scope statement
 
 Proposed acceptance, effective only after the certification PR passes its
-required CI and final-head review and merges:
+required CI and final-head review and merges, and the later tooling change
+is integrated into main with its final accepted SHA recorded:
 
 > v0.1.0 *Repo setup* is verified at commit
 > `3d75855e5cbe6cda2f7fd519b6c363710ba9b935` as repository infrastructure

@@ -56,9 +56,9 @@ probe of every control. No settings were applied during certification review.
 
 ## Acceptance reconciliation
 
-Read every setup issue body and its retained resolution/comments. Each row
-below links local evidence, not completion in SFTs or MyTemplate. All 41
-prerequisites are closed. Two historical unchecked qualifications are carried
+The initial review read every setup issue body and its retained resolution/comments. Each row
+below links local evidence, not completion in SFTs or MyTemplate. The initial 41
+prerequisites are closed; the later #186 follow-up is recorded below. Two historical unchecked qualifications are carried
 forward explicitly: #116's operator-confirmed secret retirement and #120's
 cross-platform wheel coverage without host execution. Neither is silently
 promoted to independently observed administrative/host behaviour.
@@ -107,6 +107,30 @@ promoted to independently observed administrative/host behaviour.
 | [#162](https://github.com/danielep71/K-CVA/issues/162) | Remaining template baseline | Task #163, integration #164; local tests, metadata/date policy, integrity tooling and pinned dependencies retained. |
 | [#176](https://github.com/danielep71/K-CVA/issues/176) | Settings plan/journal/equivalence | Task #177, integration #178, sync #179; 27 settings tests and final-head review. Approved digest, atomic journal and stronger-equivalent coverage verified offline; no live mutation/rollback exercise. |
 | [#20](https://github.com/danielep71/K-CVA/issues/20) | Certification | This record and CLOSEOUT; final PR gates and milestone closure remain pending. |
+| [#186](https://github.com/danielep71/K-CVA/issues/186) | Actionlint download resilience | PR #187, release commit e09be9fd; final-head CI and review linked below. No main integration or new Excel execution claimed. |
+
+## Download resilience follow-up
+
+The initial snapshot above predates #186: the setup milestone now contains
+43 issues. [PR #187](https://github.com/danielep71/K-CVA/pull/187) merged the
+retry/cache correction into release as
+`e09be9fd34c8e66fa55a1673aaaf1e3acafafc60`. Final head
+`4c258cffe04d938c9302f0990f0440fee09af779` passed
+[integrity 42473932005](https://github.com/danielep71/K-CVA/actions/runs/42473932005)
+and [CodeQL 42473932011](https://github.com/danielep71/K-CVA/actions/runs/42473932011);
+[Codex review](https://github.com/danielep71/K-CVA/pull/187#issuecomment-6720643170)
+completed without findings after the temporary-DNS correction. Eleven focused
+archive/whitespace tests pass. Initial hosted run 42473732560 demonstrated
+cache miss, download/verification and archive save. Network availability is
+still required on a cache miss; errors cannot bypass the required gate.
+
+This changes Python tooling, its tests and workflow, with related guides/audit.
+The original main/Excel/settings reports keep their original identities. The
+settings manifest and VBA executable statements are unchanged. #185 merges the
+new release base and reconciles these evidence records; its final-head checks
+and review remain required. Main integration and the final accepted main SHA
+must be recorded before #20/milestone closure. The old main SHA alone is not
+certification of this later tooling change.
 
 ## Excel evidence and subsequent source delta
 
