@@ -413,6 +413,25 @@ class PlanSafetyTests(unittest.TestCase):
         self.assertEqual(rs.ruleset_plan(DESIRED, live), [])
         self.assertEqual(rs.differences(DESIRED, live), ([], []))
 
+    def test_coverage_uses_projected_default_branch(self) -> None:
+        github = FakeGitHub()
+        github.repo["default_branch"] = "old-main"
+        github.rulesets[1]["conditions"]["ref_name"]["include"] = ["refs/heads/old-main"]
+        desired = copy.deepcopy(DESIRED)
+        desired["general"]["default_branch"] = "main"
+        live = rs.read_live(github)
+        plan = rs.build_plan(desired, live)
+        self.assertEqual([step[0] for step in plan], ["PATCH", "PUT"])
+        self.assertEqual(plan[1][2]["conditions"]["ref_name"]["include"], ["~DEFAULT_BRANCH"])
+        after = apply_test(github, desired, live)
+        self.assertEqual(rs.differences(desired, after), ([], []))
+        # A differently named old-default rule also cannot cover a missing rule.
+        github = FakeGitHub()
+        github.repo["default_branch"] = "old-main"
+        github.rulesets[1].update(name="Other")
+        github.rulesets[1]["conditions"]["ref_name"]["include"] = ["refs/heads/old-main"]
+        self.assertEqual([step[0] for step in rs.build_plan(desired, rs.read_live(github))], ["PATCH", "POST"])
+
     def test_coverage_is_evaluated_after_replacement(self) -> None:
         github = FakeGitHub()
         github.rulesets[1]["conditions"]["ref_name"]["include"] = ["~ALL"]

@@ -269,7 +269,9 @@ def ruleset_plan(desired: Mapping[str, Any], live: Mapping[str, Any]) -> list[tu
     if live["rulesets"] == UNREAD:
         return []
     projected = copy.deepcopy(live["rulesets"])
-    default = str(live.get("general", {}).get("default_branch") or "")
+    # General settings are written first, so aliases must use the projected default.
+    default = str(desired["general"].get("default_branch")
+                  or live.get("general", {}).get("default_branch") or "")
     steps = []
     missing = []
     for rule in desired["rulesets"]:
