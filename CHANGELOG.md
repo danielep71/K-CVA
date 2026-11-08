@@ -56,10 +56,18 @@ Use only the categories an entry needs.
 
 ## [Unreleased]
 
+- Retain the setup verification record and complete authenticated settings
+  check (#20), with candidate-bound static checks, issue/evidence reconciliation
+  and explicit host/platform limits. Final closeout remains subject to the
+  certification PR passing its required check and review.
+
 Planned as 0.1.0, *Repo setup*: repository infrastructure only. It contains no
 CVA calculation, public API or workbook.
 
 ### Changed
+
+- Retry transient actionlint download failures and cache its locked archive in
+  CI; checksum verification remains mandatory on every use (#186).
 
 - Settings apply requires an approved plan digest and a new atomic journal;
   equivalent and stronger protections are retained (#176). Preview again
