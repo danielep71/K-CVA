@@ -2,7 +2,8 @@
 
 The checklist and evidence index for closing the milestone
 [v0.1.0 - Repo setup](https://github.com/danielep71/K-CVA/milestone/1).
-Prepared by #17 before the file audits; filled in by #18, #19 and #20.
+Prepared by #17; audits by #18/#19; verification record assembled by #20
+on 2026-11-08. Final closeout is pending the certification PR gates.
 Nothing in this document is complete until its row links the evidence.
 
 > [!IMPORTANT]
@@ -19,7 +20,7 @@ Nothing in this document is complete until its row links the evidence.
 
 | Step | Issue | Needs | Produces |
 | ---: | --- | --- | --- |
-| 1 | The remaining setup issue: #11 | Each issue's own prerequisites | Their deliverables, merged and integrated into `main` |
+| 1 | Completed setup prerequisites, including #11 | Each issue's own prerequisites | Their deliverables, merged and integrated into `main` |
 | 2 | #18, file audit | Step 1 | The [file audit record](#file-audit-record), with relevance, provenance and owner references for every tracked file |
 | 3 | #19, comment audit | #18 | The comment columns of the same record |
 | 4 | #20, certification | #19 | The [candidate record](#candidate-record), this checklist and the [evidence index](#evidence-index) completed, the [scope statement](#scope-statement) |
@@ -36,80 +37,39 @@ The criteria of #20. Each row is ticked only with a link to its evidence.
 
 | # | Criterion | Evidence | Done |
 | ---: | --- | --- | :---: |
-| 1 | Every milestone issue and acceptance box verified against retained evidence; no source-repository completion counted as local completion | [Evidence index](#evidence-index) | ☐ |
-| 2 | Documented setup reproduced from a fresh checkout with the declared prerequisites, and the accepted commit recorded | [Candidate record](#candidate-record) | ☐ |
-| 3 | Hosted `Repository integrity` green on the candidate | Run link | ☐ |
-| 4 | Live labels agree with the catalogue; issue metadata and dependencies pass triage | *Live label drift* and *Issue triage* run links | ☐ |
-| 5 | Protection behaviour as recorded in [GOVERNANCE.md](GOVERNANCE.md#protection-policy-and-verified-controls), re-read on the certification date | Ruleset read-back | ☐ |
-| 6 | Genuine scaffold execution in Excel on the intended host, at the candidate or with the reason a later change does not affect it | #11 evidence | ☐ |
-| 7 | File and comment audits cover every tracked file at the candidate, including changes made after the audits | [File audit record](#file-audit-record) | ☐ |
-| 8 | Evidence index and explicit limitations assembled; scope statement recorded | This document | ☐ |
+| 1 | Every milestone issue and acceptance box verified against retained evidence; no source-repository completion counted as local completion | [Evidence index](#evidence-index) | ☑ |
+| 2 | Documented setup reproduced from a fresh checkout with the declared prerequisites, and the accepted commit recorded | [Candidate record](#candidate-record) | ☑ |
+| 3 | Hosted `Repository integrity` green on the candidate | [Main CI](evidence/certification-2026-11-08.md#candidate-and-reproducibility) | ☑ |
+| 4 | Live labels agree with the catalogue; issue metadata and dependencies pass triage | [Live snapshot and hosted triage](evidence/certification-2026-11-08.md#current-controls) | ☑ |
+| 5 | Protection behaviour as recorded in [GOVERNANCE.md](GOVERNANCE.md#protection-policy-and-verified-controls), re-read on the certification date | [Authenticated report](evidence/repository-settings-2026-11-08.json) | ☑ |
+| 6 | Genuine scaffold execution in Excel on the intended host, at the candidate or with the reason a later change does not affect it | [Host evidence and delta](evidence/certification-2026-11-08.md#excel-evidence-and-subsequent-source-delta) | ☑ |
+| 7 | File and comment audits cover every tracked file at the candidate, including changes made after the audits | [File audit record](#file-audit-record) | ☑ |
+| 8 | Evidence index and explicit limitations assembled; scope statement recorded | This document | ☑ |
 | 9 | Milestone closed only after every prerequisite is complete or a scope change is explicitly agreed; no tag, release or workbook published automatically | Maintainer decision | ☐ |
 
 <a id="candidate-record"></a>
 
 ## Candidate record
 
-Recorded by #20 from the runs themselves:
+Original reviewed main candidate: `3d75855e5cbe6cda2f7fd519b6c363710ba9b935`
+(integration #178; identical-tree sync #179).
 
-| Item | Value |
-| --- | --- |
-| Accepted commit | Full 40-character SHA on `main` |
-| Integration pull request | The release-to-main PR whose merge commit it is, and its sync PR |
-| Fresh checkout | `git clone`, `git switch --detach <SHA>`, `git status --short` (empty) |
-| Static checks | `python tools/check_repository.py`: exit code and one line per check; `report.json` with the SHA and `"dirty": false` |
-| Tool versions | Git, Python and Node.js actually used, against the [CI baseline](../INSTALLATION.md#developer-setup) |
-| Hosted CI | `Repository integrity` run ID and result on the SHA |
-| Excel run | Host, Excel build and bitness, harness `RESULT` line, from #11 |
-| Deviations | `none`, or each criterion not met and the decision accepting it |
+The [verification record](evidence/certification-2026-11-08.md#candidate-and-reproducibility)
+records the clean checkout, exact tools, all 24 static gates, hosted candidate
+checks, cached actionlint limitation and operator-supplied Excel evidence.
+The [static report](evidence/integrity-3d75855.json) retains candidate/file hashes
+and `dirty: false`. Final certification is pending the closeout PR's checks,
+final-head review, merge and final main integration/SHA record; this is not a publication decision.
 
 <a id="evidence-index"></a>
 
 ## Evidence index
 
-One row per issue of the milestone. *Evidence* links the issue's Resolution
-section, which links its pull requests, integration and checks. *Verified at
-candidate* is ticked by #20 once the evidence still holds for the accepted
-commit.
-
-| Issue | Subject | Evidence | Verified at candidate |
-| --- | --- | --- | :---: |
-| #2 | Branch governance and review | Resolution of #2 | ☐ |
-| #3 | Project boundary and architecture | Resolution of #3 | ☐ |
-| #4 | Licensing, provenance and security | Resolution of #4 | ☐ |
-| #5 | Source-control hygiene and conventions | Resolution of #5 | ☐ |
-| #6 | Repository CI and dependency updates | Resolution of #6 | ☐ |
-| #7 | Pull request template and issue tracking | Resolution of #7 | ☐ |
-| #8 | Methodology provenance and test-case contract | Resolution of #8 | ☐ |
-| #9 | Static checks and regression fixtures | Resolution of #9 | ☐ |
-| #10 | Regression scaffold | Resolution of #10 | ☐ |
-| #11 | Candidate-bound evidence and host smoke test | [Maintainer-supplied main-candidate PASS](evidence/excel-run-194e9cd.md); documentation acceptance tracked in #11 | ☐ |
-| #12 | Repository settings and protections | Resolution of #12 | ☐ |
-| #13 | Failing and passing checks and merge enforcement | Resolution of #13 | ☐ |
-| #14 | Traffic history | Resolution of #14; main integrations #103, #106, #111; syncs #104, #107, #112 | ☐ |
-| #15 | Repository About metadata | Resolution of #15; saved metadata read-back | ☐ |
-| #16 | Onboarding | Resolution of #16 | ☐ |
-| #17 | Versioning and closeout documents | Resolution of #17; main integration #83, sync #84 | ☐ |
-| #18 | File audit | [Per-file record](evidence/v0.1.0-file-audit.md); acceptance tracked in #18 | ☐ |
-| #19 | Comment audit | [Per-file prose review](evidence/v0.1.0-file-audit.md#prose-and-comment-review-19); acceptance tracked in #19 | ☐ |
-| #20 | Certification | Open | ☐ |
-| #35, #37, #41, #47 | Documentation and CI corrections | Their Resolutions | ☐ |
-| #56, #58, #60, #62, #64, #65 | Static-check defects | Their Resolutions | ☐ |
-| #85 | Repository/project rename to K-CVA | Resolution of #85; main integration #87, sync #88 | ☐ |
-| #108 | Public visibility, security reporting and source terms | Resolution of #108; main integrations #111, #113; syncs #112, #114 | ☐ |
-| #116 | Traffic collection with a GitHub App token | Resolution of #116; main integration #141, sync #142 | ☐ |
-| #117 | CodeQL code scanning and its first alert | Resolution of #117; main integrations #130, #138; syncs #131, #139 | ☐ |
-| #118 | Markdown anchor and external-link checks | Resolution of #118; main integration #130, sync #131 | ☐ |
-| #119 | Workflow rules and timeouts | Resolution of #119; main integrations #130, #144; syncs #131, #145 | ☐ |
-| #120 | Ruff and strict mypy gates | Resolution of #120; main integrations #130, #138; syncs #131, #139 | ☐ |
-| #121 | Repository settings as code | Resolution of #121; main integration #130, sync #131 | ☐ |
-| #122 | Milestones kept off pull requests | Resolution of #122; main integration #130, sync #131 | ☐ |
-| #123 | Timeless governance and settings rules | Resolution of #123; main integration #130, sync #131 | ☐ |
-| #158 | Issue management and label safeguards | Resolution of #158; task #159, main #160, sync #161 | ☐ |
-| #176 | Approved settings plans, journals and equivalent protection | Acceptance and final-head evidence in #176; live application not performed | ☐ |
-| #162 | Remaining MyTemplate baseline alignment | Resolution of #162; task #163, main #164, sync #165 | ☐ |
-
-An issue added to the milestone later gets a row here.
+The [43-row issue reconciliation](evidence/certification-2026-11-08.md#acceptance-reconciliation)
+links every setup-milestone issue and its local evidence. The original 41 prerequisites
+are closed; #186 is the subsequent reviewed download-resilience follow-up. Qualifications for #116 and #120, later VBA comment changes, live
+settings provenance and unsupported claims remain explicit in that record.
+Issue #20 and milestone closure remain pending the final PR gates.
 
 <a id="file-audit-record"></a>
 
@@ -136,13 +96,17 @@ with their re-audit.
 
 ## Scope statement
 
-Recorded by #20 with the candidate, in these terms unless the evidence
-supports less:
+Proposed acceptance, effective only after the certification PR passes its
+required CI and final-head review and merges, and the later tooling change
+is integrated into main with its final accepted SHA recorded:
 
-> v0.1.0 *Repo setup* is certified at commit `<SHA>` as repository
-> infrastructure only: governance and protections, repository checks and CI,
-> source conventions, licensing and provenance, the methodology register and
-> test-case contract, the VBA regression scaffold and the onboarding
-> documents. The scaffold was run in Excel on `<host>`. No CVA calculation,
+> v0.1.0 *Repo setup* is verified at commit
+> `3d75855e5cbe6cda2f7fd519b6c363710ba9b935` as repository infrastructure
+> only. The retained genuine Excel scaffold run is bound to `194e9cd`, with
+> the later comment-only delta explicitly assessed. No CVA calculation,
 > regulatory interpretation, numerical result, public API or workbook is
-> certified, released or implied. Limitations: `<list>`.
+> certified, released or implied. The [attributed evidence and limitations](evidence/certification-2026-11-08.md#scope-and-limitations)
+> are part of this statement.
+
+The issue/milestone decision records when the PR gates are satisfied. Closing
+this milestone does not authorize tags, releases or workbook publication.
