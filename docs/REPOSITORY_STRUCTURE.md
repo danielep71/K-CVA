@@ -12,8 +12,8 @@ a general exposure simulation engine. Inputs needed by the selected approach
 must be defined explicitly; the application must never equate a valuation
 adjustment with a regulatory capital requirement.
 
-No engine or workbook exists yet. Architecture is a design for subsequent work,
-not evidence of implemented or validated functionality.
+The unvalidated prototype is ported under #180; see [porting record](prototype/PORTING.md).
+Architecture and static checks are not numerical or Excel acceptance.
 
 ## Locations
 
@@ -21,16 +21,16 @@ not evidence of implemented or validated functionality.
 | --- | --- | --- |
 | `.github/` | Workflow configuration, issue forms and canonical labels | Present, including Repository integrity CI, Dependabot version updates (#6) and PR template (#7). Required-check enforcement configured under #12 and demonstrated under #13. |
 | `docs/` | Governance, architecture, decisions and API inventory | Present. |
-| `docs/methodology/` | Dated source register, approach decisions and fixture contract | Methodology skeleton, source register with a copy of the controlling text, and test-case contract (#8); no formula transcribed. |
-| `docs/contracts/` | Versioned public input/output contracts | Reserved until the first real contract. |
-| `src/` | Production source and source placement guide | Guide only. |
-| `src/core/` | VBA calculations and pure validation | Reserved. |
-| `src/modules/` | Public facade and supported entry points | Reserved. |
+| `docs/methodology/` | Dated source register, approach decisions and fixture contract | Methodology skeleton, source register with a copy of the controlling text, and test-case contract (#8); prototype methodology retained separately without acceptance (#180). |
+| `docs/contracts/` | Versioned public input/output contracts | Prototype intake contract; unvalidated (#180). |
+| `src/` | Production source and source placement guide | Guide and ported prototype sources (#180). |
+| `src/core/` | VBA calculations and pure validation | Prototype port present (#180). |
+| `src/modules/` | Public facade and supported entry points | Prototype port present (#180). |
 | `src/classes/` | Host-independent record/model classes if required | Reserved. |
-| `src/workbook/`, `src/forms/` | Excel adapters, document modules and optional forms | Reserved. |
+| `src/workbook/`, `src/forms/` | Excel adapters, document modules and optional forms | Prototype port present (#180); forms remain reserved. |
 | `tests/` | Verification guide, harness, synthetic fixtures and expected values | Guide, VBA harness and neutral example suite in `tests/modules/` (#10); [recorded Excel scaffold run](evidence/excel-run-194e9cd.md) passed (#11); no numerical CVA validation. |
-| `tests/fixtures/`, `tests/expected/` | Inputs and independently justified expected results | One illustrative format example ([TEST_CASES.md](methodology/TEST_CASES.md)); no regulatory case. |
-| `tests/derivations/` | Independent Python reference calculations | Reserved. |
+| `tests/fixtures/`, `tests/expected/` | Inputs and independently justified expected results | One illustrative format example ([TEST_CASES.md](methodology/TEST_CASES.md)); prototype intake cases in `prototype/` subfolders are not registered regulatory fixtures (#180). |
+| `tests/derivations/` | Independent Python reference calculations | Prototype port present (#180). |
 | `tests/evidence/` | Deliberately retained, reviewed evidence tied to a source commit | Reserved. An Excel run is recorded as in [INSTALLATION.md](../INSTALLATION.md#recording-an-excel-run): its folder stays outside Git, its report goes into the issue (#11). |
 | `tools/` | Repository checks, build and evidence tooling | Issue-policy checker and tests, [check_repository.py](../tools/check_repository.py), [actionlint-lock.json](../tools/actionlint-lock.json) and the static VBA checks (`check_vba_*.py`, `vba_lexer.py`) present; see [CI.md](CI.md). |
 | `examples/modules/` | Synthetic VBA examples using supported API only | Reserved. |
@@ -67,7 +67,7 @@ Host policy and conventions are in [INSTALLATION.md](../INSTALLATION.md) and
 
 ## Public API inventory
 
-[PUBLIC_API.txt](PUBLIC_API.txt) is currently empty of declarations.
+[PUBLIC_API.txt](PUBLIC_API.txt) inventories the three ported prototype facade functions.
 A VBA Public declaration is supported only if explicitly inventoried.
 Core standard modules use `Option Private Module`; this limits external
 visibility and is not a security boundary. Test/example modules are never part
@@ -87,8 +87,8 @@ follow the same inventory convention when classes become supported API.
 The `vba-public-api` check verifies the inventory against src/modules/.
 
 A supported API change needs an issue, updated contract and inventory, tests and
-a [changelog](../CHANGELOG.md) entry. There are no supported entry points
-until these records and implementation are reviewed together.
+a [changelog](../CHANGELOG.md) entry. The prototype entries and [contract](contracts/PROTOTYPE.md) are reviewed together
+for placement and signature consistency only; numerical acceptance is deferred.
 
 ## Input/output contract conventions
 

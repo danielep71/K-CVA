@@ -1,5 +1,9 @@
 # Contributing to K-CVA
 
+> Prototype port (#180): sources, template and tooling are now present. Earlier
+> setup-only absence statements below describe the v0.1.0 baseline. This port
+> provides no numerical or Excel acceptance. See the [porting record](docs/prototype/PORTING.md).
+
 Participation follows the [code of conduct](CODE_OF_CONDUCT.md).
 
 K-CVA has one maintainer, who decides scope, priorities and what is
@@ -93,7 +97,7 @@ were not checked in a commit message.
 ## Source and validation
 
 - **Exported VBA is the source.** The `.bas`, `.cls` and `.frm` files are the
-  reviewable record; a workbook never is, and none is committed. Import and
+  reviewable record; a workbook never is, with only the explicit `src/workbook/CVA_Template.xlsx` source-template exception (#180). Import and
   export as in [INSTALLATION.md](INSTALLATION.md#importing-vba-into-excel);
   write as in [docs/VBA_HOUSE_STYLE.md](docs/VBA_HOUSE_STYLE.md); place
   components as in [docs/REPOSITORY_STRUCTURE.md](docs/REPOSITORY_STRUCTURE.md).

@@ -1,5 +1,9 @@
 # Scope and architecture decisions
 
+> Prototype port (#180): sources, template and tooling are now present. Earlier
+> setup-only absence statements below describe the v0.1.0 baseline. This port
+> provides no numerical or Excel acceptance. See the [porting record](prototype/PORTING.md).
+
 Decisions for issue [#3](https://github.com/danielep71/K-CVA/issues/3),
 recorded 2026-10-24. This register distinguishes confirmed product choices,
 accepted architecture conventions, and unresolved methodology choices.

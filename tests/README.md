@@ -1,5 +1,9 @@
 # Verification
 
+> Prototype port (#180): sources, template and tooling are now present. Earlier
+> setup-only absence statements below describe the v0.1.0 baseline. This port
+> provides no numerical or Excel acceptance. See the [porting record](../docs/prototype/PORTING.md).
+
 No numerical CVA test suite or product certification exists yet. This directory
 holds the deterministic regression scaffold (#10): the VBA harness, its
 neutral example suite and the test-case files. The

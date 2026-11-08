@@ -56,13 +56,21 @@ Use only the categories an entry needs.
 
 ## [Unreleased]
 
+### Added
+
+- Port the original prototype into core, facade, workbook, tooling and test
+  locations, retaining its ZIP, hashes and mechanical-change mapping; inventory
+  three prototype facade functions and allow only the named source template.
+  No formulas changed and no numerical or Excel acceptance is claimed
+  ([#180](https://github.com/danielep71/K-CVA/issues/180)).
+
 - Retain the setup verification record and complete authenticated settings
   check (#20), with candidate-bound static checks, issue/evidence reconciliation
   and explicit host/platform limits. Record the accepted infrastructure
   candidate and final-main verification without publishing a release.
 
-Planned as 0.1.0, *Repo setup*: repository infrastructure only. It contains no
-CVA calculation, public API or workbook.
+The 0.1.0 *Repo setup* baseline contained no CVA calculation, public API or
+workbook. The #180 entry adds the unvalidated prototype port for v0.2.0.
 
 ### Changed
 
