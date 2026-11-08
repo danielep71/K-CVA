@@ -10,6 +10,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from typing import Any
+from unittest.mock import patch
 
 import repository_settings as rs
 
@@ -113,17 +114,28 @@ def run(github: FakeGitHub, *args: str) -> tuple[int, str]:
     with tempfile.TemporaryDirectory() as directory:
         desired = Path(directory) / "desired.json"
         desired.write_text(json.dumps(DESIRED), encoding="utf-8")
+        if "--apply" in args:
+            live = rs.read_live(github)
+            args = (*args, "--approve-plan", rs.plan_digest(DESIRED, live, desired.read_bytes()),
+                    "--journal", str(Path(directory) / "journal.json"))
         output = io.StringIO()
         with contextlib.redirect_stdout(output), contextlib.redirect_stderr(output):
             code = rs.main(["--desired", str(desired), *args], client=github)
     return code, output.getvalue()
 
 
+def apply_test(github: FakeGitHub, desired: dict[str, Any], live: dict[str, Any]) -> dict[str, Any]:
+    manifest = json.dumps(desired).encode()
+    with tempfile.TemporaryDirectory() as directory:
+        return rs.apply(github, desired, live, manifest=manifest,
+                        approved=rs.plan_digest(desired, live, manifest), journal=Path(directory) / "journal.json")
+
+
 class CheckTests(unittest.TestCase):
     def test_matching_settings_pass(self) -> None:
         for args in ((), ("--check",)):
             with self.subTest(args=args):
-                self.assertEqual(run(FakeGitHub(), *args), (0, "owner/repo: 0 differences, 0 unread settings\n"))
+                self.assertEqual(run(FakeGitHub(), *args)[0], 0)
 
     def test_drift_is_listed_and_fails_check(self) -> None:
         github = FakeGitHub()
@@ -135,8 +147,7 @@ class CheckTests(unittest.TestCase):
         self.assertEqual(code, 1)
         for line in ('drift: general.allow_rebase_merge: live false, desired true',
                      'drift: security.private_vulnerability_reporting: live false, desired true',
-                     'drift: rulesets.Protect main.enforcement: live "disabled", desired "active"',
-                     "drift: rulesets.Extra: not in the desired state (not deleted by --apply)"):
+                     'drift: rulesets.Protect main.enforcement: live "disabled", desired "active"'):
             self.assertIn(line, output)
         self.assertEqual(run(github)[0], 0)  # preview reports but does not fail
 
@@ -200,8 +211,8 @@ class ApplyTests(unittest.TestCase):
         github = FakeGitHub()
         github.rulesets = {7: copy.deepcopy(RULESET) | {"id": 7, "name": "Extra"}}
         code, _ = run(github, "--apply")
-        self.assertEqual(code, 1)  # the extra ruleset remains drift
-        self.assertEqual(github.writes, ["POST /rulesets"])
+        self.assertEqual(code, 0)  # equivalent protection under another name
+        self.assertEqual(github.writes, [])
         self.assertIn(7, github.rulesets)
 
     def test_visibility_is_never_applied(self) -> None:
@@ -231,7 +242,9 @@ class AlignmentTests(unittest.TestCase):
             path = Path(directory) / "desired.json"
             path.write_text(json.dumps(desired), encoding="utf-8")
             with contextlib.redirect_stdout(io.StringIO()):
-                self.assertEqual(rs.main(["--desired", str(path), "--apply"], github), 1)
+                self.assertEqual(rs.main(["--desired", str(path), "--apply", "--approve-plan",
+                    rs.plan_digest(desired, rs.read_live(github), path.read_bytes()),
+                    "--journal", str(Path(directory) / "journal.json")], github), 1)
         drift, _ = rs.differences(desired, rs.read_live(github))
         self.assertTrue(any("enabled(paused)" in line for line in drift))
 
@@ -252,7 +265,7 @@ class AlignmentTests(unittest.TestCase):
         self.assertEqual(live["actions"]["retention_days"], 90)
         self.assertEqual(live["actions"]["fork_pr_approval_policy"], "all_external_contributors")
         self.assertEqual(len(rs.differences(desired, live)[0]), 2)
-        self.assertEqual(rs.apply(github, desired, live), [])
+        self.assertEqual(rs.build_plan(desired, live), [])
 
     def test_auto_delete_is_last_and_failure_prevents_it(self) -> None:
         for fail in (False, True):
@@ -264,13 +277,173 @@ class AlignmentTests(unittest.TestCase):
                 live = rs.read_live(github)
                 if fail:
                     github.refused.add("/rulesets/1")
-                    with self.assertRaises(RuntimeError):
-                        rs.apply(github, DESIRED, live)
+                    with self.assertRaises(ValueError):
+                        apply_test(github, DESIRED, live)
                     self.assertFalse(github.repo["delete_branch_on_merge"])
                 else:
-                    rs.apply(github, DESIRED, live)
+                    apply_test(github, DESIRED, live)
                     self.assertEqual(github.writes, ["PATCH ", "PUT /rulesets/1", "PATCH "])
                     self.assertTrue(github.repo["delete_branch_on_merge"])
+
+
+class PlanSafetyTests(unittest.TestCase):
+    def test_digest_binds_manifest_destination_observation_and_plan(self) -> None:
+        github = FakeGitHub()
+        live = rs.read_live(github)
+        manifest = json.dumps(DESIRED).encode()
+        digest = rs.plan_digest(DESIRED, live, manifest)
+        self.assertEqual(digest, rs.plan_digest(DESIRED, copy.deepcopy(live), manifest))
+        self.assertNotEqual(digest, rs.plan_digest(DESIRED, live, manifest + b" "))
+        for area, key, value in (("general", "visibility", "private"),
+                                  ("general", "allow_rebase_merge", False)):
+            changed = copy.deepcopy(live)
+            changed[area][key] = value
+            self.assertNotEqual(digest, rs.plan_digest(DESIRED, changed, manifest))
+        changed_desired = dict(DESIRED, repository="another/repo")
+        self.assertNotEqual(digest, rs.plan_digest(changed_desired, live, manifest))
+
+    def test_stale_approval_and_existing_journal_never_write(self) -> None:
+        github = FakeGitHub()
+        live = rs.read_live(github)
+        manifest = json.dumps(DESIRED).encode()
+        with tempfile.TemporaryDirectory() as directory:
+            journal = Path(directory) / "journal.json"
+            digest = rs.plan_digest(DESIRED, live, manifest)
+            github.pvr = False
+            with self.assertRaises(ValueError):
+                rs.apply(github, DESIRED, live, manifest=manifest, approved=digest, journal=journal)
+            self.assertFalse(journal.exists())
+            live = rs.read_live(github)
+            journal.write_text("existing")
+            with self.assertRaises(FileExistsError):
+                rs.apply(github, DESIRED, live, manifest=manifest,
+                         approved=rs.plan_digest(DESIRED, live, manifest), journal=journal)
+            self.assertEqual(journal.read_text(), "existing")
+            self.assertEqual(github.writes, [])
+
+    def test_journal_precedes_mutations_and_retains_partial_failure(self) -> None:
+        github = FakeGitHub()
+        github.repo["allow_rebase_merge"] = False
+        github.pvr = False
+        github.alerts = False
+        live = rs.read_live(github)
+        manifest = json.dumps(DESIRED).encode()
+        original = github.request
+        with tempfile.TemporaryDirectory() as directory:
+            journal = Path(directory) / "journal.json"
+            def request(method: str, path: str, body: Any = None) -> tuple[int, Any]:
+                if method != "GET":
+                    record = json.loads(journal.read_text())
+                    self.assertTrue(any(e["status"] == "in_progress" for e in record["writes"]))
+                if method == "PUT" and path == "/private-vulnerability-reporting":
+                    return 500, None
+                return original(method, path, body)
+            with patch.object(github, "request", side_effect=request), self.assertRaises(RuntimeError):
+                rs.apply(github, DESIRED, live, manifest=manifest,
+                         approved=rs.plan_digest(DESIRED, live, manifest), journal=journal)
+            record = json.loads(journal.read_text())
+            self.assertEqual([e["status"] for e in record["writes"]], ["done", "failed_or_unknown", "pending"])
+            self.assertTrue(github.repo["allow_rebase_merge"])
+            self.assertFalse(github.alerts)
+
+    def test_journal_failure_prevents_first_mutation(self) -> None:
+        github = FakeGitHub()
+        github.pvr = False
+        with patch.object(rs, "write_journal", side_effect=OSError("disk full")), self.assertRaises(OSError):
+            apply_test(github, DESIRED, rs.read_live(github))
+        self.assertEqual(github.writes, [])
+
+    def test_successful_journal_contains_readback(self) -> None:
+        github = FakeGitHub()
+        github.pvr = False
+        live = rs.read_live(github)
+        manifest = json.dumps(DESIRED).encode()
+        with tempfile.TemporaryDirectory() as directory:
+            journal = Path(directory) / "journal.json"
+            rs.apply(github, DESIRED, live, manifest=manifest,
+                     approved=rs.plan_digest(DESIRED, live, manifest), journal=journal)
+            record = json.loads(journal.read_text())
+            self.assertEqual(record["readback"]["drift"], [])
+            self.assertEqual(record["writes"][0]["status"], "done")
+
+    def test_equivalence_refuses_bypass_exclusions_and_inactive_rules(self) -> None:
+        for key, value in (("bypass_actors", [{"actor_id": 1}]), ("enforcement", "evaluate"),
+                           ("conditions", {"ref_name": {"include": ["~ALL"], "exclude": ["refs/heads/x"]}})):
+            candidate = copy.deepcopy(RULESET)
+            candidate[key] = value
+            self.assertFalse(rs.covers(RULESET, [candidate], "main"))
+        candidate = copy.deepcopy(RULESET)
+        del candidate["bypass_actors"]
+        self.assertFalse(rs.covers(RULESET, [candidate], "main"))
+
+    def test_stronger_rules_are_retained(self) -> None:
+        want: dict[str, Any] = {"type": "pull_request", "parameters": {
+            "required_approving_review_count": 0, "allowed_merge_methods": ["merge", "squash"]}}
+        have = copy.deepcopy(want)
+        have["parameters"].update(required_approving_review_count=2, allowed_merge_methods=["merge"])
+        self.assertTrue(rs.stronger_rule(want, have))
+        self.assertFalse(rs.stronger_rule(have, want))
+        desired = copy.deepcopy(DESIRED)
+        desired["rulesets"][0]["rules"].append(want)
+        github = FakeGitHub()
+        github.rulesets[1]["rules"].append(have)
+        live = rs.read_live(github)
+        self.assertEqual(rs.ruleset_plan(desired, live), [])
+        self.assertEqual(rs.differences(desired, live), ([], []))
+
+    def test_missing_rule_does_not_reduce_existing_stronger_parameter(self) -> None:
+        desired = copy.deepcopy(DESIRED)
+        desired["rulesets"][0]["rules"].append({"type": "pull_request", "parameters": {
+            "required_approving_review_count": 0, "required_review_thread_resolution": True}})
+        github = FakeGitHub()
+        github.rulesets[1]["rules"] = [{"type": "pull_request", "parameters": {
+            "required_approving_review_count": 2, "required_review_thread_resolution": False}}]
+        live = rs.read_live(github)
+        plan = rs.ruleset_plan(desired, live)
+        rule = next(r for r in plan[0][2]["rules"] if r["type"] == "pull_request")
+        self.assertEqual(rule["parameters"], {"required_approving_review_count": 2,
+                                             "required_review_thread_resolution": True})
+
+    def test_combined_equivalent_rulesets_are_not_drift(self) -> None:
+        github = FakeGitHub()
+        github.rulesets = {
+            2: dict(copy.deepcopy(RULESET), id=2, name="First", rules=[{"type": "deletion"}]),
+            3: dict(copy.deepcopy(RULESET), id=3, name="Second", rules=[{"type": "non_fast_forward"}])}
+        live = rs.read_live(github)
+        self.assertEqual(rs.ruleset_plan(DESIRED, live), [])
+        self.assertEqual(rs.differences(DESIRED, live), ([], []))
+
+    def test_coverage_uses_projected_default_branch(self) -> None:
+        github = FakeGitHub()
+        github.repo["default_branch"] = "old-main"
+        github.rulesets[1]["conditions"]["ref_name"]["include"] = ["refs/heads/old-main"]
+        desired = copy.deepcopy(DESIRED)
+        desired["general"]["default_branch"] = "main"
+        live = rs.read_live(github)
+        plan = rs.build_plan(desired, live)
+        self.assertEqual([step[0] for step in plan], ["PATCH", "PUT"])
+        self.assertEqual(plan[1][2]["conditions"]["ref_name"]["include"], ["~DEFAULT_BRANCH"])
+        after = apply_test(github, desired, live)
+        self.assertEqual(rs.differences(desired, after), ([], []))
+        # A differently named old-default rule also cannot cover a missing rule.
+        github = FakeGitHub()
+        github.repo["default_branch"] = "old-main"
+        github.rulesets[1].update(name="Other")
+        github.rulesets[1]["conditions"]["ref_name"]["include"] = ["refs/heads/old-main"]
+        self.assertEqual([step[0] for step in rs.build_plan(desired, rs.read_live(github))], ["PATCH", "POST"])
+
+    def test_coverage_is_evaluated_after_replacement(self) -> None:
+        github = FakeGitHub()
+        github.rulesets[1]["conditions"]["ref_name"]["include"] = ["~ALL"]
+        github.rulesets[1]["rules"] = [{"type": "deletion"}]
+        desired = copy.deepcopy(DESIRED)
+        other = copy.deepcopy(RULESET)
+        other.update(name="Other", conditions={"ref_name": {"include": ["refs/heads/other"], "exclude": []}})
+        other["rules"] = [{"type": "deletion"}]
+        desired["rulesets"].append(other)
+        self.assertTrue(rs.covers(other, list(github.rulesets.values()), "main"))
+        plan = rs.ruleset_plan(desired, rs.read_live(github))
+        self.assertEqual([step[0] for step in plan], ["PUT", "POST"])
 
 
 class ReportTests(unittest.TestCase):

@@ -106,6 +106,7 @@ commit.
 | #122 | Milestones kept off pull requests | Resolution of #122; main integration #130, sync #131 | ☐ |
 | #123 | Timeless governance and settings rules | Resolution of #123; main integration #130, sync #131 | ☐ |
 | #158 | Issue management and label safeguards | Resolution of #158; task #159, main #160, sync #161 | ☐ |
+| #176 | Approved settings plans, journals and equivalent protection | Acceptance and final-head evidence in #176; live application not performed | ☐ |
 | #162 | Remaining MyTemplate baseline alignment | Resolution of #162; task #163, main #164, sync #165 | ☐ |
 
 An issue added to the milestone later gets a row here.

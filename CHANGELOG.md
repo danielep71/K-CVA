@@ -61,6 +61,10 @@ CVA calculation, public API or workbook.
 
 ### Changed
 
+- Settings apply requires an approved plan digest and a new atomic journal;
+  equivalent and stronger protections are retained (#176). Preview again
+  before applying; the old bare `--apply` command is refused.
+
 - Harden repository tooling against out-of-order traffic replays, isolate
   CodeQL PR analysis, preserve push CI evidence, and align security-settings
   verification and contributor policies with MyTemplate (#162). Existing
