@@ -1,0 +1,336 @@
+{
+  "commit": "3c4724d92a0f79757e39954d9f135661e4d29ee8",
+  "dirty": false,
+  "github_head_sha": null,
+  "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.39",
+  "files_sha256": {
+    ".editorconfig": "71c6ed1c489de166e78d5234682c020030f8ed1332980409801acf9a21797af1",
+    ".gitattributes": "a7e334fc5263bd329bfe4fded2a4c807d2c5e915871d4b842669339470335316",
+    ".github/ISSUE_TEMPLATE/bug.yml": "66576f5fda741135719989e2341bfc88872ca267fcb3526d85f4989b160dc24c",
+    ".github/ISSUE_TEMPLATE/config.yml": "da1eb55f130f01d677eec0140044ec4a6635add0ab39210b0d89988f4a2287ca",
+    ".github/ISSUE_TEMPLATE/documentation.yml": "67ec2911e3107270305cb3131006e7368d3524c26451f674c02ca2e9586f2f15",
+    ".github/ISSUE_TEMPLATE/enhancement.yml": "f4c26cc52d168119d6986b7d5a6b8258af908f9d772b6c98ce513d5a0953f07f",
+    ".github/ISSUE_TEMPLATE/security-contact.yml": "d19a1670fef02d4949d5c9e836a2134ac36da35cc3d60e7eff60375327dc0278",
+    ".github/dependabot.yml": "9cdb7f0086afb64466020ca5fd5168e3772e416cbeb6695cc6fa4227b22b2b10",
+    ".github/labels.json": "a6de386dc790dc5beb0ecff753d4eb7ad935eedaa6095de37d6791bb131c6c5a",
+    ".github/pull_request_template.md": "ec80b62f8dd232a4ab93cb25299593786a8380eb9fe6a55779bc0db710b64108",
+    ".github/repository-settings.json": "f87de47b180d9726c36f98181313fd29ccfe9b71ff83d9d2aab9226044611020",
+    ".github/scripts/labels-drift.mjs": "0194a2b5b09f21d6b44176a829de6aa635c979fddd1e7a7c719a4ff591f059c4",
+    ".github/scripts/labels-sync.mjs": "db57c6851826c6bf88bd62c5b1a6f37bd88750f24ee87fb30aed57a8af56d56f",
+    ".github/scripts/test-labels-drift.mjs": "a6937a36050583c6899ed67ef465b50a3b7f53ab9348728bfab557ca9c28c2e1",
+    ".github/workflows/codeql.yml": "998c8212aaa24df2794fcc6b8ef5d3311b8b5924c5df82197fa284c63847ae8a",
+    ".github/workflows/external-links.yml": "0f0d69949ec4cf24e6f71a6cf955170e91c1eed469c581474a58e42230c368d0",
+    ".github/workflows/issue-triage.yml": "b6f24e7a52870c61c19f75e227e8ae248a475629b376abc214074c0ec8926e20",
+    ".github/workflows/labels-drift.yml": "af3163dc69a2c5233a44b7b27f8cb2e34f5b9d9d184ac44d934dd539565ed3e3",
+    ".github/workflows/labels-sync.yml": "b4ec042eaddc562ab54803441277b76200c69395de7890f11ff83a0d058c4ef1",
+    ".github/workflows/pr-milestones.yml": "b16fdf2c3fea091c588dceb44d020dc8f12b975dc63a6e8eb6b0639f47c0a329",
+    ".github/workflows/repository-integrity.yml": "56b241b76a81ec17471d871fc033106d8c839123b3f8fb9c0c6324fd4f88c018",
+    ".github/workflows/traffic-history.yml": "a887ddf2d86c701eff5f41fc7dcc050fdb9acf5998184ff5d859b234f1b687ae",
+    ".gitignore": "dcf0a871ed0afd88b15935a6cd7cb1ab9a7ef4d6fe6ed1b80627672bbba50499",
+    "CHANGELOG.md": "69431b57bb8530470474107a3b398c30b2d57c6444391307858a0c76754c6d56",
+    "CODE_OF_CONDUCT.md": "04885c48c55c40ada5d2bb1aaedc8fd13ec7e0f29b8d42404f7f349d4a7e3b12",
+    "CONTRIBUTING.md": "5ef926c848a7e4b83d096b57f1cba26af7af946c749f50ddddcd8f9b2ac972fa",
+    "INSTALLATION.md": "46557a73a861f6efc5b862cda79aae5de930ace6839de201ffacf559c308c4a6",
+    "LICENSE": "3f3d9e0024b1921b067d6f7f88deb4a60cbe7a78e76c64e3f1d7fc3b779b9d04",
+    "NOTICE.md": "bc402cd10fee0f8f003fadb5b8229247689b40c03360cd3f34b7b401eab4fc62",
+    "README.md": "e61e605f7b50b141871af72486834f44790811d16574f721d1d70970c23c6aec",
+    "RELEASING.md": "3985020277ed509eb8f8ed7d40f11be3bcbe4de1bc867f12be1843e6a0f72867",
+    "SECURITY.md": "8a0b7da635de8b75e840c4ace992e3b735cdc11449814d9ff33b7c4784fe10d2",
+    "docs/CI.md": "d77936adb91fc0327640ae36031a2088dae05bd4b2629a61b6dd30f05e4cdd49",
+    "docs/CLOSEOUT.md": "200e275d8b108a42f66029a590cbb9b0d8478e5ff3368856e3ac406c68cb6eca",
+    "docs/DECISIONS.md": "93ec21d9ffc429cc6597571fdd9330874c069d72227c8cf709f56e9f00e6a1c6",
+    "docs/GOVERNANCE.md": "3f822c9c2ea91f50a29bbbbeeae3a5531cd707e1077a1c4da7bfcd37baedacb6",
+    "docs/ISSUE_LABELS.md": "bcc9678804fe03bd50d92351dd0e7c9e12bd1971a22bcbb5981cb7c3ea1b70a0",
+    "docs/MYTEMPLATE_ALIGNMENT.md": "935dec37756b0e4c90d3e6f273c81da00044297af030d96e0e7a333261769e82",
+    "docs/PUBLIC_API.txt": "cd9c486de94bdf1538f6947823ae29c40db9c9c5d195cc443200c0e88a5b057a",
+    "docs/REPOSITORY_SETTINGS.md": "e3204f51d1cc64b5dc1d071417d7a9c5f08fd5ed37e54390b5fd46a0df9ec5c4",
+    "docs/REPOSITORY_STRUCTURE.md": "3b4b75a790a7c7339bfab9b6646033d828d059b8465f7f8c01f0186c0ba3ecc5",
+    "docs/TRAFFIC.md": "f1a47b26559d78d325febb4b2c736e1b06c60b062622b096adc35bce8c1f91d6",
+    "docs/VBA_HOUSE_STYLE.md": "ff0b5fcea0f98e227d7caf8519395becdf413f9ea6da4965e5257b06d0c0f3ab",
+    "docs/assets/K-CVA-social-preview.jpg": "2fbf4a9148dc10038302649f7ba100eba40088c64f284dd4ea537a2039a7e7fc",
+    "docs/evidence/certification-2026-11-08.md": "e09f570c52c17f3f28d401154e1b914a9b5c7849b0b0b335cf7f71724a6ee903",
+    "docs/evidence/certification-checks-2026-11-08.json": "28a8c0de8512576cfd48f1efaa391257012b70b68402853e002985720959eceb",
+    "docs/evidence/excel-run-194e9cd.md": "d0b4c62dbd7e914b26369a21653f8bb96f3ebbd7c7d542d221ba27c9752344b3",
+    "docs/evidence/integrity-3d75855.json": "1f32252a795f123181ece5c130b5ba008d39cac934599962841955c457424f92",
+    "docs/evidence/repository-rulesets-2026-10-24.json": "4920a8105b99b9c656eec052d66ac02e46a5d0dbe45e5c7b96fc3ac0d71de1b2",
+    "docs/evidence/repository-settings-2026-10-31.json": "8b6d88d61ff91b1fa3e871a9ffd7f25142556a61f4f8f99b1b596903befd6fc8",
+    "docs/evidence/repository-settings-2026-11-08.json": "c289799ebeb1ed31abc27a67f08eadcc74bc258e19a7a2059153b14f98606578",
+    "docs/evidence/v0.1.0-file-audit.md": "67a36edc8535f01bb858a7dbc9964d9311ed3b73bfed9899b2b85f63cf423088",
+    "docs/methodology/README.md": "318fd173082af0b4351d349e61d9d0e515cbd5f7ed576638989307cb0deec32f",
+    "docs/methodology/TEST_CASES.md": "49b818d8606b386ef34085d50f6f239c05c003f9b7d524a75566c887d86a3215",
+    "docs/methodology/sources/CRR_575-2013_consolidated_2026-06-26_extract_Art162_TitleVI.pdf": "10488f8083c126faa940a4eb8c1a89600a8fe61dbc701fd70378c9583da2d715",
+    "docs/methodology/sources/README.md": "f30fa0bea1ff87706524bda49415806b84081815706fdc28e0740c0f53369623",
+    "pyproject.toml": "e7df0e508d2fc33add5bbe1ee1562fce382daf16477d297b1105b349751d7036",
+    "src/README.md": "4e0893cfe65077a40dbd394ff9e2137ce22ab8ce63a5a6ec52e725bd5c24b203",
+    "tests/README.md": "a7018c78aeb3cd635100ef3d3a9a30be27427610ec1bcd56b61eb7c86e43842f",
+    "tests/expected/illustrative-format-example.crr.json": "95c78d1d94bef56e37abf8e78543d7eeb68565465f2cf3c51523e901f0c00c03",
+    "tests/fixtures/illustrative-format-example.json": "f50b5a54deb0c31b1f47d6bcd36f10e45fc61f2e7cafc4135277f7e5e79abf04",
+    "tests/modules/TEST_Examples.bas": "4b3eddecdcf851adc48ef1b2126b596436b38786e980c8c11f7e19e9962f476e",
+    "tests/modules/TEST_Harness.bas": "fec9545b44403baaa30b879fa5dc57edd59d34361a493501bb18264111f36df1",
+    "tools/README.md": "4fb6c4d5d1e7c07abbc5de92ef94c4d5e09456378f3a5b2e10b5759331e7f7e9",
+    "tools/Record-KCVA-ExcelRun.cmd": "3d743910ba9fab040ec7ea2223f8efead7c74212117eada3d1206b76b96aaaa4",
+    "tools/Record-KCVA-ExcelRun.ps1": "bb7563f6b03aac2119c2ea3db1aa78ac08a79f595dd85423554ba733374feb52",
+    "tools/actionlint-lock.json": "5aa560d871445d466d7317d59083a6eafe6d95e739b251c5bb77417f4a406c27",
+    "tools/check_changelog.py": "0e133467fa90a0c57edc780a1aae07b6e6cfdaa73ce2e1738836c2a297c68d72",
+    "tools/check_excel_run.py": "c8533a98eb09d371ae5cae7f06ef6db5c99e6f81aca13a5d8f3b73ece2589c5a",
+    "tools/check_external_links.py": "4ef81e4455eb454c4613bdbfde13fc7f7c087ab7e008d5e2b3ee3af7b724d633",
+    "tools/check_issues.py": "3bc6abf7f8c39409032fb4e2ad1f0dbefd1ebdcb28198918e5979911afdae608",
+    "tools/check_links.py": "b1f16e68c2b32f06591acb027246234400d369e80271fbc19c2e4126e6f25e33",
+    "tools/check_repository.py": "8376eea091d02419aa415d7a05a8d2f555a1a4e7cbea8693f30726e393f709f9",
+    "tools/check_test_cases.py": "83e090b03e251a5ae48f62dd7d18da3c5b656e573a9c8999a189bfe9915fe6cb",
+    "tools/check_vba_conditionals.py": "0e4efe13ec56aadf3cd5a271a638811266dd1175cf7c459304318f96df28e861",
+    "tools/check_vba_dependencies.py": "de3c9a3a4fbcf3d9efccd407912fdc650df2ce084ee1bbe5d79e5d06946bc3c0",
+    "tools/check_vba_jumps.py": "01ef4e24d63ca3cfd9b3370338347412929f208211b0e133bcbfb5da9e672f76",
+    "tools/check_vba_public_api.py": "bd6baf653056997ab0eb1e2ae39da86148967b6d98d3395fb9a8a0b252247835",
+    "tools/check_vba_source.py": "67918253d98c7bd6a4b91322e12b6b9fb5b9fc3c4f21c75ea6a3bb4c05e7f58c",
+    "tools/check_workflows.py": "08c26c773e4bcde478ca144df61af3da09a40a48bb528004cfdf3df572cc7ca0",
+    "tools/repository_settings.py": "1a9656cdf673dd3461fd47320988aa62fcbcda1ed74d50e5b6750ce940e358cd",
+    "tools/requirements.txt": "d6b0c023be394ff70ae6d709ec1e2f5a6f36c3310097c054cacee3ef816c8a87",
+    "tools/test_check_changelog.py": "b9f0ced98dd41112e8f65fb2c38a8a98184fad08386905b2a4b29188061fd1d3",
+    "tools/test_check_excel_run.py": "d6198778d0dbba1dc31eac1fc555accd786c634c5883b8b4acc70fc2ceda95e5",
+    "tools/test_check_issues.py": "dd113462bcc9c9c589a637fed759aa8754978be01b7c7f44cb399b21f8f5b2f9",
+    "tools/test_check_links.py": "1431f9251e2f08f6dde3c0f8d9ccd5726baabddfcaddad2d3c3789971b51c2ab",
+    "tools/test_check_repository.py": "e03c4597b83bf5ac55379e59d1fa8598e8604c0f745da91bb950d408c07c52c1",
+    "tools/test_check_test_cases.py": "798a1e23cf968741a66089ff10fc382c05ec7ee50ce48460e9b45a2efe255cbb",
+    "tools/test_check_vba.py": "6585013cba8aad2598ba31634c8b0b15f8a390a6d9acce5968633a196d143125",
+    "tools/test_check_workflows.py": "5f53634c54da6de42f713f9e895a931528e5b6fab2e4d9da152215883d559114",
+    "tools/test_labels_sync.py": "ca9fdc5cc4d35b341f2689a20b176588832e8d66bb7bfc42a22248b7d861b853",
+    "tools/test_pr_milestones.py": "3d1f8b55892d3ad53a85b5addfeb1b2a36e62a73f8ef70eaac432a0612354cc7",
+    "tools/test_repository_settings.py": "a0e920412579235606b52a1e53b96f2e6b2832934017b2fb6966e2748bad92ee",
+    "tools/test_traffic_history.py": "e46828513983ae39069a1bfd43b46fd11847c0d454d5185161527724fb66ff4f",
+    "tools/test_vba_harness.py": "7aaa8a3f536baf2e43072c354f964bbec0490cd9786314f59dfbd94d3770d4f7",
+    "tools/traffic_history.py": "94a51361c9cde2781d8aedd17aac13f8efea4fabefb24dd7763d5d0737b37d5a",
+    "tools/vba_lexer.py": "108b0a53ac56fc084f121ede0db8cc0b79ff9f0db77badd0e041ffcfd3fddf33"
+  },
+  "checks": [
+    {
+      "name": "node-version",
+      "command": [
+        "node",
+        "--version"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "issue-config",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "tools/check_issues.py",
+        "--check-config"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "python-tests",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools",
+        "-p",
+        "test_*.py"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "ruff",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "-m",
+        "ruff",
+        "check",
+        "--no-cache",
+        "tools"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "mypy",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "-m",
+        "mypy",
+        "--cache-dir",
+        "/workspace/scratch/603fa40cd2e8/K-CVA-cert20-clean/.cache/mypy"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "label-sync",
+      "command": [
+        "node",
+        ".github/scripts/labels-sync.mjs",
+        "--self-test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "label-drift",
+      "command": [
+        "node",
+        ".github/scripts/labels-drift.mjs",
+        "--self-test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "label-evidence",
+      "command": [
+        "node",
+        "--test",
+        ".github/scripts/test-labels-drift.mjs"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "test-cases",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "tools/check_test_cases.py"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "changelog",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "tools/check_changelog.py"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "vba-source",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "tools/check_vba_source.py"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "vba-conditionals",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "tools/check_vba_conditionals.py"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "vba-jumps",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "tools/check_vba_jumps.py"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "vba-public-api",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "tools/check_vba_public_api.py"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "vba-dependencies",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "tools/check_vba_dependencies.py"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "syntax-labels-drift",
+      "command": [
+        "node",
+        "--check",
+        ".github/scripts/labels-drift.mjs"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "syntax-labels-sync",
+      "command": [
+        "node",
+        "--check",
+        ".github/scripts/labels-sync.mjs"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "syntax-test-labels-drift",
+      "command": [
+        "node",
+        "--check",
+        ".github/scripts/test-labels-drift.mjs"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "markdown-links",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "tools/check_links.py"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "workflow-rules",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "tools/check_workflows.py"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "actionlint-version",
+      "command": [
+        "/workspace/scratch/603fa40cd2e8/K-CVA-cert20-clean/.cache/actionlint",
+        "-version"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "workflow-validation",
+      "command": [
+        "/workspace/scratch/603fa40cd2e8/K-CVA-cert20-clean/.cache/actionlint",
+        "-shellcheck=",
+        "-pyflakes=",
+        ".github/workflows/codeql.yml",
+        ".github/workflows/external-links.yml",
+        ".github/workflows/issue-triage.yml",
+        ".github/workflows/labels-drift.yml",
+        ".github/workflows/labels-sync.yml",
+        ".github/workflows/pr-milestones.yml",
+        ".github/workflows/repository-integrity.yml",
+        ".github/workflows/traffic-history.yml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "whitespace-committed",
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
+        "HEAD"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "whitespace-local",
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "HEAD"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "scope": "Repository infrastructure only; no numerical or Excel certification",
+  "status": "pass"
+}

@@ -3,7 +3,8 @@
 The checklist and evidence index for closing the milestone
 [v0.1.0 - Repo setup](https://github.com/danielep71/K-CVA/milestone/1).
 Prepared by #17; audits by #18/#19; verification record assembled by #20
-on 2026-11-08. Final closeout is pending the certification PR gates.
+on 2026-11-08. The accepted infrastructure candidate and final evidence are
+recorded below; the issue/milestone decision completes administrative closeout.
 Nothing in this document is complete until its row links the evidence.
 
 > [!IMPORTANT]
@@ -45,21 +46,22 @@ The criteria of #20. Each row is ticked only with a link to its evidence.
 | 6 | Genuine scaffold execution in Excel on the intended host, at the candidate or with the reason a later change does not affect it | [Host evidence and delta](evidence/certification-2026-11-08.md#excel-evidence-and-subsequent-source-delta) | ☑ |
 | 7 | File and comment audits cover every tracked file at the candidate, including changes made after the audits | [File audit record](#file-audit-record) | ☑ |
 | 8 | Evidence index and explicit limitations assembled; scope statement recorded | This document | ☑ |
-| 9 | Milestone closed only after every prerequisite is complete or a scope change is explicitly agreed; no tag, release or workbook published automatically | Maintainer decision | ☐ |
+| 9 | Milestone closed only after every prerequisite is complete or a scope change is explicitly agreed; no tag, release or workbook published automatically | [Final decision in #20](https://github.com/danielep71/K-CVA/issues/20) after integration of this record | See decision |
 
 <a id="candidate-record"></a>
 
 ## Candidate record
 
-Original reviewed main candidate: `3d75855e5cbe6cda2f7fd519b6c363710ba9b935`
-(integration #178; identical-tree sync #179).
+Accepted infrastructure candidate: `3c4724d92a0f79757e39954d9f135661e4d29ee8`
+(integration #188). This includes the original baseline, evidence PR #185 and
+download-resilience PR #187. Original reports retain their original SHAs.
 
-The [verification record](evidence/certification-2026-11-08.md#candidate-and-reproducibility)
-records the clean checkout, exact tools, all 24 static gates, hosted candidate
-checks, cached actionlint limitation and operator-supplied Excel evidence.
-The [static report](evidence/integrity-3d75855.json) retains candidate/file hashes
-and `dirty: false`. Final certification is pending the closeout PR's checks,
-final-head review, merge and final main integration/SHA record; this is not a publication decision.
+The [final acceptance record](evidence/certification-2026-11-08.md#final-acceptance)
+links main integrity/CodeQL and the integration review. A clean detached checkout
+of this exact commit passed all 24 gates; the
+[retained report](evidence/integrity-3c4724d.json) records `dirty: false` and all
+97 candidate file hashes. The final recording PR changes documentation/evidence
+only; no executable source is changed after the accepted candidate.
 
 <a id="evidence-index"></a>
 
@@ -69,7 +71,8 @@ The [43-row issue reconciliation](evidence/certification-2026-11-08.md#acceptanc
 links every setup-milestone issue and its local evidence. The original 41 prerequisites
 are closed; #186 is the subsequent reviewed download-resilience follow-up. Qualifications for #116 and #120, later VBA comment changes, live
 settings provenance and unsupported claims remain explicit in that record.
-Issue #20 and milestone closure remain pending the final PR gates.
+The final closure decision is recorded in [issue #20](https://github.com/danielep71/K-CVA/issues/20)
+after the recording PR is integrated. No publication follows from that decision.
 
 <a id="file-audit-record"></a>
 
@@ -96,17 +99,15 @@ with their re-audit.
 
 ## Scope statement
 
-Proposed acceptance, effective only after the certification PR passes its
-required CI and final-head review and merges, and the later tooling change
-is integrated into main with its final accepted SHA recorded:
+Accepted infrastructure scope at the candidate above:
 
 > v0.1.0 *Repo setup* is verified at commit
-> `3d75855e5cbe6cda2f7fd519b6c363710ba9b935` as repository infrastructure
+> `3c4724d92a0f79757e39954d9f135661e4d29ee8` as repository infrastructure
 > only. The retained genuine Excel scaffold run is bound to `194e9cd`, with
 > the later comment-only delta explicitly assessed. No CVA calculation,
 > regulatory interpretation, numerical result, public API or workbook is
 > certified, released or implied. The [attributed evidence and limitations](evidence/certification-2026-11-08.md#scope-and-limitations)
 > are part of this statement.
 
-The issue/milestone decision records when the PR gates are satisfied. Closing
-this milestone does not authorize tags, releases or workbook publication.
+Administrative closure is evidenced by the final issue/milestone decision.
+Closing this milestone does not authorize tags, releases or workbook publication.
