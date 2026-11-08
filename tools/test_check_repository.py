@@ -3,6 +3,7 @@ import hashlib
 import http.client
 import io
 import os
+import socket
 import subprocess
 import tempfile
 import unittest
@@ -112,7 +113,8 @@ class ArchiveTests(unittest.TestCase):
 
     def test_permanent_http_and_url_errors_not_retried(self) -> None:
         for error in [urllib.error.HTTPError(self.url, 404, 'missing', Message(), None),
-                      urllib.error.URLError('invalid certificate')]:
+                      urllib.error.URLError('invalid certificate'),
+                      urllib.error.URLError(socket.gaierror(socket.EAI_NONAME, 'unknown host'))]:
             with self.subTest(error=error), \
                     patch('check_repository.urllib.request.urlopen', side_effect=error) as request, \
                     patch('check_repository.time.sleep') as sleep:
@@ -121,6 +123,15 @@ class ArchiveTests(unittest.TestCase):
                 self.assertEqual(request.call_count, 1)
                 sleep.assert_not_called()
                 self.assertFalse(self.archive.exists())
+
+    def test_temporary_dns_failure_is_retried(self) -> None:
+        error = urllib.error.URLError(socket.gaierror(socket.EAI_AGAIN, 'temporary DNS failure'))
+        with patch('check_repository.urllib.request.urlopen',
+                   side_effect=[error, io.BytesIO(self.payload)]) as request, \
+                patch('check_repository.time.sleep') as sleep:
+            self.assertEqual(self.load(), self.payload)
+            self.assertEqual(request.call_count, 2)
+            sleep.assert_called_once_with(2)
 
     def test_wrong_download_hash_not_cached_or_retried(self) -> None:
         with patch('check_repository.urllib.request.urlopen', return_value=io.BytesIO(b'wrong')) as request, \

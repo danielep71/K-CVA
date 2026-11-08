@@ -5,6 +5,7 @@ import io
 import json
 import os
 import platform
+import socket
 import subprocess
 import sys
 import tarfile
@@ -32,7 +33,7 @@ def download_archive(url: str) -> bytes:
                     raise
             elif isinstance(error, urllib.error.URLError) and not isinstance(
                 error.reason, (TimeoutError, ConnectionError)
-            ):
+            ) and not (isinstance(error.reason, socket.gaierror) and error.reason.errno == socket.EAI_AGAIN):
                 raise
             if attempt == 3:
                 raise RuntimeError(f'actionlint download failed after 4 attempts: {error}') from error
