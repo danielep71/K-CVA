@@ -1,0 +1,90 @@
+[
+  {
+    "case": "Single counterparty",
+    "expected": 646712.9665979459
+  },
+  {
+    "case": "Two counterparties / IMM",
+    "expected": 675933.4799438358
+  },
+  {
+    "case": "Direct single-name hedge",
+    "expected": 541768.4863844134
+  },
+  {
+    "case": "Related-name hedge",
+    "expected": 576737.626095336
+  },
+  {
+    "case": "Sector hedge",
+    "expected": 624181.9188917796
+  },
+  {
+    "case": "Mixed index constituents",
+    "expected": 651820.7723243651
+  },
+  {
+    "case": "Single-name and index hedges",
+    "expected": 553046.9653865349
+  },
+  {
+    "case": "Two netting sets, one counterparty",
+    "expected": 1319706.4112787386
+  },
+  {
+    "case": "Zero EAD",
+    "expected": 0.0
+  },
+  {
+    "case": "Overhedge remains in variance",
+    "expected": 1027288.0835771651
+  },
+  {
+    "case": "Missing EAD",
+    "expected": "INVALID INPUT"
+  },
+  {
+    "case": "Negative EAD",
+    "expected": "INVALID INPUT"
+  },
+  {
+    "case": "Zero maturity",
+    "expected": "INVALID INPUT"
+  },
+  {
+    "case": "Duplicate netting-set ID",
+    "expected": "INVALID INPUT"
+  },
+  {
+    "case": "Orphan netting set",
+    "expected": "INVALID INPUT"
+  },
+  {
+    "case": "Unknown sector",
+    "expected": "INVALID INPUT"
+  },
+  {
+    "case": "Invalid constituent sum",
+    "expected": "INVALID INPUT"
+  },
+  {
+    "case": "Unconfirmed hedge eligibility",
+    "expected": "INVALID INPUT"
+  },
+  {
+    "case": "Text EAD rejected",
+    "expected": "INVALID INPUT"
+  },
+  {
+    "case": "Orphan constituent",
+    "expected": "INVALID INPUT"
+  },
+  {
+    "case": "Duplicate constituent",
+    "expected": "INVALID INPUT"
+  },
+  {
+    "case": "Unconfirmed scope",
+    "expected": "INVALID INPUT"
+  }
+]

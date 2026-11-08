@@ -1,5 +1,9 @@
 # Repository tooling
 
+> Prototype port (#180): sources, template and tooling are now present. Earlier
+> setup-only absence statements below describe the v0.1.0 baseline. This port
+> provides no numerical or Excel acceptance. See the [porting record](../docs/prototype/PORTING.md).
+
 Run `python tools/check_repository.py` for portable repository validation.
 See [CI and dependency updates](../docs/CI.md) for pinned prerequisites, coverage,
 local/hosted evidence and dependency review rules. The workflow's stable check

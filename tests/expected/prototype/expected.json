@@ -1,0 +1,12 @@
+{
+  "Single counterparty": 646712.9665979459,
+  "Two counterparties / IMM": 675933.4799438358,
+  "Direct single-name hedge": 541768.4863844134,
+  "Related-name hedge": 576737.626095336,
+  "Sector hedge": 624181.9188917796,
+  "Mixed index constituents": 651820.7723243651,
+  "Single-name and index hedges": 553046.9653865349,
+  "Two netting sets, one counterparty": 1319706.4112787386,
+  "Zero EAD": 0.0,
+  "Overhedge remains in variance": 1027288.0835771651
+}

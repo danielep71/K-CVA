@@ -1,0 +1,132 @@
+{
+  "archive_sha256": "d756a85d23223b54c1ce4e94693b03e9a35c6e8d694f631d98ef8a4fd71036bb",
+  "files": [
+    {
+      "source": "src/core/CORE_BACVA.bas",
+      "destination": "src/core/CORE_BACVA.bas",
+      "source_sha256": "41f3669061bb4f37bd31b2fc1951e4a7c86fbc93f9f0b9ae7fbd74cea95b8eba",
+      "ported_sha256": "578d0407284f79ab7defe626d854e194c6e9519df5240de47752587c98d04c16",
+      "byte_identical": false
+    },
+    {
+      "source": "src/modules/CVA_Functions.bas",
+      "destination": "src/modules/CVA_Functions.bas",
+      "source_sha256": "0277b99d8f3a5295b8573c6fff5e2b6542edbdc9cdfdfa0ab4cd98331921ce9c",
+      "ported_sha256": "db4831a44638010ed1aa7b96fa747a617ff8ad79d414413282426121e50eff29",
+      "byte_identical": false
+    },
+    {
+      "source": "src/workbook/M_Main.bas",
+      "destination": "src/workbook/M_Main.bas",
+      "source_sha256": "136ace4d88aea99f7de49fb11310245a1a96ccff13e34419e7c2d30ca01702c0",
+      "ported_sha256": "aa52aae8748b5bae515f2b9eb5503930fa105a00e09918e59533cab02b77dc12",
+      "byte_identical": false
+    },
+    {
+      "source": "src/workbook/ThisWorkbook.cls",
+      "destination": "src/workbook/ThisWorkbook.cls",
+      "source_sha256": "b21eb258f616a6d41e713caeab6d39d1ba2eb05cb2b65a976fed288da3c911e1",
+      "ported_sha256": "893a0bc74b312e28447b0b1d0a5baeb8a9e072825c9b6def23100b70f5405e61",
+      "byte_identical": false
+    },
+    {
+      "source": "tests/modules/TEST_Prototype.bas",
+      "destination": "tests/modules/TEST_Prototype.bas",
+      "source_sha256": "9a5f1bd8cae40224d35fa1afc56bc9966062f2b6063171250d8f8ee6ff1e0ab1",
+      "ported_sha256": "026067b54bb2f90266d670589068d8d008b845ae37ad1cc0812d2b93b04f7de9",
+      "byte_identical": false
+    },
+    {
+      "source": "Build-CVA.cmd",
+      "destination": "tools/Build-CVA.cmd",
+      "source_sha256": "fc2be35ad923f964feafed26ce85b5b3db9901d09e0ab7e93d4b391ecf371ca2",
+      "ported_sha256": "000ff2dba00ec90b467f7d38c87a2b6ade33c0f4bcc14b65f5e0f0a40f935d44",
+      "byte_identical": false
+    },
+    {
+      "source": "Build-CVA.ps1",
+      "destination": "tools/Build-CVA.ps1",
+      "source_sha256": "e0f2abb91ea43867a9c9228125fb39bd371d090ccd48c09436a1b179aa5c6c7a",
+      "ported_sha256": "01d09b01b9ddc5b08bd9f24221bd4e7ff019af35c32d7e272874e1fe35f7e830",
+      "byte_identical": false
+    },
+    {
+      "source": "CVA_Template.xlsx",
+      "destination": "src/workbook/CVA_Template.xlsx",
+      "source_sha256": "5610428b459857b734e84a00782c495634beb8e5127dfe2e5c9b099a49eb7984",
+      "ported_sha256": "5610428b459857b734e84a00782c495634beb8e5127dfe2e5c9b099a49eb7984",
+      "byte_identical": true
+    },
+    {
+      "source": "tests/cases.json",
+      "destination": "tests/fixtures/prototype/cases.json",
+      "source_sha256": "b71e12832d73c2cc056459de4934f76ba6cdacb9e6a39b25fe843f627d24a08e",
+      "ported_sha256": "b71e12832d73c2cc056459de4934f76ba6cdacb9e6a39b25fe843f627d24a08e",
+      "byte_identical": true
+    },
+    {
+      "source": "tests/expected.json",
+      "destination": "tests/expected/prototype/expected.json",
+      "source_sha256": "2a4daecdeb839ef2242ae0af0d8e140c12d24cd2f6b68e3f16dc771746dcda15",
+      "ported_sha256": "2a4daecdeb839ef2242ae0af0d8e140c12d24cd2f6b68e3f16dc771746dcda15",
+      "byte_identical": true
+    },
+    {
+      "source": "tests/reference.py",
+      "destination": "tests/derivations/prototype_reference.py",
+      "source_sha256": "429a474d42e01a229e623bed355a9afd4a3e6f563f7c9b3b19c2a116ea0d5df2",
+      "ported_sha256": "c721019b2f06da55a2e2efee8ba67373942321f66a74f3059df22401705de388",
+      "byte_identical": false
+    },
+    {
+      "source": "docs/CONTRACT.md",
+      "destination": "docs/contracts/PROTOTYPE.md",
+      "source_sha256": "f536ff0ce6083a9706c4e22b45fb01c088a3f98938cb8d7d227b44ccb65e5c15",
+      "ported_sha256": "3b3072e1828bff01c262043842daf6c73719061a990ac8237085ab1026af59a7",
+      "byte_identical": false
+    },
+    {
+      "source": "docs/METHODOLOGY.md",
+      "destination": "docs/methodology/PROTOTYPE.md",
+      "source_sha256": "70e773d19b03611fc8e024acd649ad1449c8de34b990edb14229d18b93ac131d",
+      "ported_sha256": "ceec09753e5a1876721c8dc4f86acb28b3f16ed17fff75ea874345ba4e53e586",
+      "byte_identical": false
+    },
+    {
+      "source": "docs/VALIDATION.md",
+      "destination": "docs/prototype/VALIDATION.md",
+      "source_sha256": "aa1e2248a144d82bf9de6b6ac8a8d2fc49de37a7c64535d7cf99da5d185e033d",
+      "ported_sha256": "5c8549904ed934f8a6b3bd7f4e398737632412d1d2c484eafee1e0ec3beabb3e",
+      "byte_identical": false
+    },
+    {
+      "source": "START-HERE.txt",
+      "destination": "docs/prototype/START-HERE.txt",
+      "source_sha256": "fd80de598495bd8656e0d830719cad429af002194b73c2042abca2377ac72f56",
+      "ported_sha256": "75b3e5f3849a4c4bba60537b91d29ab6be4b60ec0a9480a7764e3f86ee888b4e",
+      "byte_identical": false
+    },
+    {
+      "source": "NOTICE.md",
+      "destination": "docs/prototype/NOTICE.md",
+      "source_sha256": "826217aa874af294fd4342a09178c0ab6c00554ab6c26fc76f887e715e634741",
+      "ported_sha256": "826217aa874af294fd4342a09178c0ab6c00554ab6c26fc76f887e715e634741",
+      "byte_identical": true
+    },
+    {
+      "source": "LICENSE",
+      "destination": "docs/prototype/LICENSE",
+      "source_sha256": "3f3d9e0024b1921b067d6f7f88deb4a60cbe7a78e76c64e3f1d7fc3b779b9d04",
+      "ported_sha256": "3f3d9e0024b1921b067d6f7f88deb4a60cbe7a78e76c64e3f1d7fc3b779b9d04",
+      "byte_identical": true
+    },
+    {
+      "source": "SHA256.json",
+      "destination": "docs/prototype/INTAKE_SHA256.json",
+      "source_sha256": "0aaffed0f62e6739a770518af14b261516a11234dbf48d82e3c8a9366fb59560",
+      "ported_sha256": "0aaffed0f62e6739a770518af14b261516a11234dbf48d82e3c8a9366fb59560",
+      "byte_identical": true
+    }
+  ],
+  "ported_hash_representation": "Git-normalized LF for text; binary bytes unchanged"
+}

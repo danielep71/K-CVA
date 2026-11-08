@@ -1,5 +1,9 @@
 # Methodology
 
+> Prototype port (#180): sources, template and tooling are now present. Earlier
+> setup-only absence statements below describe the v0.1.0 baseline. This port
+> provides no numerical or Excel acceptance. See the [porting record](../prototype/PORTING.md).
+
 This directory records **what K-CVA will implement and on what authority**:
 the controlling text and its dates, the source register, the approaches and
 their CRR articles, the inputs they need, the assumptions and open decisions,

@@ -1,5 +1,9 @@
 # VBA house style
 
+> Prototype port (#180): sources, template and tooling are now present. Earlier
+> setup-only absence statements below describe the v0.1.0 baseline. This port
+> provides no numerical or Excel acceptance. See the [porting record](prototype/PORTING.md).
+
 These conventions apply to the first and subsequent VBA components.
 No production VBA exists yet; tests/modules holds the test harness and its
 example suite (#10). The mechanical rules are checked

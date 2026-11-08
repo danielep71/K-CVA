@@ -1,5 +1,9 @@
 # Developer setup and VBA import/export
 
+> Prototype port (#180): sources, template and tooling are now present. Earlier
+> setup-only absence statements below describe the v0.1.0 baseline. This port
+> provides no numerical or Excel acceptance. See the [porting record](docs/prototype/PORTING.md).
+
 **Setup only:** no production VBA component, template or workbook exists yet;
 tests/modules holds the test harness and its neutral example suite (#10). The
 procedures below define the convention for components. The scaffold was imported,

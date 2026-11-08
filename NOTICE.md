@@ -288,3 +288,11 @@ requirements were compared with MyTemplate `tools/setup_repository.py`
 existing `repository_settings.py`, under this repository's MPL-2.0 terms;
 no MyTemplate source was copied. Local desired settings and write exclusions
 remain authoritative.
+
+## Prototype port (#180)
+
+The 2026-11-08 intake archive is retained unchanged under docs/prototype.
+Its MPL-2.0 notice, K-SFTs template-style attribution and inspected K-SACCR
+revision are retained in [prototype provenance](docs/prototype/NOTICE.md).
+See the [mapping and hashes](docs/prototype/PORTING.md). No K-SACCR formulas
+or validation evidence were inherited.
