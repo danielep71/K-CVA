@@ -28,7 +28,7 @@ has admin rights on the repository, for example `GH_TOKEN=$(gh auth token)`:
   preview once it is merged, review its plan, then apply that digest with a new
   journal path and keep a `--check` report as evidence.
 
-### Approved plans and journals (#176)
+### Approved plans and journals
 
 Preview prints the exact ordered requests and `PLAN SHA-256`. The digest binds
 repository identity, manifest bytes, observed settings and request payloads;

@@ -1,0 +1,539 @@
+{
+  "observed_date": "2026-11-08",
+  "repository": "danielep71/K-CVA",
+  "candidate": "3d75855e5cbe6cda2f7fd519b6c363710ba9b935",
+  "labels": {
+    "source": "Public GitHub REST labels endpoint, complete one-page response",
+    "snapshot": [
+      {
+        "id": 12818307817,
+        "node_id": "LA_kwDOVVPBoc8AAAAC_Afa6Q",
+        "url": "https://api.github.com/repos/danielep71/K-CVA/labels/behavior-change",
+        "name": "behavior-change",
+        "color": "C24E00",
+        "default": false,
+        "description": "Intentional externally observable behavior change",
+        "archived_at": null,
+        "archived_by": null
+      },
+      {
+        "id": 12818307863,
+        "node_id": "LA_kwDOVVPBoc8AAAAC_AfbFw",
+        "url": "https://api.github.com/repos/danielep71/K-CVA/labels/blocked",
+        "name": "blocked",
+        "color": "B60205",
+        "default": false,
+        "description": "Cannot proceed until a named dependency is complete",
+        "archived_at": null,
+        "archived_by": null
+      },
+      {
+        "id": 12812848842,
+        "node_id": "LA_kwDOVVPBoc8AAAAC-7SOyg",
+        "url": "https://api.github.com/repos/danielep71/K-CVA/labels/bug",
+        "name": "bug",
+        "color": "D73A4A",
+        "default": true,
+        "description": "Confirmed defect in behavior, correctness, error handling, or a documented contract",
+        "archived_at": null,
+        "archived_by": null
+      },
+      {
+        "id": 12818307894,
+        "node_id": "LA_kwDOVVPBoc8AAAAC_AfbNg",
+        "url": "https://api.github.com/repos/danielep71/K-CVA/labels/ci",
+        "name": "ci",
+        "color": "24292F",
+        "default": false,
+        "description": "Automated quality checks, workflow maintenance, or dependency updates",
+        "archived_at": null,
+        "archived_by": null
+      },
+      {
+        "id": 12812848870,
+        "node_id": "LA_kwDOVVPBoc8AAAAC-7SO5g",
+        "url": "https://api.github.com/repos/danielep71/K-CVA/labels/documentation",
+        "name": "documentation",
+        "color": "0075CA",
+        "default": true,
+        "description": "Documentation for users or for my repository maintenance",
+        "archived_at": null,
+        "archived_by": null
+      },
+      {
+        "id": 12812848880,
+        "node_id": "LA_kwDOVVPBoc8AAAAC-7SO8A",
+        "url": "https://api.github.com/repos/danielep71/K-CVA/labels/duplicate",
+        "name": "duplicate",
+        "color": "CFD3D7",
+        "default": true,
+        "description": "An existing issue or pull request already covers this work",
+        "archived_at": null,
+        "archived_by": null
+      },
+      {
+        "id": 12812848889,
+        "node_id": "LA_kwDOVVPBoc8AAAAC-7SO-Q",
+        "url": "https://api.github.com/repos/danielep71/K-CVA/labels/enhancement",
+        "name": "enhancement",
+        "color": "A2EEEF",
+        "default": true,
+        "description": "New capability or meaningful improvement to supported behavior",
+        "archived_at": null,
+        "archived_by": null
+      },
+      {
+        "id": 12812848904,
+        "node_id": "LA_kwDOVVPBoc8AAAAC-7SPCA",
+        "url": "https://api.github.com/repos/danielep71/K-CVA/labels/good%20first%20issue",
+        "name": "good first issue",
+        "color": "7057FF",
+        "default": true,
+        "description": "Well-scoped task suitable for a first contribution",
+        "archived_at": null,
+        "archived_by": null
+      },
+      {
+        "id": 12812848899,
+        "node_id": "LA_kwDOVVPBoc8AAAAC-7SPAw",
+        "url": "https://api.github.com/repos/danielep71/K-CVA/labels/help%20wanted",
+        "name": "help wanted",
+        "color": "008672",
+        "default": true,
+        "description": "I welcome external investigation, implementation, validation, or review",
+        "archived_at": null,
+        "archived_by": null
+      },
+      {
+        "id": 12812848911,
+        "node_id": "LA_kwDOVVPBoc8AAAAC-7SPDw",
+        "url": "https://api.github.com/repos/danielep71/K-CVA/labels/invalid",
+        "name": "invalid",
+        "color": "E4E669",
+        "default": true,
+        "description": "Report is incomplete, unsupported, or not actionable as submitted",
+        "archived_at": null,
+        "archived_by": null
+      },
+      {
+        "id": 12818307930,
+        "node_id": "LA_kwDOVVPBoc8AAAAC_AfbWg",
+        "url": "https://api.github.com/repos/danielep71/K-CVA/labels/P1",
+        "name": "P1",
+        "color": "B60205",
+        "default": false,
+        "description": "Confirmed calculation bug: wrong results for valid inputs (reserved for this case)",
+        "archived_at": null,
+        "archived_by": null
+      },
+      {
+        "id": 12818307979,
+        "node_id": "LA_kwDOVVPBoc8AAAAC_Afbiw",
+        "url": "https://api.github.com/repos/danielep71/K-CVA/labels/P2",
+        "name": "P2",
+        "color": "D93F0B",
+        "default": false,
+        "description": "Material correctness, robustness, or maintainability defect",
+        "archived_at": null,
+        "archived_by": null
+      },
+      {
+        "id": 12818308015,
+        "node_id": "LA_kwDOVVPBoc8AAAAC_Afbrw",
+        "url": "https://api.github.com/repos/danielep71/K-CVA/labels/P3",
+        "name": "P3",
+        "color": "FBCA04",
+        "default": false,
+        "description": "Non-blocking quality, testing, documentation, setup or technical-debt work",
+        "archived_at": null,
+        "archived_by": null
+      },
+      {
+        "id": 12812848917,
+        "node_id": "LA_kwDOVVPBoc8AAAAC-7SPFQ",
+        "url": "https://api.github.com/repos/danielep71/K-CVA/labels/question",
+        "name": "question",
+        "color": "D876E3",
+        "default": true,
+        "description": "I need further information or need to make a decision",
+        "archived_at": null,
+        "archived_by": null
+      },
+      {
+        "id": 12818308026,
+        "node_id": "LA_kwDOVVPBoc8AAAAC_Afbug",
+        "url": "https://api.github.com/repos/danielep71/K-CVA/labels/refactor",
+        "name": "refactor",
+        "color": "6F42C1",
+        "default": false,
+        "description": "Internal restructuring intended to preserve supported behavior",
+        "archived_at": null,
+        "archived_by": null
+      },
+      {
+        "id": 12818308032,
+        "node_id": "LA_kwDOVVPBoc8AAAAC_AfbwA",
+        "url": "https://api.github.com/repos/danielep71/K-CVA/labels/release",
+        "name": "release",
+        "color": "B60276",
+        "default": false,
+        "description": "Release preparation, certification, evidence, packaging, or publication",
+        "archived_at": null,
+        "archived_by": null
+      },
+      {
+        "id": 12818308049,
+        "node_id": "LA_kwDOVVPBoc8AAAAC_Afb0Q",
+        "url": "https://api.github.com/repos/danielep71/K-CVA/labels/repository",
+        "name": "repository",
+        "color": "1D76DB",
+        "default": false,
+        "description": "Repository structure, governance, metadata, tooling, or maintenance",
+        "archived_at": null,
+        "archived_by": null
+      },
+      {
+        "id": 12818308093,
+        "node_id": "LA_kwDOVVPBoc8AAAAC_Afb_Q",
+        "url": "https://api.github.com/repos/danielep71/K-CVA/labels/security",
+        "name": "security",
+        "color": "8B0000",
+        "default": false,
+        "description": "Security boundary, vulnerability handling, supply chain, or hardening",
+        "archived_at": null,
+        "archived_by": null
+      },
+      {
+        "id": 12818308172,
+        "node_id": "LA_kwDOVVPBoc8AAAAC_AfcTA",
+        "url": "https://api.github.com/repos/danielep71/K-CVA/labels/tests",
+        "name": "tests",
+        "color": "006B75",
+        "default": false,
+        "description": "Regression coverage, test harnesses, fixtures, or manual validation",
+        "archived_at": null,
+        "archived_by": null
+      },
+      {
+        "id": 12812848920,
+        "node_id": "LA_kwDOVVPBoc8AAAAC-7SPGA",
+        "url": "https://api.github.com/repos/danielep71/K-CVA/labels/wontfix",
+        "name": "wontfix",
+        "color": "6E7781",
+        "default": true,
+        "description": "I have decided not to implement or continue this work",
+        "archived_at": null,
+        "archived_by": null
+      }
+    ],
+    "comparison": {
+      "schema_version": 3,
+      "tool": "Repository label drift",
+      "status": "pass",
+      "repository": "danielep71/K-CVA",
+      "manifest": ".github/labels.json",
+      "prune": true,
+      "counts": {
+        "core": 20,
+        "overlays": 0,
+        "selected_overlays": 0,
+        "desired": 20,
+        "observed": 20,
+        "differences": 0,
+        "create": 0,
+        "update": 0,
+        "delete": 0
+      },
+      "selected_overlays": [],
+      "desired": [
+        {
+          "name": "behavior-change",
+          "color": "C24E00",
+          "description": "Intentional externally observable behavior change"
+        },
+        {
+          "name": "blocked",
+          "color": "B60205",
+          "description": "Cannot proceed until a named dependency is complete"
+        },
+        {
+          "name": "bug",
+          "color": "D73A4A",
+          "description": "Confirmed defect in behavior, correctness, error handling, or a documented contract"
+        },
+        {
+          "name": "ci",
+          "color": "24292F",
+          "description": "Automated quality checks, workflow maintenance, or dependency updates"
+        },
+        {
+          "name": "documentation",
+          "color": "0075CA",
+          "description": "Documentation for users or for my repository maintenance"
+        },
+        {
+          "name": "duplicate",
+          "color": "CFD3D7",
+          "description": "An existing issue or pull request already covers this work"
+        },
+        {
+          "name": "enhancement",
+          "color": "A2EEEF",
+          "description": "New capability or meaningful improvement to supported behavior"
+        },
+        {
+          "name": "good first issue",
+          "color": "7057FF",
+          "description": "Well-scoped task suitable for a first contribution"
+        },
+        {
+          "name": "help wanted",
+          "color": "008672",
+          "description": "I welcome external investigation, implementation, validation, or review"
+        },
+        {
+          "name": "invalid",
+          "color": "E4E669",
+          "description": "Report is incomplete, unsupported, or not actionable as submitted"
+        },
+        {
+          "name": "P1",
+          "color": "B60205",
+          "description": "Confirmed calculation bug: wrong results for valid inputs (reserved for this case)"
+        },
+        {
+          "name": "P2",
+          "color": "D93F0B",
+          "description": "Material correctness, robustness, or maintainability defect"
+        },
+        {
+          "name": "P3",
+          "color": "FBCA04",
+          "description": "Non-blocking quality, testing, documentation, setup or technical-debt work"
+        },
+        {
+          "name": "question",
+          "color": "D876E3",
+          "description": "I need further information or need to make a decision"
+        },
+        {
+          "name": "refactor",
+          "color": "6F42C1",
+          "description": "Internal restructuring intended to preserve supported behavior"
+        },
+        {
+          "name": "release",
+          "color": "B60276",
+          "description": "Release preparation, certification, evidence, packaging, or publication"
+        },
+        {
+          "name": "repository",
+          "color": "1D76DB",
+          "description": "Repository structure, governance, metadata, tooling, or maintenance"
+        },
+        {
+          "name": "security",
+          "color": "8B0000",
+          "description": "Security boundary, vulnerability handling, supply chain, or hardening"
+        },
+        {
+          "name": "tests",
+          "color": "006B75",
+          "description": "Regression coverage, test harnesses, fixtures, or manual validation"
+        },
+        {
+          "name": "wontfix",
+          "color": "6E7781",
+          "description": "I have decided not to implement or continue this work"
+        }
+      ],
+      "observed": [
+        {
+          "name": "behavior-change",
+          "color": "C24E00",
+          "description": "Intentional externally observable behavior change"
+        },
+        {
+          "name": "blocked",
+          "color": "B60205",
+          "description": "Cannot proceed until a named dependency is complete"
+        },
+        {
+          "name": "bug",
+          "color": "D73A4A",
+          "description": "Confirmed defect in behavior, correctness, error handling, or a documented contract"
+        },
+        {
+          "name": "ci",
+          "color": "24292F",
+          "description": "Automated quality checks, workflow maintenance, or dependency updates"
+        },
+        {
+          "name": "documentation",
+          "color": "0075CA",
+          "description": "Documentation for users or for my repository maintenance"
+        },
+        {
+          "name": "duplicate",
+          "color": "CFD3D7",
+          "description": "An existing issue or pull request already covers this work"
+        },
+        {
+          "name": "enhancement",
+          "color": "A2EEEF",
+          "description": "New capability or meaningful improvement to supported behavior"
+        },
+        {
+          "name": "good first issue",
+          "color": "7057FF",
+          "description": "Well-scoped task suitable for a first contribution"
+        },
+        {
+          "name": "help wanted",
+          "color": "008672",
+          "description": "I welcome external investigation, implementation, validation, or review"
+        },
+        {
+          "name": "invalid",
+          "color": "E4E669",
+          "description": "Report is incomplete, unsupported, or not actionable as submitted"
+        },
+        {
+          "name": "P1",
+          "color": "B60205",
+          "description": "Confirmed calculation bug: wrong results for valid inputs (reserved for this case)"
+        },
+        {
+          "name": "P2",
+          "color": "D93F0B",
+          "description": "Material correctness, robustness, or maintainability defect"
+        },
+        {
+          "name": "P3",
+          "color": "FBCA04",
+          "description": "Non-blocking quality, testing, documentation, setup or technical-debt work"
+        },
+        {
+          "name": "question",
+          "color": "D876E3",
+          "description": "I need further information or need to make a decision"
+        },
+        {
+          "name": "refactor",
+          "color": "6F42C1",
+          "description": "Internal restructuring intended to preserve supported behavior"
+        },
+        {
+          "name": "release",
+          "color": "B60276",
+          "description": "Release preparation, certification, evidence, packaging, or publication"
+        },
+        {
+          "name": "repository",
+          "color": "1D76DB",
+          "description": "Repository structure, governance, metadata, tooling, or maintenance"
+        },
+        {
+          "name": "security",
+          "color": "8B0000",
+          "description": "Security boundary, vulnerability handling, supply chain, or hardening"
+        },
+        {
+          "name": "tests",
+          "color": "006B75",
+          "description": "Regression coverage, test harnesses, fixtures, or manual validation"
+        },
+        {
+          "name": "wontfix",
+          "color": "6E7781",
+          "description": "I have decided not to implement or continue this work"
+        }
+      ],
+      "differences": [],
+      "canonical_plan_verified": true,
+      "cross_check": {
+        "status": "agree"
+      }
+    }
+  },
+  "issues": {
+    "source": "GitHub connector REST issues?state=all, pages of 100, 85, 0 items including PRs",
+    "open_issues_audited": 7,
+    "result": {
+      "status": "pass",
+      "findings": []
+    }
+  },
+  "wheel_hash_coverage": {
+    "requirements_sha256": "d6b0c023be394ff70ae6d709ec1e2f5a6f36c3310097c054cacee3ef816c8a87",
+    "results": [
+      {
+        "package": "ast-serialize",
+        "version": "0.13.1",
+        "published_wheels": 56,
+        "missing_hashes": []
+      },
+      {
+        "package": "librt",
+        "version": "0.16.0",
+        "published_wheels": 136,
+        "missing_hashes": []
+      },
+      {
+        "package": "markdown-it-py",
+        "version": "4.2.0",
+        "published_wheels": 1,
+        "missing_hashes": []
+      },
+      {
+        "package": "mdurl",
+        "version": "0.1.2",
+        "published_wheels": 1,
+        "missing_hashes": []
+      },
+      {
+        "package": "mypy",
+        "version": "2.4.1",
+        "published_wheels": 51,
+        "missing_hashes": []
+      },
+      {
+        "package": "mypy-extensions",
+        "version": "1.2.0",
+        "published_wheels": 1,
+        "missing_hashes": []
+      },
+      {
+        "package": "pathspec",
+        "version": "1.1.1",
+        "published_wheels": 1,
+        "missing_hashes": []
+      },
+      {
+        "package": "pyyaml",
+        "version": "6.0.3",
+        "published_wheels": 72,
+        "missing_hashes": []
+      },
+      {
+        "package": "ruff",
+        "version": "0.17.3",
+        "published_wheels": 17,
+        "missing_hashes": []
+      },
+      {
+        "package": "types-pyyaml",
+        "version": "6.0.12.20261103",
+        "published_wheels": 1,
+        "missing_hashes": []
+      },
+      {
+        "package": "typing-extensions",
+        "version": "4.16.0",
+        "published_wheels": 1,
+        "missing_hashes": []
+      }
+    ],
+    "scope": "Published wheel hash coverage; no Windows or macOS execution"
+  }
+}

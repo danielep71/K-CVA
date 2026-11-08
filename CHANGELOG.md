@@ -56,8 +56,10 @@ Use only the categories an entry needs.
 
 ## [Unreleased]
 
-- Retain the complete authenticated settings check for setup certification
-  (#20): no differences or unread controls against the candidate manifest.
+- Retain the setup verification record and complete authenticated settings
+  check (#20), with candidate-bound static checks, issue/evidence reconciliation
+  and explicit host/platform limits. Final closeout remains subject to the
+  certification PR passing its required check and review.
 
 Planned as 0.1.0, *Repo setup*: repository infrastructure only. It contains no
 CVA calculation, public API or workbook.
