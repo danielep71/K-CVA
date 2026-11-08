@@ -2,8 +2,8 @@
 
 Issue #20; reviewed 2026-11-08. This records the infrastructure checks for
 [milestone v0.1.0 - Repo setup](https://github.com/danielep71/K-CVA/milestone/1).
-**Certification is pending the closeout PR's required CI, final-head review
-and merge. The issue and milestone remain open until those gates pass.**
+**Infrastructure candidate accepted after #188; see the final acceptance
+record below. Earlier pending statements are dated intermediate evidence.**
 Nothing here publishes a tag, release or workbook.
 
 ## Candidate and reproducibility
@@ -174,3 +174,29 @@ Published wheel hashes do not prove Windows/macOS execution. External link
 availability, all shared-App installations and every historical code path were
 not independently revalidated. Historical review exceptions are not erased by
 this record. HTTP download failures must not be treated as passing CI.
+
+## Final acceptance
+
+Accepted infrastructure commit: `3c4724d92a0f79757e39954d9f135661e4d29ee8`,
+[main integration #188](https://github.com/danielep71/K-CVA/pull/188).
+It contains #185 and #187. Integration integrity 42474509784 and CodeQL
+42474509736 passed; [Codex review](https://github.com/danielep71/K-CVA/pull/188#issuecomment-6720738884)
+completed without findings on release head `3fdeb284dff5226152d0b4eb781b0617a1c8f73c`.
+Main [integrity 42474681587](https://github.com/danielep71/K-CVA/actions/runs/42474681587)
+and [CodeQL 42474681623](https://github.com/danielep71/K-CVA/actions/runs/42474681623)
+passed on the accepted commit itself.
+
+A clean detached checkout of that commit, using the declared Python/Node tools,
+passed all 24 gates. The [actual report](integrity-3c4724d.json) retains
+`dirty: false`, the commit identity, checks and hashes of all 97 tracked files.
+Latest audit rows match every candidate blob; the audit report's own externally
+identified blob is `f2966bce522b18986ce2340bf8055c9c1eaca418`.
+The subsequent recording change is documentation/evidence only and receives
+its own CI/review; it does not invalidate the executable candidate identity.
+
+All 42 prerequisite issues are closed, including #186. The final decision in
+[issue #20](https://github.com/danielep71/K-CVA/issues/20) records integration
+and administrative closure of the milestone. Earlier pending statements above
+are superseded by this dated final record; raw historical reports are unchanged.
+The operator attribution, Excel/platform limitations and setup-only scope above
+remain part of acceptance. No tag, release, VERSION file or workbook is published.
