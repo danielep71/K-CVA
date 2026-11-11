@@ -51,14 +51,18 @@ See the [decision register](docs/DECISIONS.md) and
 
 | Component | Available today | Remaining work |
 | --- | --- | --- |
-| Repository infrastructure | CI, issue policy, static checks and development conventions | Ongoing maintenance and milestone closeout |
+| Repository infrastructure | CI, issue policy, static checks and development conventions, [certified for v0.1.0](docs/evidence/certification-2026-11-08.md) | Ongoing maintenance |
 | Methodology | Regulatory basis, source copy, BA-CVA input definitions and test-case format | Calculation implementation and numerical validation |
-| VBA regression harness | Neutral example suite, evidence tooling and [recorded Excel smoke-test PASS](docs/evidence/excel-run-194e9cd.md) | Candidate closeout and validation of future changes |
+| VBA regression harness | Neutral example suite, evidence tooling and [recorded Excel smoke-test PASS](docs/evidence/excel-run-194e9cd.md) | Validation of future changes |
 | Calculation product | No engine, public API or workbook | Future implementation, testing and release |
 
-**No version, tag or workbook has been released.** The current milestone is
-**v0.1.0 — Repo setup**. Follow the [closeout checklist](docs/CLOSEOUT.md),
-[change history](CHANGELOG.md) and [release procedure](RELEASING.md).
+**No version, tag or workbook has been released.** Milestone
+**v0.1.0 — Repo setup** is closed: its infrastructure was certified on
+2026-11-08, as the [certification record](docs/evidence/certification-2026-11-08.md)
+and the [file audit](docs/evidence/v0.1.0-file-audit.md) show. The open
+milestone is **v0.2.0 — Prototype setup**. See the
+[closeout checklist](docs/CLOSEOUT.md), [change history](CHANGELOG.md) and
+[release procedure](RELEASING.md).
 
 ## Getting started
 
@@ -99,6 +103,11 @@ The regression harness exercises a neutral example suite, with no CVA formula.
 A [maintainer-supplied Excel run](docs/evidence/excel-run-194e9cd.md) records
 compile and scaffold-run PASS for its exact candidate and host; the raw bundle
 remains with the maintainer and no CVA calculation is validated.
+The v0.1.0 [file audit](docs/evidence/v0.1.0-file-audit.md) reviews every
+tracked file of its candidate, and the
+[certification record](docs/evidence/certification-2026-11-08.md) reconciles
+each setup issue with its evidence and records the final acceptance. Both
+certify the repository setup only, not a calculation.
 The methodology documents retain the
 regulatory source and describe the inputs and evidence expected for future work.
 
@@ -128,6 +137,7 @@ See [CI coverage](docs/CI.md), [tooling](tools/README.md) and
 | [NOTICE.md](NOTICE.md), [LICENSE](LICENSE) | Copyright, provenance and the MPL-2.0 licence |
 | [CHANGELOG.md](CHANGELOG.md), [RELEASING.md](RELEASING.md) | What changed, versions and the release procedure |
 | [docs/CLOSEOUT.md](docs/CLOSEOUT.md) | The v0.1.0 closeout checklist and evidence index |
+| [docs/evidence/](docs/evidence/) | Retained evidence: the [Excel scaffold run](docs/evidence/excel-run-194e9cd.md), the [v0.1.0 file audit](docs/evidence/v0.1.0-file-audit.md) and [certification record](docs/evidence/certification-2026-11-08.md) |
 | [docs/TRAFFIC.md](docs/TRAFFIC.md) | Repository traffic history: schedule, credential, stored data, recovery |
 
 </details>
