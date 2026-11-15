@@ -11,7 +11,8 @@ not matched with regular expressions. Rules (docs/CI.md, Workflow rules):
 - every ``uses:`` names an action or workflow at a full commit SHA;
 - every ``actions/checkout`` step sets ``persist-credentials: false``;
 - the required check runs on ``pull_request`` and ``push`` without path filters,
-  and its job has no ``if:`` condition and keeps its check name.
+  on pull requests to any base and on pushes to exactly ``main`` and
+  ``release/**``, and its job has no ``if:`` condition and keeps its check name.
 """
 
 from __future__ import annotations
@@ -165,9 +166,13 @@ def check_required(name: str, workflow: Mapping[Any, Any]) -> list[str]:
             branches = config.get("branches")
             listed = [branches] if isinstance(branches, str) else list(branches or [])
             missing = [branch for branch in REQUIRED_PUSH_BRANCHES if branch not in listed]
+            extra = [branch for branch in listed if branch not in REQUIRED_PUSH_BRANCHES]
             if missing:
                 found.append(f"{name}: required check's push branches must include "
                              f"{', '.join(missing)}")
+            if extra:
+                found.append(f"{name}: required check's push branches must not list "
+                             f"{', '.join(map(str, extra))}")
     job = (workflow.get("jobs") or {}).get(job_id)
     if not isinstance(job, dict):
         return [*found, f"{name}: required job {job_id} is missing"]

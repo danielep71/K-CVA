@@ -161,6 +161,10 @@ class RequiredCheckTests(unittest.TestCase):
                 "r.yml: required check's push branches must include main, release/**",
             (PUSH_BRANCHES, PUSH_BRANCHES + "    branches-ignore: [wip/**]\n"):
                 "r.yml: required check must not filter push by branches-ignore",
+            (PUSH_BRANCHES, "  push:\n    branches: [main, 'release/**', 'task/**']\n"):
+                "r.yml: required check's push branches must not list task/**",
+            (PUSH_BRANCHES, "  push:\n    branches: [main, 'release/**', '!main']\n"):
+                "r.yml: required check's push branches must not list !main",
         }
         for (old, new), message in cases.items():
             with self.subTest(new=new):
