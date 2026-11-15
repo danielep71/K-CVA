@@ -1,7 +1,8 @@
 name: Repository integrity
 on:
+  # Every pull request, whatever its base, gets the required check; pushes
+  # run it only where they land (tools/check_workflows.py enforces both).
   pull_request:
-    branches: [main, 'release/**']
   push:
     branches: [main, 'release/**']
   workflow_dispatch:

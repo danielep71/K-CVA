@@ -74,6 +74,10 @@ workbook. The #180 entry adds the unvalidated prototype port for v0.2.0.
 
 ### Changed
 
+- `Repository integrity` runs on pull requests to any base, stacked ones
+  included, and on pushes only to `main` and `release/**`; the workflow
+  checker fails if those filters drift (#205).
+
 - A sync PR needs no new automated review when its head is the integration
   merge commit, its diff against the release branch is empty and the
   integration's final-head review covered the same tree; its record names
