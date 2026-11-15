@@ -11,7 +11,8 @@ not matched with regular expressions. Rules (docs/CI.md, Workflow rules):
 - every ``uses:`` names an action or workflow at a full commit SHA;
 - every ``actions/checkout`` step sets ``persist-credentials: false``;
 - the required check runs on ``pull_request`` and ``push`` without path filters,
-  and its job has no ``if:`` condition and keeps its check name.
+  on pull requests to any base and on pushes to exactly ``main`` and
+  ``release/**``, and its job has no ``if:`` condition and keeps its check name.
 """
 
 from __future__ import annotations
@@ -39,6 +40,10 @@ WRITE_ALLOWED: dict[tuple[str, str], frozenset[str]] = {
     ("traffic-history.yml", "collect"): frozenset({"contents"}),
 }
 REQUIRED_CHECK = ("repository-integrity.yml", "integrity", "Repository integrity")
+# Pushes run the required check only where they land: the default branch, by
+# name, and the release branches. A task-branch push would repeat the run its
+# pull request already makes on the same head.
+REQUIRED_PUSH_BRANCHES = ("main", "release/**")
 PINNED = re.compile(r"[\w.-]+/[\w./-]+@[0-9a-f]{40}")
 
 
@@ -140,7 +145,8 @@ def check(name: str, workflow: Mapping[Any, Any]) -> list[str]:
 
 
 def check_required(name: str, workflow: Mapping[Any, Any]) -> list[str]:
-    """The required check must run unfiltered and unconditionally under its name."""
+    """The required check runs on every pull request and on pushes where they land,
+    unconditionally and under its name."""
     _, job_id, check_name = REQUIRED_CHECK
     found: list[str] = []
     on = triggers(workflow)
@@ -152,6 +158,21 @@ def check_required(name: str, workflow: Mapping[Any, Any]) -> list[str]:
         for key in ("paths", "paths-ignore"):
             if key in config:
                 found.append(f"{name}: required check must not filter {event} by {key}")
+        if "branches-ignore" in config:
+            found.append(f"{name}: required check must not filter {event} by branches-ignore")
+        if event == "pull_request" and "branches" in config:
+            found.append(f"{name}: required check must run on pull requests to any base")
+        if event == "push":
+            branches = config.get("branches")
+            listed = [branches] if isinstance(branches, str) else list(branches or [])
+            missing = [branch for branch in REQUIRED_PUSH_BRANCHES if branch not in listed]
+            extra = [branch for branch in listed if branch not in REQUIRED_PUSH_BRANCHES]
+            if missing:
+                found.append(f"{name}: required check's push branches must include "
+                             f"{', '.join(missing)}")
+            if extra:
+                found.append(f"{name}: required check's push branches must not list "
+                             f"{', '.join(map(str, extra))}")
     job = (workflow.get("jobs") or {}).get(job_id)
     if not isinstance(job, dict):
         return [*found, f"{name}: required job {job_id} is missing"]

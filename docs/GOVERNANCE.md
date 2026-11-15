@@ -40,8 +40,10 @@ A release branch does not imply publication.
    and merge it using a merge commit. Record whether its file diff is empty.
 5. Do not merge task PRs into release between integration and sync. If a task
    accidentally enters this window, cut a recovery branch from release, merge
-   main into it and use a merge PR back into release. Verify its diff is empty
-   before applying the sync review exception. Do not relax protection.
+   main into it and use a merge PR back into release. That PR is reviewed as
+   usual unless it meets every condition that exempts a sync PR in
+   [Review of the final head](#review-of-the-final-head).
+   Do not relax protection.
 6. If main receives unrelated commits while release has unique commits, stop
    integration and record the maintainer's recovery decision.
 
@@ -65,9 +67,15 @@ Bot-authored PRs require maintainer final-head review; do not change authorship
 to obtain a review. If required review is unavailable, keep the PR open and
 record the blocker rather than treating absent review as success.
 
-A sync PR with a verified empty file diff needs only applicable CI, with that
-evidence recorded in the PR. A sync PR changing files needs normal final-head
-review. `Repository integrity` must pass on the sync head as on other
+A sync PR needs no new automated review when all three hold:
+
+1. its head is the integration merge commit;
+2. its file diff against the release branch is empty;
+3. the integration PR's final-head review covered the same tree.
+
+Its record names that review, with the empty-diff evidence. A sync PR that
+changes any file, or that misses a condition, needs normal final-head review.
+`Repository integrity` must pass on the sync head in every case, as on other
 protected-branch PRs.
 
 ## Protection policy and verified controls

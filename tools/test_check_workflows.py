@@ -31,13 +31,11 @@ build:
         persist-credentials: false
 """
 
+PUSH_BRANCHES = "  push:\n    branches: [main, 'release/**']\n"
 REQUIRED = f"""\
 on:
   pull_request:
-    branches: [main]
-  push:
-    branches: [main]
-permissions:
+{PUSH_BRANCHES}permissions:
   contents: read
 jobs:
   integrity:
@@ -135,8 +133,8 @@ class RequiredCheckTests(unittest.TestCase):
 
     def test_path_filters_conditions_and_names_fail(self) -> None:
         cases = {
-            "    branches: [main]\n  push:": "    paths: [src/**]\n  push:",
-            "  push:\n    branches: [main]\n": "  push:\n    paths-ignore: [docs/**]\n",
+            "  pull_request:\n": "  pull_request:\n    paths: [src/**]\n",
+            PUSH_BRANCHES: PUSH_BRANCHES + "    paths-ignore: [docs/**]\n",
             "    name: Repository integrity\n": "    name: Repository integrity\n"
                                                "    if: github.actor != 'bot'\n",
         }
@@ -145,9 +143,35 @@ class RequiredCheckTests(unittest.TestCase):
                 self.assertTrue(check_required("r.yml", load(REQUIRED.replace(old, new, 1))))
         renamed = REQUIRED.replace("name: Repository integrity", "name: Integrity")
         self.assertTrue(check_required("r.yml", load(renamed)))
-        no_push = REQUIRED.replace("  push:\n    branches: [main]\n", "")
+        no_push = REQUIRED.replace(PUSH_BRANCHES, "")
         self.assertIn("r.yml: required check must run on push",
                       check_required("r.yml", load(no_push)))
+
+    def test_branch_filters_keep_every_pull_request_and_the_landing_pushes(self) -> None:
+        cases = {
+            ("  pull_request:\n", "  pull_request:\n    branches: [main]\n"):
+                "r.yml: required check must run on pull requests to any base",
+            ("  pull_request:\n", "  pull_request:\n    branches-ignore: [wip/**]\n"):
+                "r.yml: required check must not filter pull_request by branches-ignore",
+            (PUSH_BRANCHES, "  push:\n    branches: [main]\n"):
+                "r.yml: required check's push branches must include release/**",
+            (PUSH_BRANCHES, "  push:\n    branches: ['release/**']\n"):
+                "r.yml: required check's push branches must include main",
+            (PUSH_BRANCHES, "  push:\n"):
+                "r.yml: required check's push branches must include main, release/**",
+            (PUSH_BRANCHES, PUSH_BRANCHES + "    branches-ignore: [wip/**]\n"):
+                "r.yml: required check must not filter push by branches-ignore",
+            (PUSH_BRANCHES, "  push:\n    branches: [main, 'release/**', 'task/**']\n"):
+                "r.yml: required check's push branches must not list task/**",
+            (PUSH_BRANCHES, "  push:\n    branches: [main, 'release/**', '!main']\n"):
+                "r.yml: required check's push branches must not list !main",
+        }
+        for (old, new), message in cases.items():
+            with self.subTest(new=new):
+                self.assertIn(message, check_required("r.yml", load(REQUIRED.replace(old, new, 1))))
+        single = REQUIRED.replace(PUSH_BRANCHES, "  push:\n    branches: main\n")
+        self.assertIn("r.yml: required check's push branches must include release/**",
+                      check_required("r.yml", load(single)))
 
 
 class RepositoryTests(unittest.TestCase):
