@@ -74,6 +74,10 @@ workbook. The #180 entry adds the unvalidated prototype port for v0.2.0.
 
 ### Changed
 
+- `Repository integrity` runs on pull requests to any base, stacked ones
+  included, and on pushes only to `main` and `release/**`; the workflow
+  checker fails if those filters drift (#205).
+
 - Retry transient actionlint download failures and cache its locked archive in
   CI; checksum verification remains mandatory on every use (#186).
 
