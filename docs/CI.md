@@ -256,6 +256,7 @@ error, so a later key cannot silently replace an earlier one.
 | Every `uses:` names an action or reusable workflow at a full 40-character commit SHA | Tags and branches can move |
 | Every `actions/checkout` step sets `persist-credentials: false` | The token is not left in the checkout for later steps |
 | `repository-integrity.yml` runs on `pull_request` and `push` without `paths` or `paths-ignore`, its job `integrity` has no `if:` and keeps the name `Repository integrity` | The required check must report on every pull request and push it protects |
+| That workflow's `pull_request` has no branch filter, and its `push` lists `main` and `release/**`, with no `branches-ignore` | Every pull request gets the check, a stacked one included; a task-branch push would repeat the run its pull request makes on the same head. Skipping the job with `if:` instead would not work: a skipped run of the required check counts as passing |
 
 The current allowlist: `codeql.yml` job `analyze` may write `security-events`;
 `labels-sync.yml` job `reconcile` may write `issues`; `pr-milestones.yml` job
