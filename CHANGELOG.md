@@ -74,6 +74,11 @@ workbook. The #180 entry adds the unvalidated prototype port for v0.2.0.
 
 ### Changed
 
+- A sync PR needs no new automated review when its head is the integration
+  merge commit, its diff against the release branch is empty and the
+  integration's final-head review covered the same tree; its record names
+  that review, and the required check still runs (#206).
+
 - Retry transient actionlint download failures and cache its locked archive in
   CI; checksum verification remains mandatory on every use (#186).
 
