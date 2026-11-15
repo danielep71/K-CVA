@@ -62,8 +62,8 @@ prevent report creation; upload then fails rather than claiming evidence exists.
 Download selected evidence before expiry if it must be retained under #11.
 
 The stable job/check name is **Repository integrity**. It runs without path
-filters on PRs targeting main/release/**, pushes to those branches, and manual
-dispatch. It has contents:read only and does not receive a write token. Main and release/** rulesets require this check from GitHub Actions with strict
+filters on every pull request, whatever its base, on pushes to main and
+release/** only, and on manual dispatch. It has contents:read only and does not receive a write token. Main and release/** rulesets require this check from GitHub Actions with strict
 up-to-date enforcement, configured under #12. Release creation alone is exempt;
 subsequent updates require checks. See [settings evidence](REPOSITORY_SETTINGS.md).
 The controlled failing/passing exercise of #13 is recorded in
@@ -256,7 +256,7 @@ error, so a later key cannot silently replace an earlier one.
 | Every `uses:` names an action or reusable workflow at a full 40-character commit SHA | Tags and branches can move |
 | Every `actions/checkout` step sets `persist-credentials: false` | The token is not left in the checkout for later steps |
 | `repository-integrity.yml` runs on `pull_request` and `push` without `paths` or `paths-ignore`, its job `integrity` has no `if:` and keeps the name `Repository integrity` | The required check must report on every pull request and push it protects |
-| That workflow's `pull_request` has no branch filter, and its `push` lists `main` and `release/**`, with no `branches-ignore` | Every pull request gets the check, a stacked one included; a task-branch push would repeat the run its pull request makes on the same head. Skipping the job with `if:` instead would not work: a skipped run of the required check counts as passing |
+| That workflow's `pull_request` has no branch filter, and its `push` lists exactly `main` and `release/**`, with no other pattern (a negation included) and no `branches-ignore` | Every pull request gets the check, a stacked one included; a task-branch push would repeat the run its pull request makes on the same head. Skipping the job with `if:` instead would not work: a skipped run of the required check counts as passing |
 
 The current allowlist: `codeql.yml` job `analyze` may write `security-events`;
 `labels-sync.yml` job `reconcile` may write `issues`; `pr-milestones.yml` job
